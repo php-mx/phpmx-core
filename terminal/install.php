@@ -2,7 +2,6 @@
 
 use PhpMx\Dir;
 use PhpMx\File;
-use PhpMx\Path;
 use PhpMx\Terminal;
 
 return new class extends Terminal {
