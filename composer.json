@@ -27,7 +27,8 @@
             "helper/function/uuid.php",
             "helper/script/env.php",
             "helper/script/error.php",
-            "helper/script/log.php"
+            "helper/script/log.php",
+            "helper/script/path.php"
         ]
     },
     "require": {

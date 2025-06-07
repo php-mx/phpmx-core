@@ -43,11 +43,7 @@ abstract class Path
   /** Retorna os caminhos registrados em path */
   static function registred(): array
   {
-    return [
-      '',
-      ...self::$paths,
-      self::format(dirname(__DIR__, 2)),
-    ];
+    return array_reverse(self::$paths);
   }
 
   /** Busca e retorna um arquivo utilizando os caminhos registrados */
