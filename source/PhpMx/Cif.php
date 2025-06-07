@@ -2,7 +2,7 @@
 
 namespace PhpMx;
 
-use Error;
+use Exception;
 
 abstract class Cif
 {
@@ -149,7 +149,7 @@ abstract class Cif
     private static function loadFileCif(string $path)
     {
         if (!File::check($path))
-            throw new Error("Cif file [$path] not found.");
+            throw new Exception("Cif file [$path] not found.");
 
         $content = Import::content($path);
         $content = str_replace([" ", "\t", "\n", "\r", "\0", "\x0B"], '', $content);

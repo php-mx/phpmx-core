@@ -7,50 +7,69 @@ abstract class File
     /** Cria um arquivo de texto */
     static function create(string $path, string $content, bool $recreate = false): ?bool
     {
-        if ($recreate || !self::check($path)) {
-            $path = Path::format($path);
-            Dir::create($path);
-            $fp = fopen($path, 'w');
-            fwrite($fp, $content);
-            fclose($fp);
-            return true;
-        }
-        return null;
+        $path = Path::format($path);
+
+        return log_add('file', 'create [#]', [$path], function () use ($path, $content, $recreate) {
+            if ($recreate || !self::check($path)) {
+                $path = Path::format($path);
+                Dir::create($path);
+                $fp = fopen($path, 'w');
+                fwrite($fp, $content);
+                fclose($fp);
+                return true;
+            }
+            return null;
+        });
     }
 
     /** Remove um arquivo */
     static function remove(string $path): ?bool
     {
-        if (self::check($path)) {
-            $path = Path::format($path);
-            unlink($path);
-            return !is_file($path);
-        }
-        return null;
+        $path = Path::format($path);
+
+        return log_add('file', 'remove [#]', [$path], function () use ($path) {
+            if (self::check($path)) {
+                $path = Path::format($path);
+                unlink($path);
+                return !is_file($path);
+            }
+            return null;
+        });
     }
 
     /** Cria uma copia de um arquivo */
-    static function copy(string $path_from, string $path_for, bool $recreate = false): ?bool
+    static function copy(string $path_from, string $path_to, bool $replace = false): ?bool
     {
-        if ($recreate || !self::check($path_for)) {
-            if (self::check($path_from)) {
-                Dir::create($path_for);
-                return boolval(copy(Path::format($path_from), Path::format($path_for)));
+        $path_from = Path::format($path_from);
+        $path_to = Path::format($path_to);
+
+        return log_add('file', 'copy [#] to [#]', [$path_from, $path_to], function () use ($path_from, $path_to, $replace) {
+            if ($replace || !self::check($path_to)) {
+                if (self::check($path_from)) {
+                    Dir::create($path_to);
+                    return boolval(copy(Path::format($path_from), Path::format($path_to)));
+                }
             }
-        }
-        return null;
+            return null;
+        });
     }
 
     /** Altera o local de um arquivo */
-    static function move(string $path_from, string $path_for, bool $replace = false): ?bool
+    static function move(string $path_from, string $path_to, bool $replace = false): ?bool
     {
-        if ($replace || !self::check($path_for)) {
-            if (self::check($path_from)) {
-                Dir::create($path_for);
-                return boolval(rename(Path::format($path_from), Path::format($path_for)));
+
+        $path_from = Path::format($path_from);
+        $path_to = Path::format($path_to);
+
+        return log_add('file', 'move [#] to [#]', [$path_from, $path_to], function () use ($path_from, $path_to, $replace) {
+            if ($replace || !self::check($path_to)) {
+                if (self::check($path_from)) {
+                    Dir::create($path_to);
+                    return boolval(rename(Path::format($path_from), Path::format($path_to)));
+                }
             }
-        }
-        return null;
+            return null;
+        });
     }
 
     /** Retorna apenas o nome do arquivo com a extensão */

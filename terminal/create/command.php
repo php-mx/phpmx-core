@@ -18,7 +18,7 @@ return new class extends Terminal {
         $commandFile = File::setEx($commandFile, 'php');
 
         if (File::check($commandFile))
-            throw new Error("Command [$command] already exists in project");
+            throw new Exception("Command [$command] already exists in project");
 
         $template = Path::seekFile('storage/template/terminal/command.txt');
         $template = Import::content($template, ['command' => $command]);

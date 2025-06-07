@@ -1,0 +1,148 @@
+<?php
+
+namespace PhpMx;
+
+abstract class Log
+{
+  protected static array $log = [];
+  protected static bool $started = false;
+
+  /** Inicia a captura do log */
+  static function start($message, $prepare = [])
+  {
+    if (self::$started) return;
+
+    self::$started = true;
+
+    self::$log[] = [
+      'type' => '_MX',
+      'message' => prepare($message, $prepare),
+      'isGroup' => true,
+      'closed' => false,
+      'time' => microtime(true),
+      'memory' => memory_get_usage(),
+      'lines' => [],
+    ];
+  }
+
+  /** Interrompe a captura do log */
+  static function stop(): void
+  {
+    if (!self::$started) return;
+
+    while (self::currentLogGroup()) self::close(self::currentLogGroup());
+
+    self::$started = false;
+  }
+
+  /** Retorna o log em forma de array */
+  static function get(): array
+  {
+    self::stop();
+    return self::$log;
+  }
+
+  /** Retorna o log em forma de string */
+  static function getString(): string
+  {
+    $log = self::get();
+    $logString = self::stringifyLogGroup($log);
+    return trim($logString);
+  }
+
+  /** Adicona ao log uma linha ou um escopo de linhas */
+  static function add($type, $message, $prepare = [], $isGroup = false)
+  {
+    if (!self::$started) return;
+
+    $log = &self::currentLogGroup();
+
+    $line = [
+      'type' => $type,
+      'message' => prepare($message, $prepare),
+      'isGroup' => $isGroup,
+    ];
+
+    if ($isGroup) {
+      $line['closed'] = false;
+      $line['time'] = microtime(true);
+      $line['memory'] = memory_get_usage(true);
+      $line['lines'] = [];
+    }
+
+    $log['lines'][] = $line;
+  }
+
+  /** Fecha o escopo atual do logo */
+  static function close()
+  {
+    if (!self::$started) return;
+    $log = &self::currentLogGroup();
+
+    $duration = microtime(true) - $log['time'];
+    $memory = memory_get_usage() - $log['memory'];
+    $log['closed'] = true;
+    $log['time'] = $duration > 1 ? self::formatTime($duration) : '';
+    $log['memory'] = $memory > 1 ?  self::formatMemory($memory) : '';
+  }
+
+  static function &currentLogGroup(?array &$group = null): ?array
+  {
+    if (is_null($group)) {
+      $lastKey = array_key_last(self::$log);
+      return self::currentLogGroup(self::$log[$lastKey]);
+    }
+
+    if ($group['closed']) return null;
+
+    if (empty($group['lines'])) return $group;
+
+    $lastKey = array_key_last($group['lines']);
+    $last = &$group['lines'][$lastKey];
+
+    if (!$last['isGroup']) return $group;
+
+    $lastGroup = &self::currentLogGroup($last);
+
+    if (is_null($lastGroup)) return $group;
+
+    return self::currentLogGroup($last);
+  }
+
+  protected static function stringifyLogGroup(array $logGroup, int $level = 0): string
+  {
+    $output = '';
+    $indent = str_repeat('| ', $level);
+
+    foreach ($logGroup as $entry) {
+
+      $type = trim($entry['type'], '_');
+      $message = $entry['message'];
+      $time = $entry['time'] ? ' ' . $entry['time'] : '';
+      $memory = $entry['memory'] ? ' ' . $entry['memory'] : '';
+      $line = "[$type] $message$time$memory";
+      $output .= "$indent$line\n";
+
+      if ($entry['isGroup'] && !empty($entry['lines']))
+        $output .= self::stringifyLogGroup($entry['lines'], $level + 1);
+    }
+
+    return $output;
+  }
+
+  protected static function formatTime(float $seconds): string
+  {
+    if ($seconds < 1) return round($seconds * 1000, 2) . 'ms';
+    if ($seconds < 60) return round($seconds, 2) . 's';
+    if ($seconds < 3600) return round($seconds / 60, 2) . 'm';
+    return round($seconds / 3600, 2) . 'h';
+  }
+
+  protected static function formatMemory(int $bytes): string
+  {
+    if ($bytes < 1024) return $bytes . 'b';
+    if ($bytes < 1048576) return round($bytes / 1024, 2) . 'kb';
+    if ($bytes < 1073741824) return round($bytes / 1048576, 2) . 'mb';
+    return round($bytes / 1073741824, 2) . 'gb';
+  }
+}

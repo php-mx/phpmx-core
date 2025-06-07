@@ -9,18 +9,21 @@ abstract class Dir
     {
         $path = self::getOnly($path);
 
-        if (!is_dir($path)) {
-            $createList = explode('/', $path);
-            $createPath = '';
-            foreach ($createList as $creating) {
-                $createPath = ($createPath == '') ? $creating : self::getOnly("$createPath/$creating");
-                if ($createPath != '.' && $createPath != '..' && !empty($createPath) && !self::check($createPath)) {
-                    mkdir($createPath);
+        if (empty($path)) return null;
+
+        return log_add('dir', "create [#]", [$path], function () use ($path) {
+            if (!is_dir($path)) {
+                $createList = explode('/', $path);
+                $createPath = '';
+                foreach ($createList as $creating) {
+                    $createPath = ($createPath == '') ? $creating : self::getOnly("$createPath/$creating");
+                    if ($createPath != '.' && $createPath != '..' && !empty($createPath) && !self::check($createPath))
+                        mkdir($createPath);
                 }
+                return is_dir($path);
             }
-            return is_dir($path);
-        }
-        return null;
+            return null;
+        });
     }
 
     /** Remove um diretório */
@@ -28,79 +31,93 @@ abstract class Dir
     {
         $path = self::getOnly($path);
 
-        if (is_dir($path)) {
-            if ($recursive || empty(self::seekForAll($path))) {
-                $drop = function ($path, $function) {
-                    foreach (scandir($path) as $item) {
-                        if ($item != '.' && $item != '..') {
-                            if (is_dir("$path/$item")) {
-                                $function("$path/$item", $function);
-                            } else {
-                                unlink("$path/$item");
+        return log_add('dir', "remove [#]", [$path], function () use ($path, $recursive) {
+            if (is_dir($path)) {
+                if ($recursive || empty(self::seekForAll($path))) {
+                    $drop = function ($path, $function) {
+                        foreach (scandir($path) as $item) {
+                            if ($item != '.' && $item != '..') {
+                                if (is_dir("$path/$item")) {
+                                    $function("$path/$item", $function);
+                                } else {
+                                    unlink("$path/$item");
+                                }
                             }
                         }
-                    }
-                    rmdir($path);
-                };
-                $drop($path, $drop);
+                        rmdir($path);
+                    };
+                    $drop($path, $drop);
+                }
+                return !is_dir($path);
             }
-            return !is_dir($path);
-        }
-        return null;
+            return null;
+        });
     }
 
     /** Cria uma copia de um diretório */
-    static function copy(string $path_from, string $path_for, bool $replace = false): ?bool
+    static function copy(string $path_from, string $path_to, bool $replace = false): ?bool
     {
-        if (self::check($path_from)) {
-            self::create($path_for);
-            $copy = function ($from, $for, $replace, $function) {
-                foreach (self::seekForDir($from) as $dir) {
-                    $function("$from/$dir", "$for/$dir", $replace, $function);
-                }
-                foreach (self::seekForFile($from) as $file) {
-                    File::copy("$from/$file", "$for/$file", $replace);
-                }
-            };
-            $copy($path_from, $path_for, $replace, $copy);
-            return true;
-        }
-        return null;
+        $path_from = Path::format($path_from);
+        $path_to = Path::format($path_to);
+
+        return log_add('dir', 'copy [#] to [#]', [$path_from, $path_to], function () use ($path_from, $path_to, $replace) {
+            if (self::check($path_from)) {
+                self::create($path_to);
+                $copy = function ($from, $to, $replace, $function) {
+                    foreach (self::seekForDir($from) as $dir) {
+                        $function("$from/$dir", "$to/$dir", $replace, $function);
+                    }
+                    foreach (self::seekForFile($from) as $file) {
+                        File::copy("$from/$file", "$to/$file", $replace);
+                    }
+                };
+                $copy($path_from, $path_to, $replace, $copy);
+                return true;
+            }
+            return null;
+        });
     }
 
     /** Altera o local de um diretório */
-    static function move(string $path_from, string $path_for): ?bool
+    static function move(string $path_from, string $path_to): ?bool
     {
-        if (!self::check($path_for) && self::check($path_from)) {
-            $path_from = Path::format($path_from);
-            $path_for = Path::format($path_for);
-            return boolval(rename($path_from, $path_for));
-        }
-        return null;
+        $path_from = Path::format($path_from);
+        $path_to = Path::format($path_to);
+
+        return log_add('dir', 'move [#] to [#]', [$path_from, $path_to], function () use ($path_from, $path_to) {
+            if (!self::check($path_to) && self::check($path_from)) {
+                $path_from = Path::format($path_from);
+                $path_to = Path::format($path_to);
+                return boolval(rename($path_from, $path_to));
+            }
+            return null;
+        });
     }
 
     /** Vasculha um diretório em busca de arquivos */
     static function seekForFile(string $path, bool $recursive = false): array
     {
-        $return = [];
-        foreach (self::seekForAll($path, $recursive) as $item) {
-            if (File::check("$path/$item")) {
-                $return[] = $item;
-            }
-        }
-        return $return;
+        $path = Path::format($path);
+        return log_add('dir', 'seek for file in [#]', [$path], function () use ($path, $recursive) {
+            $return = [];
+            foreach (self::seekForAll($path, $recursive) as $item)
+                if (File::check("$path/$item"))
+                    $return[] = $item;
+            return $return;
+        });
     }
 
     /** Vasculha um diretório em busca de diretórios */
     static function seekForDir(string $path, bool $recursive = false): array
     {
-        $return = [];
-        foreach (self::seekForAll($path, $recursive) as $item) {
-            if (self::check("$path/$item")) {
-                $return[] = $item;
-            }
-        }
-        return $return;
+        $path = Path::format($path);
+        return log_add('dir', 'seek for dir in [#]', [$path], function () use ($path, $recursive) {
+            $return = [];
+            foreach (self::seekForAll($path, $recursive) as $item)
+                if (self::check("$path/$item"))
+                    $return[] = $item;
+            return $return;
+        });
     }
 
     /** Vasculha um diretório em busca de arquivos e diretórios */
@@ -112,11 +129,9 @@ abstract class Dir
             foreach (scandir($path) as $item) {
                 if ($item != '.' && $item != '..') {
                     $return[] = $item;
-                    if ($recursive && self::check("$path/$item")) {
-                        foreach (self::seekForAll("$path/$item", true) as $subItem) {
+                    if ($recursive && self::check("$path/$item"))
+                        foreach (self::seekForAll("$path/$item", true) as $subItem)
                             $return[] = "$item/$subItem";
-                        }
-                    }
                 }
             }
         }
@@ -129,9 +144,8 @@ abstract class Dir
         $path = Path::format($path);
         if (!is_dir($path) && $path != '.') {
             $path = explode('/', $path);
-            if (strpos(end($path), '.') !== false) {
+            if (strpos(end($path), '.') !== false)
                 array_pop($path);
-            }
             $path = implode('/', $path);
         }
         return $path;

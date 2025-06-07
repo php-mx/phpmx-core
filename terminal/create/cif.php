@@ -12,7 +12,7 @@ return new class extends Terminal {
         $file = File::setEx($file, 'crt');
 
         if (File::check($file))
-            throw new Error("Cif file [$cifName] already exists");
+            throw new Exception("Cif file [$cifName] already exists");
 
         $allowChar = Cif::BASE;
 
