@@ -6,6 +6,7 @@ abstract class Log
 {
   protected static array $log = [];
   protected static bool $started = false;
+  protected static array $count = ['MX' => 0];
 
   /** Inicia a captura do log */
   static function start($message, $prepare = [])
@@ -15,7 +16,7 @@ abstract class Log
     self::$started = true;
 
     self::$log[] = [
-      'type' => '_MX',
+      'type' => 'MX',
       'message' => prepare($message, $prepare),
       'isGroup' => true,
       'closed' => false,
@@ -39,14 +40,26 @@ abstract class Log
   static function get(): array
   {
     self::stop();
-    return self::$log;
+    return [
+      'log' => self::$log,
+      'count' => self::$count
+    ];
   }
 
   /** Retorna o log em forma de string */
   static function getString(): string
   {
     $log = self::get();
-    $logString = self::stringifyLogGroup($log);
+    $logString = "-------------------------\n";
+    $logString .= self::stringifyLogGroup($log);
+    $logString .= "-------------------------\n";
+
+    foreach (self::$count as $type => $count)
+      if ($count)
+        $logString .= "[$count] $type\n";
+
+    $logString .= "-------------------------\n";
+
     return trim($logString);
   }
 
@@ -56,6 +69,9 @@ abstract class Log
     if (!self::$started) return;
 
     $log = &self::currentLogGroup();
+
+    self::$count[$type] = self::$count[$type] ?? 0;
+    self::$count[$type]++;
 
     $line = [
       'type' => $type,
@@ -115,14 +131,12 @@ abstract class Log
     $indent = str_repeat('| ', $level);
 
     foreach ($logGroup as $entry) {
-
-      $type = trim($entry['type'], '_');
+      $type = $entry['type'];
       $message = $entry['message'];
       $time = $entry['time'] ? ' ' . $entry['time'] : '';
       $memory = $entry['memory'] ? ' ' . $entry['memory'] : '';
       $line = "[$type] $message$time$memory";
       $output .= "$indent$line\n";
-
       if ($entry['isGroup'] && !empty($entry['lines']))
         $output .= self::stringifyLogGroup($entry['lines'], $level + 1);
     }
