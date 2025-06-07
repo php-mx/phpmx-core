@@ -49,14 +49,17 @@ abstract class Log
   /** Retorna o log em forma de string */
   static function getString(): string
   {
-    $log = self::get();
+    $result = self::get();
+    $log = $result['log'];
+    $count = $result['count'];
+
     $logString = "-------------------------\n";
     $logString .= self::stringifyLogGroup($log);
     $logString .= "-------------------------\n";
 
-    foreach (self::$count as $type => $count)
-      if ($count)
-        $logString .= "[$count] $type\n";
+    foreach ($count as $type => $n)
+      if ($n)
+        $logString .= "[$n] $type\n";
 
     $logString .= "-------------------------\n";
 
