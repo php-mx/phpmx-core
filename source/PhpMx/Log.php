@@ -124,12 +124,16 @@ abstract class Log
 
   static protected function &currentLogGroup(?array &$group = null): ?array
   {
+
     if (is_null($group)) {
       $lastKey = array_key_last(self::$log);
       return self::currentLogGroup(self::$log[$lastKey]);
     }
 
-    if ($group['closed']) return null;
+    if ($group['closed']) {
+      $null = null;
+      return $null;
+    }
 
     if (empty($group['lines'])) return $group;
 
