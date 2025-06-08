@@ -14,7 +14,7 @@ if (!function_exists('log_add')) {
       $result = $scope();
       Log::close();
       return $result;
-    } catch (Exception $e) {
+    } catch (Exception | Error $e) {
       log_exception($e);
       Log::close();
       throw $e;
@@ -25,12 +25,13 @@ if (!function_exists('log_add')) {
 if (!function_exists('log_exception')) {
 
   /** Adiciona uma linha de exceção ao log */
-  function log_exception(Exception $e)
+  function log_exception(Exception | Error $e)
   {
+    $type = is_class($e, Error::class) ? 'ERROR' : 'exception';
     $message = $e->getMessage();
     $file = path($e->getFile());
     $line = $e->getLine();
 
-    Log::add('exception', "$message $file ($line)");
+    Log::add($type, "$message $file ($line)");
   }
 }
