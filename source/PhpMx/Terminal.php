@@ -12,7 +12,6 @@ abstract class Terminal
     {
         $showLog = false;
 
-
         $commandLine = array_map(fn($v) => trim($v), $commandLine);
         $commandLine = array_filter($commandLine, fn($v) => boolval($v));
 
