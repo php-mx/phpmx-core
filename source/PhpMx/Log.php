@@ -6,7 +6,7 @@ abstract class Log
 {
   protected static array $log = [];
   protected static bool $started = false;
-  protected static array $count = ['MX' => 1];
+  protected static array $count = ['mx' => 1];
 
   /** Inicia a captura do log */
   static function start($message, $prepare = [])
@@ -16,7 +16,7 @@ abstract class Log
     self::$started = true;
 
     self::$log[] = [
-      'type' => 'MX',
+      'type' => 'mx',
       'message' => prepare($message, $prepare),
       'isGroup' => true,
       'closed' => false,
