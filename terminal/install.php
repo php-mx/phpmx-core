@@ -3,6 +3,7 @@
 use PhpMx\Dir;
 use PhpMx\File;
 use PhpMx\Import;
+use PhpMx\Path;
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -20,7 +21,8 @@ return new class extends Terminal {
     File::copy(path(dirname(__FILE__, 2), '.gitignore'), './.gitignore');
     File::copy(path(dirname(__FILE__, 2), 'helper/script/path.php'), './helper/script/path.php');
 
-    $templateEnv = Import::content('storage/template/env.txt');
+    $templateEnv = Path::seekFile('storage/template/env.txt');
+    $templateEnv = Import::content($templateEnv);
     File::create('./.env', $templateEnv);
 
     Terminal::run('composer');
