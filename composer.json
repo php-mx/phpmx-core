@@ -39,7 +39,6 @@
     "ext-fileinfo": "*"
   },
   "bin": [
-    "phpmx",
     "mx"
   ]
 }
