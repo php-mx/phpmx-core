@@ -20,6 +20,8 @@ return new class extends Terminal {
             foreach ($this->getFilesIn($path, $origin) as $file) {
                 self::echo(' - [#ref] ([#file]) [[#status]]', $file);
             };
+
+            self::echo();
         }
     }
 
