@@ -39,9 +39,6 @@
         "ext-fileinfo": "*"
     },
     "bin": [
-        "install"
-    ],
-    "scripts": {
-        "phpmx": "@install"
-    }
+        "phpmx"
+    ]
 }

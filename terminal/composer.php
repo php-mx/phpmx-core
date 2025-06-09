@@ -6,7 +6,7 @@ use PhpMx\Terminal;
 
 return new class extends Terminal {
 
-    function __invoke()
+    function __invoke($forceDev = 0)
     {
         $composer = Json::import('composer');
 
@@ -32,7 +32,7 @@ return new class extends Terminal {
 
         self::echo('File [composer.json] updated');
 
-        env('DEV') ? self::instalInDev() : self::instalInProd();
+        $forceDev || env('DEV') ? self::instalInDev() : self::instalInProd();
     }
 
     protected static function instalInDev()

@@ -1,6 +1,28 @@
 <?php
 
-if (!file_exists('./mx'))
-  copy(__DIR__ . '/mx', './mx');
+use PhpMx\Dir;
+use PhpMx\File;
+use PhpMx\Import;
+use PhpMx\Path;
+use PhpMx\Terminal;
 
-echo shell_exec("php mx +install");
+return new class extends Terminal {
+
+  function __invoke()
+  {
+    Dir::create('helper');
+    Dir::create('helper/constant');
+    Dir::create('helper/function');
+    Dir::create('helper/script');
+    Dir::create('source');
+    Dir::create('storage');
+    Dir::create('terminal');
+
+    File::copy(path(dirname(__FILE__, 2), '.gitignore'), './.gitignore');
+    File::copy(path(dirname(__FILE__, 2), 'helper/script/path.php'), './helper/script/path.php');
+
+    $templateEnv = Path::seekFile('storage/template/env.txt');
+    $templateEnv = Import::content($templateEnv);
+    File::create('./.env', $templateEnv);
+  }
+};
