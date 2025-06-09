@@ -19,7 +19,7 @@ return new class extends Terminal {
             self::echoLine();
 
             foreach ($this->getCommandsIn($path, $origin) as $command) {
-                self::echo(' - [#terminal] ([#file]) [[#status]]', $command);
+                self::echo(' - [#terminal] ([#file])[#status]', $command);
 
                 foreach ($command['variations'] as $variation)
                     self::echo('     php mx [#][#]', [$command['terminal'], $variation]);
@@ -72,7 +72,7 @@ return new class extends Terminal {
                 'terminal' => $terminal,
                 'file' => $file,
                 'variations' => $variations,
-                'status' => $this->used[$terminal] == $origin ? 'ok' : 'replaced in ' . $this->used[$terminal]
+                'status' => $this->used[$terminal] == $origin ? '' : ' [replaced in ' . $this->used[$terminal] . ']'
             ];
         }
         ksort($commands);
