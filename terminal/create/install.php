@@ -16,6 +16,7 @@ return new class extends Terminal {
             throw new Exception("Installation script [$command] already exists in project");
 
         $template = Path::seekFile('storage/template/terminal/install.txt');
+        $template = Import::content($template);
 
         File::create($commandFile, $template);
 
