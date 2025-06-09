@@ -12,7 +12,8 @@ abstract class File
         return log_add('file', 'create [#]', [$path], function () use ($path, $content, $recreate) {
             if ($recreate || !self::check($path)) {
                 $path = Path::format($path);
-                Dir::create($path);
+                if (File::getOnly($path) != Dir::getOnly($path))
+                    Dir::create($path);
                 $fp = fopen($path, 'w');
                 fwrite($fp, $content);
                 fclose($fp);
