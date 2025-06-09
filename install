@@ -18,8 +18,11 @@ return new class extends Terminal {
     Dir::create('storage');
     Dir::create('terminal');
 
-    File::copy(path(dirname(__FILE__, 1), '.gitignore'), './.gitignore');
     File::copy(path(dirname(__FILE__, 1), 'helper/script/path.php'), './helper/script/path.php');
+
+    $templateIgnore = Path::seekFile('storage/template/ignore.txt');
+    $templateIgnore = Import::content($templateIgnore);
+    File::create('./.gitignore', $templateIgnore);
 
     $templateEnv = Path::seekFile('storage/template/env.txt');
     $templateEnv = Import::content($templateEnv);
@@ -28,5 +31,15 @@ return new class extends Terminal {
     $template = Path::seekFile('storage/template/mx.txt');
     $template = Import::content($template);
     File::create('./mx', $template);
+
+    $ignore = Import::content('.gitignore');
+
+    if (strpos($ignore, "#phpmx-core") === false) {
+      $ignore .= "\n#phpmx-core";
+      $ignore .= "\n/storage/certificate";
+      $ignore .= "\n";
+    }
+
+    File::create('.gitignore', $ignore, true);
   }
 };

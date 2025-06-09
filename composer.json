@@ -1,44 +1,44 @@
 {
-  "name": "phpmx/core",
-  "description": "Núcleo base para criação de aplicações modernas com PHP MX",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "André Ricardo",
-      "email": "contatoadmx@gmail.com"
-    }
-  ],
-  "autoload": {
-    "psr-4": {
-      "": "source/"
+    "name": "phpmx/core",
+    "description": "Núcleo base para criação de aplicações modernas com PHP MX",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "André Ricardo",
+            "email": "contatoadmx@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "source/"
+        },
+        "files": [
+            "helper/constant/char_normalizer.php",
+            "helper/constant/is_terminal.php",
+            "helper/function/changes.php",
+            "helper/function/dbug.php",
+            "helper/function/env.php",
+            "helper/function/is.php",
+            "helper/function/log.php",
+            "helper/function/num.php",
+            "helper/function/path.php",
+            "helper/function/prepare.php",
+            "helper/function/remove_accents.php",
+            "helper/function/str.php",
+            "helper/function/uuid.php",
+            "helper/script/env.php",
+            "helper/script/error.php",
+            "helper/script/log.php",
+            "helper/script/path.php"
+        ]
     },
-    "files": [
-      "helper/constant/char_normalizer.php",
-      "helper/constant/is_terminal.php",
-      "helper/function/changes.php",
-      "helper/function/dbug.php",
-      "helper/function/env.php",
-      "helper/function/is.php",
-      "helper/function/log.php",
-      "helper/function/num.php",
-      "helper/function/path.php",
-      "helper/function/prepare.php",
-      "helper/function/remove_accents.php",
-      "helper/function/str.php",
-      "helper/function/uuid.php",
-      "helper/script/env.php",
-      "helper/script/error.php",
-      "helper/script/log.php",
-      "helper/script/path.php"
+    "require": {
+        "php": "^8.3",
+        "ext-exif": "*",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*"
+    },
+    "bin": [
+        "mx"
     ]
-  },
-  "require": {
-    "php": "^8.3",
-    "ext-exif": "*",
-    "ext-mbstring": "*",
-    "ext-fileinfo": "*"
-  },
-  "bin": [
-    "mx"
-  ]
 }
