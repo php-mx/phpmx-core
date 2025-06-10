@@ -37,7 +37,11 @@ abstract class Dir
                     $drop = function ($path, $function) {
                         foreach (scandir($path) as $item)
                             if ($item != '.' && $item != '..')
-                                is_dir("$path/$item") ? $function("$path/$item", $function) : unlink("$path/$item");
+                                if (is_dir("$path/$item")) {
+                                    $function("$path/$item", $function);
+                                } else {
+                                    unlink("$path/$item");
+                                }
                         rmdir($path);
                     };
                     $drop($path, $drop);
