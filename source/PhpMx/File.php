@@ -77,7 +77,9 @@ abstract class File
     static function getOnly(string $path): string
     {
         $path = Path::format($path);
+
         $path = explode('/', $path);
+
         return array_pop($path);
     }
 
@@ -85,29 +87,34 @@ abstract class File
     static function getName(string $path): string
     {
         $fileName = self::getOnly($path);
+
         $ex = self::getEx($path);
-        return substr($fileName, 0, (strlen($ex) + 1) * -1);
+
+        $ex = substr($fileName, 0, (strlen($ex) + 1) * -1);
+
+        return $ex;
     }
 
     /** Retorna apenas a extensão do arquivo */
     static function getEx(string $path): string
     {
         $parts = explode('.', self::getOnly($path));
+
         return strtolower(end($parts));
     }
 
     /** Define/Altera a extensão de um arquivo */
     static function setEx(string $path, string $extension = 'php'): string
     {
+        $extension = trim($extension, '.');
+
         if (!str_ends_with($path, ".$extension")) {
             $path = explode('.', $path);
-
             if (count($path) > 1) array_pop($path);
-
             $path[] = $extension;
-
             $path = implode('.', $path);
         }
+
         return $path;
     }
 
@@ -124,7 +131,7 @@ abstract class File
 
         if (!self::check($path)) return '-';
 
-        $size =  filesize($path);
+        $size = filesize($path);
 
         if ($human) {
             $units = [' b', ' kb', ' mb', ' gb', ' tb'];
@@ -133,8 +140,7 @@ abstract class File
                 $size /= 1024;
                 $i++;
             }
-
-            $size = round($size, 2) .  $units[$i];
+            $size = round($size, 2) . $units[$i];
         }
 
         return $size;
@@ -144,6 +150,9 @@ abstract class File
     public static function getLastModified($path): ?int
     {
         $path = Path::format($path);
-        return self::check($path) ? filemtime($path) : null;
+
+        $lastModified = self::check($path) ? filemtime($path) : null;
+
+        return $lastModified;
     }
 }

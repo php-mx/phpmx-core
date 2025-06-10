@@ -35,15 +35,9 @@ abstract class Dir
             if (is_dir($path)) {
                 if ($recursive || empty(self::seekForAll($path))) {
                     $drop = function ($path, $function) {
-                        foreach (scandir($path) as $item) {
-                            if ($item != '.' && $item != '..') {
-                                if (is_dir("$path/$item")) {
-                                    $function("$path/$item", $function);
-                                } else {
-                                    unlink("$path/$item");
-                                }
-                            }
-                        }
+                        foreach (scandir($path) as $item)
+                            if ($item != '.' && $item != '..')
+                                is_dir("$path/$item") ? $function("$path/$item", $function) : unlink("$path/$item");
                         rmdir($path);
                     };
                     $drop($path, $drop);
@@ -64,12 +58,10 @@ abstract class Dir
             if (self::check($path_from)) {
                 self::create($path_to);
                 $copy = function ($from, $to, $replace, $function) {
-                    foreach (self::seekForDir($from) as $dir) {
+                    foreach (self::seekForDir($from) as $dir)
                         $function("$from/$dir", "$to/$dir", $replace, $function);
-                    }
-                    foreach (self::seekForFile($from) as $file) {
+                    foreach (self::seekForFile($from) as $file)
                         File::copy("$from/$file", "$to/$file", $replace);
-                    }
                 };
                 $copy($path_from, $path_to, $replace, $copy);
                 return true;
@@ -98,11 +90,14 @@ abstract class Dir
     static function seekForFile(string $path, bool $recursive = false): array
     {
         $path = Path::format($path);
+
         return log_add('dir', 'seek for file in [#]', [$path], function () use ($path, $recursive) {
             $return = [];
+
             foreach (self::seekForAll($path, $recursive) as $item)
                 if (File::check("$path/$item"))
                     $return[] = $item;
+
             return $return;
         });
     }
@@ -111,11 +106,14 @@ abstract class Dir
     static function seekForDir(string $path, bool $recursive = false): array
     {
         $path = Path::format($path);
+
         return log_add('dir', 'seek for dir in [#]', [$path], function () use ($path, $recursive) {
             $return = [];
+
             foreach (self::seekForAll($path, $recursive) as $item)
                 if (self::check("$path/$item"))
                     $return[] = $item;
+
             return $return;
         });
     }
@@ -124,6 +122,7 @@ abstract class Dir
     static function seekForAll(string $path, bool $recursive = false): array
     {
         $path = self::getOnly($path);
+
         $return = [];
         if (is_dir($path)) {
             foreach (scandir($path) as $item) {
@@ -135,6 +134,7 @@ abstract class Dir
                 }
             }
         }
+
         return $return;
     }
 
@@ -142,10 +142,11 @@ abstract class Dir
     static function getOnly(string $path): string
     {
         $path = Path::format($path);
-        if (!is_dir($path) && $path != '.') {
+        if ($path != '.' && !is_dir($path)) {
             $path = explode('/', $path);
-            if (strpos(end($path), '.') !== false)
-                array_pop($path);
+
+            if (strpos(end($path), '.') !== false) array_pop($path);
+
             $path = implode('/', $path);
         }
         return $path;

@@ -25,6 +25,7 @@
             "helper/function/prepare.php",
             "helper/function/remove_accents.php",
             "helper/function/str.php",
+            "helper/function/strCase.php",
             "helper/function/uuid.php",
             "helper/script/env.php",
             "helper/script/error.php",
