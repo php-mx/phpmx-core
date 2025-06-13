@@ -33,6 +33,7 @@ abstract class Log
 
         while (self::currentLogGroup()) self::close(self::currentLogGroup());
 
+        ksort(self::$count);
         self::$started = false;
     }
 
@@ -90,6 +91,8 @@ abstract class Log
 
         $log = &self::currentLogGroup();
 
+        $type = strToCamelCase($type);
+
         self::$count[$type] = self::$count[$type] ?? 0;
         self::$count[$type]++;
 
@@ -107,6 +110,25 @@ abstract class Log
         }
 
         $log['lines'][] = $line;
+    }
+
+    /** Altera a linha de log aberta */
+    static function change($type = null, $message = null, $prepare = [])
+    {
+        if (!self::$started) return;
+        $log = &self::currentLogGroup();
+
+        if ($type) {
+            $type = strToCamelCase($type);
+            self::$count[$log['type']]--;
+            self::$count[$type] = self::$count[$type] ?? 0;
+            self::$count[$type]++;
+            $log['type'] = $type;
+        }
+
+        if ($message) {
+            $log['message'] = prepare($message, $prepare);
+        }
     }
 
     /** Fecha o escopo atual do logo */
