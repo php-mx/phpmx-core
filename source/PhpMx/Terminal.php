@@ -134,6 +134,5 @@ abstract class Terminal
         self::echoLine();
         Terminal::run('composer');
         self::echo('Installation completed');
-        self::echo(Log::getString());
     }
 }
