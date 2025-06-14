@@ -8,38 +8,28 @@ use PhpMx\Terminal;
 
 return new class extends Terminal {
 
-  function __invoke()
-  {
-    Dir::create('helper');
-    Dir::create('helper/constant');
-    Dir::create('helper/function');
-    Dir::create('helper/script');
-    Dir::create('source');
-    Dir::create('storage');
-    Dir::create('terminal');
+    function __invoke()
+    {
+        Dir::create('helper');
+        Dir::create('helper/constant');
+        Dir::create('helper/function');
+        Dir::create('helper/script');
+        Dir::create('source');
+        Dir::create('storage');
+        Dir::create('terminal');
 
-    File::copy(path(dirname(__FILE__, 1), 'helper/script/path.php'), './helper/script/path.php');
+        File::copy(path(dirname(__FILE__, 1), 'helper/script/path.php'), './helper/script/path.php');
 
-    $templateIgnore = Path::seekFile('storage/template/ignore.txt');
-    $templateIgnore = Import::content($templateIgnore);
-    File::create('./.gitignore', $templateIgnore);
+        $templateIgnore = Path::seekFile('storage/template/ignore.txt');
+        $templateIgnore = Import::content($templateIgnore);
+        File::create('./.gitignore', $templateIgnore);
 
-    $templateEnv = Path::seekFile('storage/template/env.txt');
-    $templateEnv = Import::content($templateEnv);
-    File::create('./.env', $templateEnv);
+        $templateEnv = Path::seekFile('storage/template/env.txt');
+        $templateEnv = Import::content($templateEnv);
+        File::create('./.env', $templateEnv);
 
-    $template = Path::seekFile('storage/template/mx.txt');
-    $template = Import::content($template);
-    File::create('./mx', $template);
-
-    $ignore = Import::content('.gitignore');
-
-    if (strpos($ignore, "#phpmx-core") === false) {
-      $ignore .= "\n#phpmx-core";
-      $ignore .= "\n/storage/certificate";
-      $ignore .= "\n";
+        $template = Path::seekFile('storage/template/mx.txt');
+        $template = Import::content($template);
+        File::create('./mx', $template);
     }
-
-    File::create('.gitignore', $ignore, true);
-  }
 };
