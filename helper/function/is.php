@@ -120,10 +120,10 @@ if (!function_exists('is_closure')) {
 
 if (!function_exists('is_stringable')) {
 
-    /** Verifica se uma variavel é uma string ou um objeto Stringable */
+    /** Verifica se uma variavel é uma string ou algo que possa ser convertido para string */
     function is_stringable(mixed $var): bool
     {
-        return is_string($var) || ($var instanceof Stringable);
+        return is_string($var) || is_numeric($var) || ($var instanceof Stringable);
     }
 }
 
