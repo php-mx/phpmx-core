@@ -34,8 +34,7 @@
         ]
     },
     "require": {
-        "php": "^8.3",
-        "ext-exif": "*",
+        "php": "^8.1",
         "ext-mbstring": "*",
         "ext-fileinfo": "*"
     },
