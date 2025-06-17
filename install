@@ -18,6 +18,8 @@ return new class extends Terminal {
         Dir::create('storage');
         Dir::create('terminal');
 
+        Dir::remove('storage/cache');
+
         File::copy(path(dirname(__FILE__, 1), 'helper/script/path.php'), './helper/script/path.php');
 
         $templateIgnore = Path::seekFile('storage/template/ignore.txt');
