@@ -1,3 +1,5 @@
 /.env
 /vendor
 /composer.lock
+/storage/certificate/*
+!/storage/certificate/base.crt

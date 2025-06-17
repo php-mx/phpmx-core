@@ -31,5 +31,14 @@ return new class extends Terminal {
         $template = Path::seekFile('storage/template/mx.txt');
         $template = Import::content($template);
         File::create('./mx', $template);
+
+        $ignore = Import::content('.gitignore');
+
+        if (strpos($ignore, "#phpmx-core") === false) {
+            $ignore .= "\n#phpmx-core";
+            $ignore .= "\n/storage/certificate";
+            $ignore .= "\n";
+            File::create('.gitignore', $ignore, true);
+        }
     }
 };

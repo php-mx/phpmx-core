@@ -7,4 +7,6 @@ Env::loadFile('./.conf');
 
 Env::default('DEV', false);
 
+Env::default('CIF', 'base');
+
 Env::default('CODE', 'mxcodekey');
