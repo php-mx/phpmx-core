@@ -34,9 +34,9 @@
         ]
     },
     "require": {
-        "php": "^8.1",
         "ext-mbstring": "*",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "php": "^8.1"
     },
     "bin": [
         "mx"
