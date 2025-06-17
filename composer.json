@@ -15,6 +15,7 @@
         "files": [
             "helper/constant/char_normalizer.php",
             "helper/constant/is_terminal.php",
+            "helper/function/cache.php",
             "helper/function/changes.php",
             "helper/function/dbug.php",
             "helper/function/env.php",
