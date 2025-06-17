@@ -36,6 +36,7 @@ return new class extends Terminal {
 
         if (strpos($ignore, "#phpmx-core") === false) {
             $ignore .= "\n#phpmx-core";
+            $ignore .= "\n/storage/cache";
             $ignore .= "\n/storage/certificate";
             $ignore .= "\n";
             File::create('.gitignore', $ignore, true);
