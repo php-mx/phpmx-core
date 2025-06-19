@@ -18,7 +18,7 @@ return new class extends Terminal {
         Dir::create('storage');
         Dir::create('terminal');
 
-        Dir::remove('storage/cache');
+        Dir::remove('storage/cache', true);
 
         File::copy(path(dirname(__FILE__, 1), 'helper/script/path.php'), './helper/script/path.php');
 
