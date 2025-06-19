@@ -7,7 +7,7 @@ if (!function_exists('cache')) {
     /** Armazena e recupera o retorno de uma Closure em /storage/cache */
     function cache(string $cacheName, Closure $action): mixed
     {
-        $file = path('storage/cache', strToSnakeCase($cacheName));
+        $file = path('storage/cache', strToCamelCase($cacheName));
 
         $result = Json::import($file);
 
