@@ -11,28 +11,27 @@ abstract class Path
     {
         $path = array_values(func_get_args());
         $path = implode('/', $path);
+        $path = str_replace('\\', '/', $path);
+        $path = str_replace_all('//', '/', $path);
+
+        $currentPath = getcwd();
+        $currentPath = str_replace('\\', '/', $currentPath);
+        $currentPath = rtrim($currentPath, '/');
+
+        if (str_starts_with($path, $currentPath))
+            $path = substr($path, strlen($currentPath));
+
+        $path = ltrim($path, '/');
 
         if (str_starts_with($path, './'))
             $path = substr($path, 2);
 
-        if (str_starts_with($path, '/'))
-            $path = substr($path, 1);
-
-        $path = str_replace('\\', '/', $path);
         $path = str_trim($path, '/', '/ ');
         $path = str_replace_all('//', '/', $path);
 
-        $currentPath = getcwd();
-
-        $currentPath = str_replace('\\', '/', $currentPath);
-
-        if (str_starts_with($path, $currentPath)) {
-            $path = substr($path, strlen($currentPath));
-            $path = trim($path, '/');
-        }
-
         return $path;
     }
+
 
     /** Registra um novo caminho para importação de arquivos */
     static function register($path): void
