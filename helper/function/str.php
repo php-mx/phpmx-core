@@ -1,5 +1,32 @@
 <?php
 
+if (!function_exists('str_var')) {
+
+    /** Extrai uma variavel de dentro de uma string */
+    function str_get_var($var): mixed
+    {
+        if (!is_string($var))
+            return $var;
+
+        if ($var === 'null' || $var === 'NULL' || $var === '')
+            return null;
+
+        if ($var == 'true' || $var === 'TRUE')
+            return true;
+
+        if ($var === 'false' || $var === 'FALSE')
+            return false;
+
+        if (strval(intval($var)) === $var)
+            return intval($var);
+
+        if (strval(floatval($var)) === $var)
+            return floatval($var);
+
+        return $var;
+    }
+}
+
 if (!function_exists('str_replace_all')) {
 
     /** Substitua todas as ocorrências da string de pesquisa pela string de substituição */
@@ -118,32 +145,5 @@ if (!function_exists('mb_str_split')) {
             $parts = array($string);
         }
         return $parts;
-    }
-}
-
-if (!function_exists('str_var')) {
-
-    /** Extrai uma variavel de dentro de uma string */
-    function str_get_var($var): mixed
-    {
-        if (!is_string($var))
-            return $var;
-
-        if ($var === 'null' || $var === 'NULL' || $var === '')
-            return null;
-
-        if ($var == 'true' || $var === 'TRUE')
-            return true;
-
-        if ($var === 'false' || $var === 'FALSE')
-            return false;
-
-        if (strval(intval($var)) === $var)
-            return intval($var);
-
-        if (strval(floatval($var)) === $var)
-            return floatval($var);
-
-        return $var;
     }
 }

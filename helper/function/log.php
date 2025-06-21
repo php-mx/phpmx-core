@@ -5,12 +5,12 @@ use PhpMx\Log;
 if (!function_exists('log_add')) {
 
     /** Adicona ao log uma linha ou um escopo de linhas */
-    function log_add(string $type, string $mesasge, array $prepare = [], ?Closure $scope = null): mixed
+    function log_add(string $type, string $message, array $prepare = [], ?Closure $scope = null): mixed
     {
-        if (is_null($scope)) return Log::add($type, $mesasge, $prepare);
+        if (is_null($scope)) return Log::add($type, $message, $prepare);
 
         try {
-            Log::add($type, $mesasge, $prepare, true);
+            Log::add($type, $message, $prepare, true);
             $result = $scope();
             Log::close();
             return $result;

@@ -1,6 +1,6 @@
 <?php
 
-/** Array de caracteres especiais com os respectivos caracteres normais */
+/** Array que mapeia caracteres acentuados para suas versões normalizadas sem acento */
 define('CHAR_NORMALIZER', [
     ...[
         'ъ' => '-',
