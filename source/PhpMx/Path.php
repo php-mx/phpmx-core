@@ -32,7 +32,6 @@ abstract class Path
         return $path;
     }
 
-
     /** Registra um novo caminho para importação de arquivos */
     static function register($path): void
     {
