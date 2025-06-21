@@ -129,8 +129,8 @@ php mx teste
 
   - [cif](./doc/terminal/cif.md)
   - [code](./doc/terminal/code.md)
+  - [composer](./doc/terminal/composer.md)
   - [create](./doc/terminal/create.md)
   - [help](./doc/terminal/help.md)
-  - [composer](./doc/terminal/composer.md)
   - [install](./doc/terminal/install.md)
   - [promote](./doc/terminal/promote.md)
