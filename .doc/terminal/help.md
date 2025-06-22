@@ -12,7 +12,7 @@ Grupo de comandos para exibir informações de ajuda e estrutura do projeto PHPM
 Lista todos os comandos disponíveis no terminal, agrupando por origem (projeto ou pacotes).
 
 ```sh
-phpmx help command
+php mx help command
 ```
 
 - Exibe todos os comandos customizados e suas variações.
@@ -25,7 +25,7 @@ phpmx help command
 Lista todos os arquivos presentes no diretório `storage` e suas origens.
 
 ```sh
-phpmx help storage
+php mx help storage
 ```
 
 - Exibe todos os arquivos de storage, indicando se foram sobrescritos por pacotes.

@@ -11,7 +11,7 @@ Promove (copia) um arquivo de um pacote ou dependência para o projeto atual, pe
 ## Uso
 
 ```sh
-phpmx promote <arquivo>
+php mx promote <arquivo>
 ```
 
 - `<arquivo>`: Caminho relativo do arquivo a ser promovido para o projeto.
@@ -19,5 +19,5 @@ phpmx promote <arquivo>
 Exemplo:
 
 ```sh
-phpmx promote terminal/logo.php
+php mx promote terminal/logo.php
 ```

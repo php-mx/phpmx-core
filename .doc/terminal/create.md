@@ -12,7 +12,7 @@ Grupo de comandos para criação de artefatos no projeto PHPMX. Os subcomandos d
 Cria um novo certificado CIF no diretório `storage/certificate`.
 
 ```sh
-phpmx create cif <nome>
+php mx create cif <nome>
 ```
 
 - `<nome>`: Nome do arquivo de certificado a ser criado (sem extensão).
@@ -20,7 +20,7 @@ phpmx create cif <nome>
 Exemplo:
 
 ```sh
-phpmx create cif empresa123
+php mx create cif empresa123
 ```
 
 ---
@@ -30,7 +30,7 @@ phpmx create cif empresa123
 Cria um novo comando customizado no diretório `terminal/` a partir de um template.
 
 ```sh
-phpmx create command <nome>
+php mx create command <nome>
 ```
 
 - `<nome>`: Nome do comando a ser criado.
@@ -38,7 +38,7 @@ phpmx create command <nome>
 Exemplo:
 
 ```sh
-phpmx create command relatorio
+php mx create command relatorio
 ```
 
 ---

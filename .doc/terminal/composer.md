@@ -11,7 +11,7 @@ Atualiza o autoload do `composer.json` com os helpers do projeto e executa o com
 ## Uso
 
 ```sh
-phpmx composer
+php mx composer
 ```
 
 - Atualiza o arquivo `composer.json` para garantir que todos os helpers estejam no autoload.
@@ -24,6 +24,6 @@ phpmx composer
 ## Exemplo
 
 ```sh
-phpmx composer
-phpmx composer 1   # força modo dev
+php mx composer
+php mx composer 1   # força modo dev
 ```

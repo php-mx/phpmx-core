@@ -9,7 +9,7 @@ Grupo de comandos para aplicar e remover codificação em conteúdos no PHPMX. O
 Aplica codificação a um conteúdo fornecido.
 
 ```sh
-phpmx code on <conteúdo>
+php mx code on <conteúdo>
 ```
 
 - `<conteúdo>`: Texto a ser codificado.
@@ -17,7 +17,7 @@ phpmx code on <conteúdo>
 Exemplo:
 
 ```sh
-phpmx code on teste
+php mx code on teste
 ```
 
 ---
@@ -27,7 +27,7 @@ phpmx code on teste
 Remove a codificação de um conteúdo codificado.
 
 ```sh
-phpmx code off <conteúdo_codificado>
+php mx code off <conteúdo_codificado>
 ```
 
 - `<conteúdo_codificado>`: Texto codificado a ser decodificado.
@@ -35,5 +35,5 @@ phpmx code off <conteúdo_codificado>
 Exemplo:
 
 ```sh
-phpmx code off mjpgwtopwigptiriwunsrygvnosrvulnux
+php mx code off mjpgwtopwigptiriwunsrygvnosrvulnux
 ```
