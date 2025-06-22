@@ -1,17 +1,6 @@
 # PHPMX - CORE
 
-O PHPMX **não é um framework**, nem um pacote genérico que você injeta em qualquer projeto. Ele é o **núcleo conceitual e estrutural do ecossistema PHPMX**. Ao adotá-lo, você não está apenas instalando código — você está assumindo um compromisso com uma forma diferente de programar.
-
-A filosofia do PHPMX parte de três princípios fundamentais:
-
-1. **PHP como linguagem, não como ferramenta auxiliar**
-   O foco é no domínio pleno da linguagem, não em abstrações que escondem sua essência.
-
-2. **Autonomia do programador**
-   O sistema não impõe estrutura, design pattern ou convenção. Ele fornece ferramentas; você define a arquitetura.
-
-3. **Controle absoluto**
-   Zero mágica, zero acoplamento implícito. Tudo é explícito, extensível e rastreável.
+Núcleo base para criação de aplicações modernas com PHPMX
 
 ---
 
@@ -134,3 +123,20 @@ php mx teste
   - [help](./.doc/terminal/help.md)
   - [install](./.doc/terminal/install.md)
   - [promote](./.doc/terminal/promote.md)
+
+---
+
+[phpmx-core](https://github.com/php-mx/phpmx-core) | [phpmx-server](https://github.com/php-mx/phpmx-server) | [phpmx-datalayer](https://github.com/php-mx/phpmx-datalayer) | [phpmx-view](https://github.com/php-mx/phpmx-view)
+
+O PHPMX **não é um framework**, nem um pacote genérico que você injeta em qualquer projeto. Ele é o **núcleo conceitual e estrutural do ecossistema PHPMX**. Ao adotá-lo, você não está apenas instalando código — você está assumindo um compromisso com uma forma diferente de programar.
+
+A filosofia do PHPMX parte de três princípios fundamentais:
+
+1. **PHP como linguagem, não como ferramenta auxiliar**
+   O foco é no domínio pleno da linguagem, não em abstrações que escondem sua essência.
+
+2. **Autonomia do programador**
+   O sistema não impõe estrutura, design pattern ou convenção. Ele fornece ferramentas; você define a arquitetura.
+
+3. **Controle absoluto**
+   Zero mágica, zero acoplamento implícito. Tudo é explícito, extensível e rastreável.
