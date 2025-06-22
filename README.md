@@ -97,6 +97,7 @@ php mx teste
 - **Helper**
 
   - [constant](./.doc/helper/constant.md)
+  - [environment](./.doc/helper/environment.md)
   - [function](./.doc/helper/function.md)
 
 - **Souce**
