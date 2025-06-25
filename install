@@ -22,22 +22,25 @@ return new class extends Terminal {
 
         File::copy(path(dirname(__FILE__, 1), 'helper/script/path.php'), './helper/script/path.php');
 
-        $templateIgnore = Path::seekFile('storage/template/ignore.txt');
-        $templateIgnore = Import::content($templateIgnore);
-        File::create('./.gitignore', $templateIgnore);
+        $mxTemplateFile = Path::seekFile('storage/template/mx.txt');
+        $mxContent = Import::content($mxTemplateFile);
+        File::create("./mx", $mxContent);
 
-        $templateEnv = Path::seekFile('storage/template/env.txt');
-        $templateEnv = Import::content($templateEnv);
-        File::create('./.env', $templateEnv);
+        $env = Import::content('.env');
 
-        $template = Path::seekFile('storage/template/mx.txt');
-        $template = Import::content($template);
-        File::create('./mx', $template);
+        if (strpos($env, "#phpmx-core") === false) {
+            $env .= "\n#phpmx-server";
+            $env .= "\nDEV = true";
+            $env .= "\n";
+            File::create('.env', $env, true);
+        }
 
         $ignore = Import::content('.gitignore');
 
         if (strpos($ignore, "#phpmx-core") === false) {
             $ignore .= "\n#phpmx-core";
+            $ignore .= "\n/.env";
+            $ignore .= "\n/vendor";
             $ignore .= "\n/storage/cache";
             $ignore .= "\n/storage/certificate";
             $ignore .= "\n";

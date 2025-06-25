@@ -4,3 +4,4 @@
 /storage/cache
 /storage/certificate/*
 !/storage/certificate/base.crt
+
