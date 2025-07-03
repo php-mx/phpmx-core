@@ -2,7 +2,6 @@
 
 use PhpMx\File;
 use PhpMx\Import;
-use PhpMx\Path;
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -24,11 +23,7 @@ return new class extends Terminal {
 
         $migrationName = $migrationName ? strToSnakeCase("$time $migrationName") : $time;
 
-        $pathRef = func_get_args();
-        array_shift($pathRef);
-        $pathName = path(...$pathRef);
-
-        $migrationFile = path('migration', $migrationDbName, $pathName, $migrationName);
+        $migrationFile = path('system/datalayer', $migrationDbName, 'migration', $migrationName);
         $migrationFile = File::setEx($migrationFile, 'php');
 
         $template = path(CORE_PATH, 'storage/template/terminal/migration.txt');

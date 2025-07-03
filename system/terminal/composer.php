@@ -16,7 +16,7 @@ return new class extends Terminal {
 
         $composer['autoload']['psr-4'][''] = path('source/');
 
-        $autoImport = path('helper/');
+        $autoImport = path('system/helper/');
 
         $files = [];
 

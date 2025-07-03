@@ -1,11 +1,10 @@
 /.env
 /vendor
 /composer.lock
-/storage/cache
-/storage/certificate/*
-!/storage/certificate/base.crt
 
-/source/Model
-/storage/sqlite
-/storage/scheme/db*
-/system/migration
+/source/Model/*
+
+/storage/cache/*
+/storage/sqlite/*
+
+/system/datalayer/*

@@ -43,7 +43,7 @@ class Middleware
 
             $actionFile = path(...$action);
             $actionFile = File::setEx($actionFile, 'php');
-            $actionFile = path('middleware', $actionFile);
+            $actionFile = path('system/middleware', $actionFile);
 
             if (!File::check($actionFile))
                 $actionFile = path(CORE_PATH, $actionFile);

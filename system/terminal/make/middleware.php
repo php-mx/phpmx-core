@@ -11,7 +11,7 @@ return new class extends Terminal {
         $middleware = remove_accents($middleware);
 
         $middlewareFile = explode('.', $middleware);
-        $middlewareFile = path('middleware', ...$middlewareFile);
+        $middlewareFile = path('system/middleware', ...$middlewareFile);
         $middlewareFile = File::setEx($middlewareFile, 'php');
 
         if (File::check($middlewareFile))
