@@ -14,6 +14,7 @@
         },
         "files": [
             "helper/constant/char_normalizer.php",
+            "helper/constant/core_path.php",
             "helper/constant/is_terminal.php",
             "helper/function/cache.php",
             "helper/function/changes.php",
@@ -30,8 +31,7 @@
             "helper/function/uuid.php",
             "helper/script/env.php",
             "helper/script/error.php",
-            "helper/script/log.php",
-            "helper/script/path.php"
+            "helper/script/log.php"
         ]
     },
     "require": {
