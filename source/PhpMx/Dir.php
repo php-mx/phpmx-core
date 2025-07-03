@@ -55,8 +55,8 @@ abstract class Dir
     /** Cria uma copia de um diretório */
     static function copy(string $path_from, string $path_to, bool $replace = false): ?bool
     {
-        $path_from = Path::format($path_from);
-        $path_to = Path::format($path_to);
+        $path_from = path($path_from);
+        $path_to = path($path_to);
 
         return log_add('dir', 'copy [#] to [#]', [$path_from, $path_to], function () use ($path_from, $path_to, $replace) {
             if (self::check($path_from)) {
@@ -77,13 +77,13 @@ abstract class Dir
     /** Altera o local de um diretório */
     static function move(string $path_from, string $path_to): ?bool
     {
-        $path_from = Path::format($path_from);
-        $path_to = Path::format($path_to);
+        $path_from = path($path_from);
+        $path_to = path($path_to);
 
         return log_add('dir', 'move [#] to [#]', [$path_from, $path_to], function () use ($path_from, $path_to) {
             if (!self::check($path_to) && self::check($path_from)) {
-                $path_from = Path::format($path_from);
-                $path_to = Path::format($path_to);
+                $path_from = path($path_from);
+                $path_to = path($path_to);
                 return boolval(rename($path_from, $path_to));
             }
             return null;
@@ -93,7 +93,7 @@ abstract class Dir
     /** Vasculha um diretório em busca de arquivos */
     static function seekForFile(string $path, bool $recursive = false): array
     {
-        $path = Path::format($path);
+        $path = path($path);
 
         return log_add('dir', 'seek for file in [#]', [$path], function () use ($path, $recursive) {
             $return = [];
@@ -109,7 +109,7 @@ abstract class Dir
     /** Vasculha um diretório em busca de diretórios */
     static function seekForDir(string $path, bool $recursive = false): array
     {
-        $path = Path::format($path);
+        $path = path($path);
 
         return log_add('dir', 'seek for dir in [#]', [$path], function () use ($path, $recursive) {
             $return = [];
@@ -145,7 +145,7 @@ abstract class Dir
     /** Retorna um caminho sem referenciar arquivos */
     static function getOnly(string $path): string
     {
-        $path = Path::format($path);
+        $path = path($path);
         if ($path != '.' && !is_dir($path)) {
             $path = explode('/', $path);
 
@@ -159,6 +159,6 @@ abstract class Dir
     /** Verifica se um diretório existe */
     static function check(string $path): bool
     {
-        return is_dir(Path::format($path));
+        return is_dir(path($path));
     }
 }

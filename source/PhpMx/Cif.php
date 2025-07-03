@@ -137,9 +137,10 @@ abstract class Cif
         if (is_null(self::$CIF)) {
             $path = env('CIF');
 
-            $path = Path::seekFile("storage/certificate/$path.crt");
+            $path = path("storage/certificate/$path.crt");
 
-            if (!$path) $path = Path::seekFile("storage/certificate/base.crt");
+            if (!File::check($path))
+                $path = path(CORE_PATH, "storage/certificate/base.crt");
 
             self::loadFileCif($path);
         }

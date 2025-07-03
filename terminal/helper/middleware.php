@@ -1,7 +1,6 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\Path;
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -11,7 +10,7 @@ return new class extends Terminal {
     function __invoke()
     {
         self::echo();
-        foreach (Path::seekDirs('middleware') as $path) {
+        foreach ([path(CORE_PATH, 'middleware'), path('middleware')] as $path) {
             $origin = $this->getOrigim($path);
 
             self::echo('[[#]]', $origin);

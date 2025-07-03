@@ -2,7 +2,6 @@
 
 use PhpMx\File;
 use PhpMx\Import;
-use PhpMx\Path;
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -20,7 +19,7 @@ return new class extends Terminal {
         if (File::check($commandFile))
             throw new Exception("Command [$command] already exists in project");
 
-        $template = Path::seekFile('storage/template/terminal/command.txt');
+        $template = path(CORE_PATH, 'storage/template/terminal/command.txt');
         $template = Import::content($template, ['command' => $command]);
 
         File::create($commandFile, $template);

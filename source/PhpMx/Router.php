@@ -69,8 +69,10 @@ abstract class Router
     static function solve(array $globalMiddlewares = [])
     {
         list($middlewares, $wrapper) = log_add('mx', 'router solve', [], function () use ($globalMiddlewares) {
-            $paths = Path::seekDirs('routes');
-            $paths = array_reverse($paths);
+            $paths = [
+                path(CORE_PATH, 'routes'),
+                path('routes'),
+            ];
 
             foreach ($paths as $path)
                 foreach (Dir::seekForFile($path, true) as $file)

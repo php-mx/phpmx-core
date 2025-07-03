@@ -29,7 +29,7 @@ $interceptor = new class extends Terminal {
     {
         self::$MIDDLEWARES[] = $globalMiddlewares;
 
-        foreach (Path::seekDirs('routes') as $path) {
+        foreach ([path(CORE_PATH, 'routes'), path('routes')] as $path) {
             $origin = $this->getOrigim($path);
             self::echo('[#]', $origin);
             self::echoLine();

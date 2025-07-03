@@ -2,7 +2,7 @@
 
 use PhpMx\File;
 use PhpMx\Import;
-use PhpMx\Path;
+
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -21,7 +21,7 @@ return new class extends Terminal {
         $class = array_pop($controller);
         $namespace = implode('\\', ['Controller', ...$controller]);
 
-        $template = Path::seekFile('storage/template/terminal/controller.txt');
+        $template = path(CORE_PATH, 'storage/template/terminal/controller.txt');
         $template = Import::content($template, [
             'class' => $class,
             'namespace' => $namespace

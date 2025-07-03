@@ -7,7 +7,7 @@ abstract class Import
     /** Importa um arquivo PHP */
     static function only(string $filePath, bool $once = true): bool
     {
-        $filePath = Path::format($filePath);
+        $filePath = path($filePath);
         $filePath = File::setEx($filePath, 'php');
 
         return log_add('import', 'only [#]', [$filePath], function () use ($filePath, $once) {
@@ -20,7 +20,7 @@ abstract class Import
     /** Retorna o conteúdo de um aquivo */
     static function content(string $filePath, string|array $prepare = []): string
     {
-        $filePath = Path::format($filePath);
+        $filePath = path($filePath);
 
         return log_add('import', 'content [#]', [$filePath], function () use ($filePath, $prepare) {
             $content = File::check($filePath) ? file_get_contents($filePath) : '';
@@ -32,7 +32,7 @@ abstract class Import
     /** Retorna o resultado (return) em um arquivo php  */
     static function return(string $filePath, array $params = []): mixed
     {
-        $filePath = Path::format($filePath);
+        $filePath = path($filePath);
         $filePath = File::setEx($filePath, 'php');
 
         return log_add('import', 'return [#]', [$filePath], function () use ($filePath, $params) {
@@ -56,7 +56,7 @@ abstract class Import
     /** Retorna o valor de uma variavel dentro de em um arquivo php  */
     static function var(string $filePath, string $varName, array $params = []): mixed
     {
-        $filePath = Path::format($filePath);
+        $filePath = path($filePath);
         $filePath = File::setEx($filePath, 'php');
 
         return log_add('import', 'variable [#] in [#]', [$varName, $filePath], function () use ($filePath, $varName, $params) {
@@ -82,7 +82,7 @@ abstract class Import
     /** Retorna a saída de texto gerada por um arquivo */
     static function output(string $filePath, array $params = []): string
     {
-        $filePath = Path::format($filePath);
+        $filePath = path($filePath);
 
         return log_add('import', 'output [#]', [$filePath], function () use ($filePath,  $params) {
             if (File::check($filePath)) {

@@ -1,7 +1,6 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\Path;
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -10,7 +9,7 @@ return new class extends Terminal {
 
     function __invoke()
     {
-        foreach (Path::seekDirs('storage') as $path) {
+        foreach ([path(CORE_PATH, 'storage'), path('storage')] as $path) {
             $origin = $this->getOrigim($path);
 
             self::echo();

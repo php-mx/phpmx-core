@@ -45,9 +45,10 @@ class Middleware
             $actionFile = File::setEx($actionFile, 'php');
             $actionFile = path('middleware', $actionFile);
 
-            $actionFile = Path::seekFile($actionFile);
+            if (!File::check($actionFile))
+                $actionFile = path(CORE_PATH, $actionFile);
 
-            if (!$actionFile)
+            if (!File::check($actionFile))
                 throw new Exception("Middleware [$middleware] not found");
 
             $action = Import::return($actionFile);

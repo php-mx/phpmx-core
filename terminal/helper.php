@@ -2,7 +2,7 @@
 
 use PhpMx\Dir;
 use PhpMx\Import;
-use PhpMx\Path;
+
 use PhpMx\Terminal;
 
 return new class extends Terminal {
@@ -11,7 +11,7 @@ return new class extends Terminal {
 
     function __invoke($command = null)
     {
-        foreach (Path::seekDirs('terminal') as $path) {
+        foreach ([path(CORE_PATH, 'terminal'), path('terminal')] as $path) {
             $origin = $this->getOrigim($path);
 
             self::echo();
