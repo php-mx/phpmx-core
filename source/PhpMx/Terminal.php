@@ -36,7 +36,7 @@ abstract class Terminal
 
                 $commandFile = explode('.', $commandFile);
                 $commandFile = array_map(fn($v) => strtolower($v), $commandFile);
-                $commandFile = path('terminal', ...$commandFile);
+                $commandFile = path('system/terminal', ...$commandFile);
                 $commandFile = File::setEx($commandFile, 'php');
 
                 if (!$commandFile)
