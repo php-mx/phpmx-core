@@ -27,7 +27,6 @@ return new class extends Terminal {
         File::create("./mx", $mxContent);
 
         $env = Import::content('.env');
-
         if (strpos($env, "#phpmx-core") === false) {
             $env .= "\n#phpmx-core";
             $env .= "\nDEV = true";
@@ -36,7 +35,6 @@ return new class extends Terminal {
         }
 
         $ignore = Import::content('.gitignore');
-
         if (strpos($ignore, "#phpmx-core") === false) {
             $ignore .= "\n#phpmx-core";
             $ignore .= "\n/.env";
