@@ -1,6 +1,9 @@
 <?php
 
 /** Indica se a execução atual está sendo feita via terminal CLI */
+
+use PhpMx\Request;
+
 define('IS_TERMINAL', PHP_SAPI == 'cli');
 
 /** Se a requisição é do tipo GET */
@@ -20,3 +23,9 @@ define('IS_DELETE', !IS_TERMINAL && $_SERVER['REQUEST_METHOD'] == 'DELETE');
 
 /** Se a requisição é do tipo OPTIONS */
 define('IS_OPTIONS', !IS_TERMINAL && $_SERVER['REQUEST_METHOD'] == 'OPTIONS');
+
+/** Se a requisição é uma solicitação de api */
+define('IS_API', !IS_TERMINAL && Request::header('Request-Api'));
+
+/** Se a requisição é uma solicitação página parcial */
+define('IS_PARTIAL', !IS_TERMINAL && Request::header('Request-Partial'));

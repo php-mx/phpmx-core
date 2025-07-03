@@ -5,6 +5,7 @@ namespace PhpMx;
 use PhpMx\ViewRender\ViewRenderCss;
 use PhpMx\ViewRender\ViewRenderHtml;
 use PhpMx\ViewRender\ViewRenderJs;
+use PhpMx\ViewRender\ViewRenderVue;
 
 abstract class View
 {
@@ -18,11 +19,12 @@ abstract class View
 
     protected static array $MEDIA_STYLE = [];
 
-    static array $RENDER_EX_CLASS = [
+    protected static array $RENDER_EX_CLASS = [
         'php' => ViewRenderHtml::class,
         'html' => ViewRenderHtml::class,
         'css' => ViewRenderCss::class,
         'js' => ViewRenderJs::class,
+        'vue' => ViewRenderVue::class,
     ];
 
     /** Renderiza uma view e retorna seu conteúdo em forma de string */
