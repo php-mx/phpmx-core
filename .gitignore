@@ -5,3 +5,8 @@
 /storage/certificate/*
 !/storage/certificate/base.crt
 
+/migration
+/source/Model
+/storage/sqlite
+/storage/scheme/db*
+
