@@ -1,9 +1,8 @@
 <?php
 
-/** Indica se a execução atual está sendo feita via terminal CLI */
-
 use PhpMx\Request;
 
+/** Indica se a execução atual está sendo feita via terminal CLI */
 define('IS_TERMINAL', PHP_SAPI == 'cli');
 
 /** Se a requisição é do tipo GET */
