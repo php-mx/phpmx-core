@@ -6,7 +6,6 @@ use Exception;
 use PhpMx\Cif;
 use PhpMx\Code;
 use PhpMx\Mime;
-use PhpMx\Path;
 
 class Captcha
 {

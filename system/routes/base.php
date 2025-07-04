@@ -2,16 +2,13 @@
 
 use PhpMx\Router;
 
-Router::get('api', 'phpMx.status');
+Router::get('favicon.ico', 'base.favicon');
+Router::get('robots.txt', 'base.robots');
+Router::get('sitemap.xml', 'base.sitemap');
+Router::get('assets/...', 'base.assets');
+Router::get('download/...', 'base.download');
+Router::get('style.css', 'base.style');
+Router::get('script.js', 'base.script');
+Router::get('captcha', 'base.captcha');
 
-Router::get('favicon.ico', 'phpMx.favicon');
-Router::get('robots.txt', 'phpMx.robots');
-Router::get('sitemap.xml', 'phpMx.sitemap');
-
-Router::get('captcha', 'phpMx.captcha');
-
-Router::get('assets/...', 'phpMx.assets');
-Router::get('download/...', 'phpMx.download');
-
-Router::get('style.css', 'phpMx.assets:style');
-Router::get('script.js', 'phpMx.assets:script');
+Router::get('', STS_OK);

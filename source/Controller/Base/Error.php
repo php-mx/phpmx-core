@@ -1,6 +1,6 @@
 <?php
 
-namespace Controller\PhpMx\Energize;
+namespace Controller\Base;
 
 use PhpMx\Energize\Front;
 use PhpMx\View;
@@ -8,7 +8,7 @@ use Throwable;
 
 class Error
 {
-    function handleThrowable(Throwable $e)
+    static function handlePageThrowable(Throwable $e)
     {
         $status = $e->getCode();
         $message = env("STM_$status") ?? 'Erro desconhecido';
@@ -16,9 +16,6 @@ class Error
         Front::title($message);
         Front::layout(null);
 
-        return View::render('_base/error', [
-            'status' => $status,
-            'message' => $message,
-        ]);
+        return View::render('_base/error', ['status' => $status, 'message' => $message]);
     }
 }
