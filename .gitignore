@@ -2,9 +2,9 @@
 /vendor
 /composer.lock
 
-/source/Model/*
+/source/Model
 
-/storage/cache/*
-/storage/sqlite/*
+/storage/cache
+/storage/sqlite
 
-/system/datalayer/*
+/system/datalayer

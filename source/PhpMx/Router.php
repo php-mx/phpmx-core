@@ -76,16 +76,15 @@ abstract class Router
     static function solve(array $globalMiddlewares = [])
     {
         list($middlewares, $wrapper) = log_add('mx', 'router solve', [], function () use ($globalMiddlewares) {
-            $paths = [
-                path(CORE_PATH, 'routes'),
-                path('routes'),
-            ];
+            $routes = cache('routes-' . Request::type(), function () {
+                foreach ([path(CORE_PATH, 'system/routes'), path('system/routes')] as $path)
+                    foreach (Dir::seekForFile($path, true) as $file)
+                        Import::only("$path/$file", true);
 
-            foreach ($paths as $path)
-                foreach (Dir::seekForFile($path, true) as $file)
-                    Import::only("$path/$file", true);
+                return self::organize(self::$ROUTE);
+            });
 
-            $routeMatch = self::getRouteMatch();
+            $routeMatch = self::getRouteMatch($routes);
 
             if ($routeMatch) {
                 list($template, $response, $params, $middlewares) = $routeMatch;
@@ -96,6 +95,7 @@ abstract class Router
                 $wrapper = fn() => throw new Exception('Route not found', STS_NOT_FOUND);
                 $middlewares = $globalMiddlewares;
             }
+
             return [$middlewares, $wrapper];
         });
 
@@ -166,14 +166,11 @@ abstract class Router
     }
 
     /** Retorna o template da rota que corresponde a URL atual */
-    protected static function getRouteMatch(): ?array
+    protected static function getRouteMatch($routes): ?array
     {
-        $routes = self::organize(self::$ROUTE);
         foreach ($routes as $template => $route)
-            if (self::checkRouteMatch($template)) {
-                log_add('mx', 'route matching [[#]]', [$template]);
+            if (self::checkRouteMatch($template))
                 return $route;
-            }
         log_add('mx', 'route matching not found');
         return null;
     }
