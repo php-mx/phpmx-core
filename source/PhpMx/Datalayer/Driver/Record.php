@@ -235,17 +235,21 @@ abstract class Record
     /** Salva o registro no banco de dados */
     final function _save(bool $forceUpdate = false): static
     {
-        log_add('driver.save', "[#].[#]", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)], function () use ($forceUpdate) {
-            if ($this->_checkSave()) {
-                match (true) {
-                    $this->DELETE => $this->__runDelete(),
-                    $this->_checkInDb() => $this->__runUpdate($forceUpdate),
-                    default => $this->__runCreate()
-                };
-            } else {
-                Log::change('driver.save.aborted', '[#].[#] record cannot be saved', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]);
+        log_add(
+            'driver.save',
+            prepare("[#].[#]", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]),
+            function () use ($forceUpdate) {
+                if ($this->_checkSave()) {
+                    match (true) {
+                        $this->DELETE => $this->__runDelete(),
+                        $this->_checkInDb() => $this->__runUpdate($forceUpdate),
+                        default => $this->__runCreate()
+                    };
+                } else {
+                    Log::change('driver.save.aborted', prepare('[#].[#] record cannot be saved', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]));
+                }
             }
-        });
+        );
 
         return $this;
     }

@@ -9,7 +9,7 @@ abstract class Log
     protected static array $count = ['mx' => 1];
 
     /** Inicia a captura do log */
-    static function start($message, $prepare = [])
+    static function start($message)
     {
         if (self::$started) return;
 
@@ -17,7 +17,7 @@ abstract class Log
 
         self::$log[] = [
             'type' => 'mx',
-            'message' => prepare($message, $prepare),
+            'message' => $message,
             'isGroup' => true,
             'closed' => false,
             'time' => microtime(true),
@@ -85,7 +85,7 @@ abstract class Log
     }
 
     /** Adicona ao log uma linha ou um escopo de linhas */
-    static function add($type, $message, $prepare = [], $isGroup = false)
+    static function add($type, $message, $isGroup = false)
     {
         if (!self::$started) return;
 
@@ -98,7 +98,7 @@ abstract class Log
 
         $line = [
             'type' => $type,
-            'message' => prepare($message, $prepare),
+            'message' => $message,
             'isGroup' => $isGroup,
         ];
 
@@ -113,7 +113,7 @@ abstract class Log
     }
 
     /** Altera a linha de log aberta */
-    static function change($type = null, $message = null, $prepare = [])
+    static function change($type = null, $message = null)
     {
         if (!self::$started) return;
         $log = &self::currentLogGroup();
@@ -127,7 +127,7 @@ abstract class Log
         }
 
         if ($message) {
-            $log['message'] = prepare($message, $prepare);
+            $log['message'] = $message;
         }
     }
 

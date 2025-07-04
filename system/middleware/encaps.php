@@ -12,6 +12,9 @@ return new class {
         } catch (Exception | Error $e) {
             $this->encapsException($e);
         }
+
+        ddpre(debug_backtrace());
+
         Response::send();
     }
 

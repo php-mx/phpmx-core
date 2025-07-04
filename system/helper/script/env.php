@@ -45,3 +45,5 @@ Env::default('STM_503', 'service unavailable');
 Env::default('DB_MAIN_TYPE', 'sqlite');
 
 Env::default('COOKIE_LIFE', '+30 days');
+
+Env::default('USE_CACHE_FILE', true);

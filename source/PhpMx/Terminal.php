@@ -26,7 +26,7 @@ abstract class Terminal
         }
 
         if (empty($commandLine)) $commandLine = ['logo'];
-        $result = log_add('mx', 'terminal [#]', [implode(' ', $commandLine)], function () use ($commandLine) {
+        $result = log_add('mx', 'terminal ' . implode(' ', $commandLine), function () use ($commandLine) {
             try {
                 $command = array_shift($commandLine);
                 $params = $commandLine;

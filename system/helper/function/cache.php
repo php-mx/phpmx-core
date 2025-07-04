@@ -8,8 +8,11 @@ if (!function_exists('cache')) {
     function cache(string $cacheName, Closure $action): mixed
     {
         $cacheName = strToCamelCase($cacheName);
-        return log_add('cache', $cacheName, [], function () use ($cacheName, $action) {
+        return log_add('cache', $cacheName, function () use ($cacheName, $action) {
             $file = path('storage/cache', $cacheName);
+
+            if (!env('USE_CACHE_FILE'))
+                return $action();
 
             $result = Json::import($file);
 

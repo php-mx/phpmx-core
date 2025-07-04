@@ -75,7 +75,7 @@ abstract class Router
     /** Resolve a requisição atual enviando a reposta ao cliente */
     static function solve(array $globalMiddlewares = [])
     {
-        list($middlewares, $wrapper) = log_add('mx', 'router solve', [], function () use ($globalMiddlewares) {
+        list($middlewares, $wrapper) = log_add('mx', 'router solve', function () use ($globalMiddlewares) {
             $routes = cache('routes-' . Request::type(), function () {
                 foreach ([path(CORE_PATH, 'system/routes'), path('system/routes')] as $path)
                     foreach (Dir::seekForFile($path, true) as $file)
@@ -99,8 +99,8 @@ abstract class Router
             return [$middlewares, $wrapper];
         });
 
-        log_add('mx', 'route dispatch', [], function () use ($middlewares, $wrapper) {
-            $wrapper = fn() => log_add('mx', 'route action', [], $wrapper);
+        log_add('mx', 'route dispatch', function () use ($middlewares, $wrapper) {
+            $wrapper = fn() => log_add('mx', 'route action', $wrapper);
 
             $response = Middleware::run($middlewares, $wrapper);
 

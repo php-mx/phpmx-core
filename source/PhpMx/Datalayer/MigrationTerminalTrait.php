@@ -100,7 +100,7 @@ trait MigrationTerminalTrait
         $logAction = $mode ? 'up' : 'down';
         $logDdName = Datalayer::externalName(self::$dbName, 'db');
 
-        log_add("migration.$logAction", '[#] [[#]]', [$logDdName, $file,], function () use ($file, $mode) {
+        log_add("migration.$logAction", "$logDdName [$file]", function () use ($file, $mode) {
             Terminal::echo("run [#action] [#file]", [
                 'action' => $mode ? 'up' : 'down',
                 'file' => $file,
