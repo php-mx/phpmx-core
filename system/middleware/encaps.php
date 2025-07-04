@@ -13,8 +13,6 @@ return new class {
             $this->encapsException($e);
         }
 
-        ddpre(debug_backtrace());
-
         Response::send();
     }
 
