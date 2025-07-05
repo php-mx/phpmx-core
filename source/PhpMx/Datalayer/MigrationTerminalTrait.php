@@ -45,7 +45,7 @@ trait MigrationTerminalTrait
 
         Datalayer::get($dbName);
         self::$dbName = Datalayer::internalName($dbName);
-        self::$path = path('migration', self::$dbName);
+        self::$path = path('system/datalayer', self::$dbName, 'migration');
     }
 
     /** Retorna a lista de arquivos de migration */

@@ -9,7 +9,7 @@ return new class {
     {
         try {
             $this->encapsResponse($next());
-        } catch (Exception | Error $e) {
+        } catch (Throwable $e) {
             $this->encapsException($e);
         }
 
@@ -43,7 +43,7 @@ return new class {
         Response::content($response);
     }
 
-    function encapsException(Exception | Error $e): void
+    function encapsException(Throwable $e): void
     {
         $status = $e->getCode();
         $message = $e->getMessage();

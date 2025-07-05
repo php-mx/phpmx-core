@@ -2,12 +2,11 @@
 
 namespace PhpMx\Datalayer\Connection;
 
-use Error;
 use Exception;
 use PDO;
-use PDOException;
 use PhpMx\Datalayer\Query;
 use PhpMx\Datalayer\Query\BaseQuery;
+use Throwable;
 
 abstract class BaseConnection
 {
@@ -76,18 +75,16 @@ abstract class BaseConnection
             list($query, $data) = $query->query();
 
         return log_add('datalayer.query', $query, function () use ($query, $data) {
-            try {
-                $pdoQuery = $this->pdo()->prepare($query);
-                if (!$pdoQuery)
-                    throw new Exception("[$query]");
 
-                if (!$pdoQuery->execute($data)) {
-                    $error = $pdoQuery->errorInfo();
-                    $error = $error[2] ?? '-undefined-';
-                    throw new Exception("[$query] [$error]");
-                }
-            } catch (Error | Exception | PDOException $e) {
-                throw new Exception($e->getMessage());
+            $pdoQuery = $this->pdo()->prepare($query);
+
+            if (!$pdoQuery)
+                throw new Exception("[$query]");
+
+            if (!$pdoQuery->execute($data)) {
+                $error = $pdoQuery->errorInfo();
+                $error = $error[2] ?? '-undefined-';
+                throw new Exception("[$query] [$error]");
             }
 
             $type = explode(' ', $query);
@@ -113,7 +110,7 @@ abstract class BaseConnection
                 $query = $this->executeQuery(...$queryParams);
             }
             if ($transaction) $this->pdo()->commit();
-        } catch (Error | Exception | PDOException $e) {
+        } catch (Throwable $e) {
             if ($transaction) $this->pdo()->rollBack();
             throw $e;
         }

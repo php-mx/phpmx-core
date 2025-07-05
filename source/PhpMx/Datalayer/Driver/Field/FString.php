@@ -2,7 +2,6 @@
 
 namespace PhpMx\Datalayer\Driver\Field;
 
-use Exception;
 use PhpMx\Datalayer\Driver\Field;
 
 /** Armazena uma variavel em forma de string */

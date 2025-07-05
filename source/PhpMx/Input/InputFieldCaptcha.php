@@ -2,9 +2,9 @@
 
 namespace PhpMx\Input;
 
-use Exception;
 use PhpMx\Cif;
 use PhpMx\Code;
+use Throwable;
 
 class InputFieldCaptcha extends InputField
 {
@@ -20,7 +20,7 @@ class InputFieldCaptcha extends InputField
                 $key = Cif::off($captcha[0]);
                 $value = Code::on(strtoupper($captcha[1]));
                 return Code::compare($key, $value);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 return false;
             }
         }, 'Código de validação incorreto');

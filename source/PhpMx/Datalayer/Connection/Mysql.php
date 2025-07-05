@@ -2,10 +2,7 @@
 
 namespace PhpMx\Datalayer\Connection;
 
-use Error;
-use Exception;
 use PDO;
-use PDOException;
 use PhpMx\Cif;
 use PhpMx\Datalayer;
 use PhpMx\Datalayer\Query;
@@ -48,11 +45,7 @@ class Mysql extends BaseConnection
     {
         if (is_array($this->instancePDO)) {
             log_add('datalayer.start', prepare('[#] mysql', Datalayer::externalName($this->dbName, 'Db')), function () {
-                try {
-                    $this->instancePDO = new PDO(...$this->instancePDO);
-                } catch (Error | Exception | PDOException $e) {
-                    throw new Exception($e->getMessage());
-                }
+                $this->instancePDO = new PDO(...$this->instancePDO);
             });
         }
         return $this->instancePDO;
@@ -80,23 +73,18 @@ class Mysql extends BaseConnection
     /** Query para criação de tabelas */
     protected function schemeQueryCreateTable(string $tableName, ?string $comment, array $fields): array
     {
-        $queryFields = [
-            '`id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY'
-        ];
+        $queryFields = ['`id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY'];
 
         foreach ($fields['add'] ?? [] as $fielName => $field)
             if ($field)
                 $queryFields[] = $this->schemeTemplateField($fielName, $field);
 
         return [
-            Prepare::prepare(
-                "CREATE TABLE `[#name]` ([#fields]) DEFAULT CHARSET=utf8[#comment] ENGINE=InnoDB;",
-                [
-                    'name' => $tableName,
-                    'fields' => implode(', ', $queryFields),
-                    'comment' => $comment ? " COMMENT='$comment'" : ''
-                ]
-            )
+            Prepare::prepare("CREATE TABLE `[#name]` ([#fields]) DEFAULT CHARSET=utf8[#comment] ENGINE=InnoDB;", [
+                'name' => $tableName,
+                'fields' => implode(', ', $queryFields),
+                'comment' => $comment ? " COMMENT='$comment'" : ''
+            ])
         ];
     }
 
@@ -106,31 +94,31 @@ class Mysql extends BaseConnection
         $query = [];
 
         if (!is_null($comment)) {
-            $query[] = Prepare::prepare(
-                "ALTER TABLE `[#table]` COMMENT='[#comment]'",
-                ['table' => $tableName, 'comment' => $comment]
-            );
+            $query[] = Prepare::prepare("ALTER TABLE `[#table]` COMMENT='[#comment]'", [
+                'table' => $tableName,
+                'comment' => $comment
+            ]);
         }
 
         foreach ($fields['add'] as $fieldName => $fieldData) {
-            $query[] = Prepare::prepare(
-                'ALTER TABLE `[#table]` ADD COLUMN [#fieldQuery]',
-                ['table' => $tableName, 'fieldQuery' => $this->schemeTemplateField($fieldName, $fieldData)]
-            );
+            $query[] = Prepare::prepare('ALTER TABLE `[#table]` ADD COLUMN [#fieldQuery]', [
+                'table' => $tableName,
+                'fieldQuery' => $this->schemeTemplateField($fieldName, $fieldData)
+            ]);
         }
 
         foreach ($fields['drop'] as $fieldName => $fieldData) {
-            $query[] = Prepare::prepare(
-                'ALTER TABLE `[#table]` DROP COLUMN `[#fieldName]`',
-                ['table' => $tableName, 'fieldName' => $fieldName]
-            );
+            $query[] = Prepare::prepare('ALTER TABLE `[#table]` DROP COLUMN `[#fieldName]`', [
+                'table' => $tableName,
+                'fieldName' => $fieldName
+            ]);
         }
 
         foreach ($fields['alter'] as $fieldName => $fieldData) {
-            $query[] = Prepare::prepare(
-                'ALTER TABLE `[#table]` MODIFY COLUMN [#fieldQuery]',
-                ['table' => $tableName, 'fieldQuery' => $this->schemeTemplateField($fieldName, $fieldData)]
-            );
+            $query[] = Prepare::prepare('ALTER TABLE `[#table]` MODIFY COLUMN [#fieldQuery]', [
+                'table' => $tableName,
+                'fieldQuery' => $this->schemeTemplateField($fieldName, $fieldData)
+            ]);
         }
 
         return $query;

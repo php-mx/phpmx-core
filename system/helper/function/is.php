@@ -102,7 +102,7 @@ if (!function_exists('is_json')) {
             try {
                 json_decode($var);
                 return json_last_error() === JSON_ERROR_NONE;
-            } catch (Error | Exception) {
+            } catch (Throwable) {
             }
 
         return false;

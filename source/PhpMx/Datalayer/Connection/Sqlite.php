@@ -2,10 +2,7 @@
 
 namespace PhpMx\Datalayer\Connection;
 
-use Error;
-use Exception;
 use PDO;
-use PDOException;
 use PhpMx\Datalayer;
 use PhpMx\Datalayer\Query;
 use PhpMx\Dir;
@@ -51,12 +48,9 @@ class Sqlite extends BaseConnection
     {
         if (is_array($this->instancePDO)) {
             log_add('datalayer.start', prepare('[#] sqlite', Datalayer::externalName($this->dbName, 'Db')), function () {
-                try {
-                    if (!File::check($this->data['file'])) Dir::create($this->data['file']);
-                    $this->instancePDO = new PDO(...(array) $this->instancePDO);
-                } catch (Error | Exception | PDOException $e) {
-                    throw new Exception($e->getMessage());
-                }
+                if (!File::check($this->data['file']))
+                    Dir::create($this->data['file']);
+                $this->instancePDO = new PDO(...(array) $this->instancePDO);
             });
         }
         return $this->instancePDO;

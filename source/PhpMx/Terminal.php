@@ -2,9 +2,9 @@
 
 namespace PhpMx;
 
-use Error;
 use Exception;
 use ReflectionMethod;
+use Throwable;
 
 abstract class Terminal
 {
@@ -63,7 +63,7 @@ abstract class Terminal
                 }
 
                 return $action(...$params);
-            } catch (Exception | Error $e) {
+            } catch (Throwable $e) {
                 self::echo('Exception');
                 self::echo(' | [#]', $e->getMessage());
                 self::echo(' | [#] ([#])', [$e->getFile(), $e->getLine()]);

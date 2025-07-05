@@ -23,7 +23,7 @@ if (!function_exists('idKeyType')) {
     {
         try {
             return Cif::off($idKey)[0];
-        } catch (Error | Exception) {
+        } catch (Throwable) {
             return null;
         }
     }
@@ -37,7 +37,7 @@ if (!function_exists('idKeyId')) {
     {
         try {
             return Cif::off($idKey)[1];
-        } catch (Error | Exception) {
+        } catch (Throwable) {
             return null;
         }
     }
