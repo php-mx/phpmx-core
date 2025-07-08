@@ -11,9 +11,6 @@ abstract class Terminal
     /** Executa uma linha de comando */
     final static function run(...$commandLine)
     {
-        if (count($commandLine) == 1)
-            $commandLine = explode(' ', array_shift($commandLine));
-
         $showLog = false;
 
         $commandLine = array_map(fn($v) => trim($v), $commandLine);
@@ -135,7 +132,7 @@ abstract class Terminal
         }
 
         self::echoLine();
-        Terminal::run('composer 1');
+        Terminal::run('composer');
         self::echo('Installation completed');
     }
 }

@@ -9,7 +9,7 @@ return new class extends Terminal {
 
     protected $used = [];
 
-    function __invoke($command = null)
+    function __invoke()
     {
         foreach (Path::seekDirs('terminal') as $path) {
             $origin = $this->getOrigim($path);
@@ -18,13 +18,13 @@ return new class extends Terminal {
             self::echo('[[#]]', $origin);
             self::echoLine();
 
-            foreach ($this->getCommandsIn($path, $origin) as $cmd) {
-                if (is_null($command) || str_starts_with($cmd['terminal'], $command)) {
-                    self::echo(' - [#terminal] ([#file])[#status]', $cmd);
-                    foreach ($cmd['variations'] as $variation)
-                        self::echo('     php mx [#][#]', [$cmd['terminal'], $variation]);
-                    self::echo();
-                }
+            foreach ($this->getCommandsIn($path, $origin) as $command) {
+                self::echo(' - [#terminal] ([#file])[#status]', $command);
+
+                foreach ($command['variations'] as $variation)
+                    self::echo('     php mx [#][#]', [$command['terminal'], $variation]);
+
+                self::echo();
             };
         }
     }
@@ -51,24 +51,22 @@ return new class extends Terminal {
 
             $file = path($path, $ref);
 
+            $command = Import::return($file);
+
             $variations = [''];
 
-            $this->used[$terminal] = $this->used[$terminal] ?? $origin;
+            $invoke = new ReflectionMethod($command, '__invoke');
 
-            try {
-                $command = Import::return($file);
-                $invoke = new ReflectionMethod($command, '__invoke');
-                foreach ($invoke->getParameters() as $param) {
-                    $name = '<' . $param->getName() . '>';
-                    if (!$param->isOptional()) {
-                        $variations[0] .= " $name";
-                    } else {
-                        $variations[] = end($variations) . " $name";
-                    }
+            foreach ($invoke->getParameters() as $param) {
+                $name = '<' . $param->getName() . '>';
+                if (!$param->isOptional()) {
+                    $variations[0] .= " $name";
+                } else {
+                    $variations[] = end($variations) . " $name";
                 }
-            } catch (Throwable) {
-                $variations = [' <???>'];
             }
+
+            $this->used[$terminal] = $this->used[$terminal] ?? $origin;
 
             $commands[$terminal] = [
                 'terminal' => $terminal,
