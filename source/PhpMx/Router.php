@@ -37,6 +37,15 @@ abstract class Router
         if (IS_DELETE) self::defineRoute($route, $response, $middlewares);
     }
 
+    /** Adiciona uma rota para responder por chamadas do tipo página GET e POST */
+    static function page(string $route, string $response, array $middlewares = []): void
+    {
+        if (IS_TERMINAL || !IS_API) {
+            self::get($route, $response, $middlewares);
+            self::post($route, $response, $middlewares);
+        };
+    }
+
     /** Adiciona um caminho padrão para um conjunto de rotas */
     static function path(string $path, Closure $wrapper): void
     {

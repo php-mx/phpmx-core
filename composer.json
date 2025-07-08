@@ -37,6 +37,7 @@
             "helper/function/uuid.php",
             "helper/script/env.php",
             "helper/script/error.php",
+            "helper/script/front.php",
             "helper/script/log.php",
             "helper/script/path.php",
             "helper/script/view.php"
