@@ -35,7 +35,8 @@
             "helper/script/env.php",
             "helper/script/error.php",
             "helper/script/log.php",
-            "helper/script/path.php"
+            "helper/script/path.php",
+            "helper/script/view.php"
         ]
     },
     "require": {
