@@ -10,3 +10,5 @@ Env::default('DEV', false);
 Env::default('CIF', 'base');
 
 Env::default('CODE', 'mxcodekey');
+
+Env::default('DB_MAIN_TYPE', 'sqlite');
