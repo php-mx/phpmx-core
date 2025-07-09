@@ -29,6 +29,7 @@ return new class extends Terminal {
         self::echoLine();
 
         self::promote('system/helper/script/path.php');
+        self::promote('.htaccess');
         self::promote('index.php');
         self::promote('mx');
 
