@@ -15,7 +15,7 @@ Env::default('FORCE_SSL', true);
 
 Env::default('TERMINAL_URL', 'http://localhost:8888');
 
-Env::default('JWT', 'jwt-key');
+Env::default('JWT', 'jwtkey');
 
 Env::default('CACHE', null);
 Env::default('CACHE_JS', '+30 days');

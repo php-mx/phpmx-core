@@ -35,13 +35,20 @@ return new class extends Terminal {
 
         self::echoLine();
 
+        $env = "# PRIVATE ENVIRONMENT VARIABLES\n";
         $env = "DEV = true\n";
+        $env = "CIF = base\n";
+        $env = "CODE = mxcodekey\n";
+        $env = "JWT = jwtkey\n";
         self::file('.env', $env);
+
+        $conf = "# PUBLIC ENVIRONMENT VARIABLES\n";
+        self::file('.conf', $conf);
 
         $ignore = "/.env\n";
         $ignore .= "/class/Model/Db*/Driver\n";
-        $ignore .= "/storage/cache\n";
-        $ignore .= "/storage/certificate\n";
+        $ignore .= "/library/cache\n";
+        $ignore .= "/library/certificate\n";
         $ignore .= "/vendor\n";
         self::file('.gitignore', $ignore);
 
