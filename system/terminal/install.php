@@ -35,11 +35,9 @@ return new class extends Terminal {
 
         self::echoLine();
 
-        $env = "# PRIVATE ENVIRONMENT VARIABLES\n";
-        $env .= "DEV = true\n";
-        $env .= "CIF = base\n";
-        $env .= "CODE = mxcodekey\n";
-        $env .= "JWT = jwtkey\n";
+        $env = "# PRIVATE ENVIRONMENT VARIABLES\n\n";
+        $env .= "DEV = true\n\n";
+        $env .= "FORCE_SSL = false\n";
         self::file('.env', $env);
 
         $conf = "# PUBLIC ENVIRONMENT VARIABLES\n";
