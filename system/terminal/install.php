@@ -9,7 +9,7 @@ return new class extends Terminal {
     function __invoke()
     {
         self::structure('class');
-        self::structure('class/controller');
+        self::structure('class/Controller');
 
         self::echoLine();
 
@@ -31,7 +31,6 @@ return new class extends Terminal {
         self::promote('system/helper/script/path.php');
         self::promote('.htaccess');
         self::promote('index.php');
-        self::promote('mx');
 
         self::echoLine();
 
@@ -48,6 +47,24 @@ return new class extends Terminal {
         $ignore .= "\n/vendor";
         $ignore .= "\n";
         self::file('.gitignore', $ignore);
+
+        $mx = '<?php';
+        $mx .= "\n";
+        $mx .= "\nrequire \"./vendor/autoload.php\";";
+        $mx .= "\n";
+        $mx .= "\ndate_default_timezone_set(\"America/Sao_Paulo\");";
+        $mx .= "\n";
+        $mx .= "\necho \"---< MX-CMD >---\\n\\n\";";
+        $mx .= "\n";
+        $mx .= "\n\$terminalArgs = \$argv;";
+        $mx .= "\n";
+        $mx .= "\narray_shift(\$terminalArgs);";
+        $mx .= "\n\PhpMx\Terminal::run(...\$terminalArgs);";
+        $mx .= "\n";
+        $mx .= "\necho \"\\n---< MX-CMD >---\\n\";";
+        $mx .= "\n";
+        $mx .= "\ndie;";
+        self::file('mx', $mx);
 
         self::echoLine();
 
