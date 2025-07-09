@@ -47,7 +47,7 @@ return new class extends Terminal {
         $ignore .= "\n/storage/certificate";
         $ignore .= "\n/vendor";
         $ignore .= "\n";
-        self::file('.gitignore', $env);
+        self::file('.gitignore', $ignore);
 
         self::echoLine();
 
