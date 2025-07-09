@@ -1,6 +1,6 @@
 {
     "name": "phpmx/core",
-    "description": "Núcleo base para criação de aplicações modernas com PHPMX",
+    "description": "Núcleo para criação de aplicações modernas com PHP",
     "license": "MIT",
     "authors": [
         {
@@ -10,45 +10,46 @@
     ],
     "autoload": {
         "psr-4": {
-            "": "source/"
+            "": "class/"
         },
         "files": [
-            "helper/constant/char_normalizer.php",
-            "helper/constant/http_status.php",
-            "helper/constant/is_terminal.php",
-            "helper/constant/request_is.php",
-            "helper/function/cache.php",
-            "helper/function/capsule.php",
-            "helper/function/changes.php",
-            "helper/function/dbug.php",
-            "helper/function/env.php",
-            "helper/function/idkey.php",
-            "helper/function/is.php",
-            "helper/function/log.php",
-            "helper/function/num.php",
-            "helper/function/path.php",
-            "helper/function/prepare.php",
-            "helper/function/redirect.php",
-            "helper/function/remove_accents.php",
-            "helper/function/str.php",
-            "helper/function/str_to.php",
-            "helper/function/syncIds.php",
-            "helper/function/url.php",
-            "helper/function/uuid.php",
-            "helper/script/env.php",
-            "helper/script/error.php",
-            "helper/script/front.php",
-            "helper/script/log.php",
-            "helper/script/path.php",
-            "helper/script/view.php"
+            "system/helper/constant/char_normalizer.php",
+            "system/helper/constant/http_status.php",
+            "system/helper/constant/request_is.php",
+            "system/helper/function/cache.php",
+            "system/helper/function/capsule.php",
+            "system/helper/function/changes.php",
+            "system/helper/function/dbug.php",
+            "system/helper/function/env.php",
+            "system/helper/function/idkey.php",
+            "system/helper/function/is.php",
+            "system/helper/function/log.php",
+            "system/helper/function/num.php",
+            "system/helper/function/path.php",
+            "system/helper/function/prepare.php",
+            "system/helper/function/redirect.php",
+            "system/helper/function/remove_accents.php",
+            "system/helper/function/str.php",
+            "system/helper/function/str_to.php",
+            "system/helper/function/syncIds.php",
+            "system/helper/function/url.php",
+            "system/helper/function/uuid.php",
+            "system/helper/function/view.php",
+            "system/helper/script/env.php",
+            "system/helper/script/error.php",
+            "system/helper/script/log.php",
+            "system/helper/script/page.php",
+            "system/helper/script/path.php",
+            "system/helper/script/view.php"
         ]
     },
     "require": {
+        "ext-gd": "*",
+        "ext-exif": "*",
         "ext-mbstring": "*",
         "ext-fileinfo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-pdo_sqlite": "*",
         "php": "^8.1"
-    },
-    "bin": [
-        "mx"
-    ]
+    }
 }

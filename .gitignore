@@ -1,7 +1,11 @@
 /.env
 /vendor
 /composer.lock
-/storage/cache
-/storage/certificate/*
-!/storage/certificate/base.crt
 
+/class/Controller/Api
+/class/Model
+
+/library/cache
+/library/sqlite
+
+/system/datalayer

@@ -1,0 +1,1 @@
+// [#VIEW:./mx/script.js]
