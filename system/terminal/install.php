@@ -15,6 +15,7 @@ return new class extends Terminal {
 
         self::structure('library');
         self::structure('library/assets');
+        self::structure('library/certificate');
 
         self::echoLine();
 
@@ -34,36 +35,25 @@ return new class extends Terminal {
 
         self::echoLine();
 
-        $env = '';
-        $env .= "\nDEV = true";
-        $env .= "\n";
+        $env = "DEV = true\n";
         self::file('.env', $env);
 
-        $ignore = '';
-        $ignore .= "\n/.env";
-        $ignore .= "\n/class/Model/Db*/Driver";
-        $ignore .= "\n/storage/cache";
-        $ignore .= "\n/storage/certificate";
-        $ignore .= "\n/vendor";
-        $ignore .= "\n";
+        $ignore = "/.env\n";
+        $ignore .= "/class/Model/Db*/Driver\n";
+        $ignore .= "/storage/cache\n";
+        $ignore .= "/storage/certificate\n";
+        $ignore .= "/vendor\n";
         self::file('.gitignore', $ignore);
 
-        $mx = '<?php';
-        $mx .= "\n";
-        $mx .= "\nrequire \"./vendor/autoload.php\";";
-        $mx .= "\n";
-        $mx .= "\ndate_default_timezone_set(\"America/Sao_Paulo\");";
-        $mx .= "\n";
-        $mx .= "\necho \"---< MX-CMD >---\\n\\n\";";
-        $mx .= "\n";
-        $mx .= "\n\$terminalArgs = \$argv;";
-        $mx .= "\n";
-        $mx .= "\narray_shift(\$terminalArgs);";
-        $mx .= "\n\PhpMx\Terminal::run(...\$terminalArgs);";
-        $mx .= "\n";
-        $mx .= "\necho \"\\n---< MX-CMD >---\\n\";";
-        $mx .= "\n";
-        $mx .= "\ndie;";
+        $mx = "<?php\n\n";
+        $mx .= "require_once \"./vendor/autoload.php\";\n\n";
+        $mx .= "date_default_timezone_set(\"America/Sao_Paulo\");\n\n";
+        $mx .= "echo \"---< MX-CMD >---\\n\\n\";\n\n";
+        $mx .= "\$terminalArgs = \$argv;\n\n";
+        $mx .= "array_shift(\$terminalArgs);\n\n";
+        $mx .= "\PhpMx\Terminal::run(...\$terminalArgs);\n\n";
+        $mx .= "echo \"\\n---< MX-CMD >---\\n\";\n\n";
+        $mx .= "die;";
         self::file('mx', $mx);
 
         self::echoLine();
