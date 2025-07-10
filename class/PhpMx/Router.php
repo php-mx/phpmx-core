@@ -76,7 +76,7 @@ abstract class Router
     {
         list($middlewares, $wrapper) = log_add('mx', 'router solve', function () use ($globalMiddlewares) {
             $routes = cache('routes-' . Request::type(), function () {
-                foreach (Path::seekForDirs('system/routes') as $path)
+                foreach (array_reverse(Path::seekForDirs('system/routes')) as $path)
                     foreach (Dir::seekForFile($path, true) as $file)
                         Import::only("$path/$file", true);
 
