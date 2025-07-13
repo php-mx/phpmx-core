@@ -7,6 +7,7 @@ use PhpMx\Datalayer;
 use PhpMx\Dir;
 use PhpMx\File;
 use PhpMx\Import;
+use PhpMx\Log;
 use PhpMx\Terminal;
 
 trait MigrationTerminalTrait
@@ -99,7 +100,7 @@ trait MigrationTerminalTrait
         $logAction = $mode ? 'up' : 'down';
         $logDdName = Datalayer::externalName(self::$dbName, 'db');
 
-        log_add("migration.$logAction", "$logDdName [$file]", function () use ($file, $mode) {
+        Log::add("migration.$logAction", "$logDdName [$file]", function () use ($file, $mode) {
             Terminal::echo("run [#action] [#file]", [
                 'action' => $mode ? 'up' : 'down',
                 'file' => $file,

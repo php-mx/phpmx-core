@@ -235,7 +235,7 @@ abstract class Record
     /** Salva o registro no banco de dados */
     final function _save(bool $forceUpdate = false): static
     {
-        log_add(
+        Log::add(
             'driver.save',
             prepare("[#].[#]", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]),
             function () use ($forceUpdate) {
@@ -246,7 +246,7 @@ abstract class Record
                         default => $this->__runCreate()
                     };
                 } else {
-                    Log::change('driver.save.aborted', prepare('[#].[#] record cannot be saved', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]));
+                    Log::changeScope('driver.save.aborted', prepare('[#].[#] record cannot be saved', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]));
                 }
             }
         );
@@ -283,14 +283,14 @@ abstract class Record
             if (is_callable($onCreate))
                 $onCreate($this);
         } else {
-            Log::change('driver.create.aborted', '[#].[#]() aborted in _onCreate', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]);
+            Log::changeScope('driver.create.aborted', '[#].[#]() aborted in _onCreate', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]);
         }
     }
 
     /** Executa o comando parar atualizar o registro */
     final protected function __runUpdate(bool $forceUpdate)
     {
-        Log::change('driver.update', "[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+        Log::changeScope('driver.update', "[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
         $this->__runSaveIdx();
         if ($forceUpdate || $this->_checkChange()) {
             $onUpdate = $this->_onUpdate() ?? null;
@@ -315,17 +315,17 @@ abstract class Record
                 if (is_callable($onUpdate))
                     $onUpdate($this);
             } else {
-                Log::change('driver.update.aborted', '[#].[#]([#]) aborted in _onUpdate', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+                Log::changeScope('driver.update.aborted', '[#].[#]([#]) aborted in _onUpdate', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
             }
         } else {
-            Log::change('driver.update.ignored', "[#].[#]([#]) unchanged values",  [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+            Log::changeScope('driver.update.ignored', "[#].[#]([#]) unchanged values",  [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
         }
     }
 
     /** Executa o comando para deletar o registro do banco de dados */
     final protected function __runDelete()
     {
-        Log::change('driver.delete', "[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+        Log::changeScope('driver.delete', "[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
         $onDelete = $this->_onDelete() ?? null;
         if ($onDelete ?? true) {
             Query::delete($this->TABLE)
@@ -342,7 +342,7 @@ abstract class Record
             if (is_callable($onDelete))
                 $onDelete($this);
         } else {
-            Log::change('driver.delete.aborted', '[#].[#]([#]) aborted in _onDelete', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+            Log::changeScope('driver.delete.aborted', '[#].[#]([#]) aborted in _onDelete', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
         }
     }
 

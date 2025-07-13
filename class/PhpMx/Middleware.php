@@ -54,7 +54,7 @@ class Middleware
             if (!is_callable($action))
                 throw new Exception("Middleware [$middleware] cannot be called");
 
-            return fn($next) => log_add('middleware', $middleware, fn() => $action($next));
+            return fn($next) => Log::add('middleware', $middleware, fn() => $action($next));
         }
 
         if (is_closure($middleware))

@@ -10,7 +10,7 @@ abstract class Import
         $filePath = path($filePath);
         $filePath = File::setEx($filePath, 'php');
 
-        return log_add('import', "only $filePath", function () use ($filePath, $once) {
+        return Log::add('import', "only $filePath", function () use ($filePath, $once) {
             if (File::check($filePath))
                 return $once ? require_once $filePath : require $filePath;
             return false;
@@ -22,7 +22,7 @@ abstract class Import
     {
         $filePath = path($filePath);
 
-        return log_add('import', "content $filePath", function () use ($filePath, $prepare) {
+        return Log::add('import', "content $filePath", function () use ($filePath, $prepare) {
             $content = File::check($filePath) ? file_get_contents($filePath) : '';
             $return = Prepare::prepare($content, $prepare);
             return $return;
@@ -35,7 +35,7 @@ abstract class Import
         $filePath = path($filePath);
         $filePath = File::setEx($filePath, 'php');
 
-        return log_add('import', "return $filePath", function () use ($filePath, $params) {
+        return Log::add('import', "return $filePath", function () use ($filePath, $params) {
             if (File::check($filePath)) {
                 $return = function ($__FILEPATH__, &$__PARAMS__) {
                     foreach (array_keys($__PARAMS__) as $__KEY__)
@@ -59,7 +59,7 @@ abstract class Import
         $filePath = path($filePath);
         $filePath = File::setEx($filePath, 'php');
 
-        return log_add('import', "variable $varName in $filePath", function () use ($filePath, $varName, $params) {
+        return Log::add('import', "variable $varName in $filePath", function () use ($filePath, $varName, $params) {
             if (File::check($filePath)) {
                 $return = function ($__FILEPATH__, $__VARNAME__, &$__PARAMS__) {
                     foreach (array_keys($__PARAMS__) as $__KEY__)
@@ -84,7 +84,7 @@ abstract class Import
     {
         $filePath = path($filePath);
 
-        return log_add('import', "output $filePath", function () use ($filePath,  $params) {
+        return Log::add('import', "output $filePath", function () use ($filePath,  $params) {
             if (File::check($filePath)) {
                 $return = function ($__FILEPATH__, &$__PARAMS__) {
                     foreach (array_keys($__PARAMS__) as $__KEY__)

@@ -2,225 +2,225 @@
 
 namespace PhpMx;
 
+use Closure;
+use Throwable;
+
 abstract class Log
 {
+    protected static ?float $started = null;
     protected static array $log = [];
-    protected static bool $started = false;
-    protected static array $count = ['mx' => 1];
+    protected static array $scope = [];
 
-    /** Inicia a captura do log */
-    static function start($message)
+    /** Adicona uma linha de log ou um escopo de linhas de log */
+    static function add(string $type, string $message, ?Closure $scope = null): mixed
     {
-        if (self::$started) return;
+        if (is_null($scope))
+            return self::set($type, $message);
 
-        self::$started = true;
-
-        self::$log[] = [
-            'type' => 'mx',
-            'message' => $message,
-            'isGroup' => true,
-            'closed' => false,
-            'time' => microtime(true),
-            'memory' => memory_get_usage(),
-            'lines' => [],
-        ];
+        try {
+            self::openScope($type, $message, true);
+            $result = $scope();
+            self::closeScope();
+            return $result;
+        } catch (Throwable $e) {
+            self::exception($e);
+            self::closeScope();
+            throw $e;
+        }
     }
 
-    /** Interrompe a captura do log */
-    static function stop(): void
+    /** Altera a linha de escopo aberta */
+    static function changeScope(string $type, string $message): void
     {
-        if (!self::$started) return;
+        if (count(self::$scope)) {
+            $scopeKey = end(self::$scope);
+            self::$log[$scopeKey][0] = $type;
+            self::$log[$scopeKey][1] = $message;
+        }
+    }
 
-        while (self::currentLogGroup()) self::close(self::currentLogGroup());
+    /** Adiciona uma linha de exceção ao log */
+    static function exception(Throwable $e): void
+    {
+        $type = $e::class;
+        $message = $e->getMessage();
+        $file = path($e->getFile());
+        $line = $e->getLine();
 
-        ksort(self::$count);
-        self::$started = false;
+        self::set($type, "$message $file ($line)");
     }
 
     /** Retorna o log atual com contadores */
-    static function get(): array
+    static function get()
     {
-        self::stop();
+        $currentLog = self::$log;
+        $currentScope = self::$scope;
+
+        $encapsLine = ['mx', 'log', -1, memory_get_peak_usage(true), microtime(true) - self::$started];
+
+        while (count($currentScope)) {
+            $scopeKey = array_pop($currentScope);
+            self::closeLine($currentLog[$scopeKey]);
+        }
+
+        array_unshift($currentLog, $encapsLine);
+
+        $count = [];
+        foreach ($currentLog as $pos => $line) {
+            list($type, $message, $scope, $memory, $time) = $line;
+
+            $type = strToCamelCase($type);
+            $message = str_replace('\\', '.', $message);
+            $scope += 1;
+            $memory = self::formatMemory($memory);
+            $time = self::formatTime($time);
+
+            $count[$type] = $count[$type] ?? 0;
+            $count[$type]++;
+
+            $currentLog[$pos] = [
+                $type,
+                $message,
+                $scope,
+                $memory,
+                $time,
+            ];
+        }
+
         return [
-            'log' => self::$log,
-            'count' => self::$count
+            'log' => $currentLog,
+            'count' => $count
         ];
     }
 
     /** Retorna o log em forma de array */
     static function getArray(): array
     {
-        self::stop();
-        $log = self::$log;
+        $logData = self::get();
+        $lines = $logData['log'];
+        $count = $logData['count'];
 
-        $logArray = self::mountLogArray($log);
+        $output = [];
 
-        $count = [];
-        foreach (self::$count as $type => $n)
-            if ($n)
-                $count[$type] = $n;
+        foreach ($lines as $line) {
+            list($type, $message, $scope, $memory, $time) = $line;
 
-        $logArray[] = $count;
+            $info = [];
 
-        return $logArray;
+            if ($time) $info[] = $time;
+
+            if ($memory) $info[] = $memory;
+
+            $infoText = count($info) ? ' [' . implode('|', $info) . ']' : '';
+
+            $output[] = str_repeat('| ', $scope) . "[$type] $message$infoText";
+        }
+
+        $output[] = $count;
+
+        return $output;
     }
 
     /** Retorna o log em forma de string */
     static function getString(): string
     {
-        self::stop();
-        $log = self::$log;
+        $logData = self::get();
+        $lines = $logData['log'];
+        $count = $logData['count'];
 
-        $logString = "-------------------------\n";
-        $logString .= self::mountLogString($log);
-        $logString .= "-------------------------\n";
+        $output = "-------------------------\n";
 
-        foreach (self::$count as $type => $n)
-            if ($n)
-                $logString .= "[$n] $type\n";
+        foreach ($lines as $line) {
+            list($type, $message, $scope, $memory, $time) = $line;
 
-        $logString .= "-------------------------\n";
+            $info = [];
 
-        return trim($logString);
-    }
+            if ($time) $info[] = $time;
 
-    /** Adicona ao log uma linha ou um escopo de linhas */
-    static function add($type, $message, $isGroup = false)
-    {
-        if (!self::$started) return;
+            if ($memory) $info[] = $memory;
 
-        $log = &self::currentLogGroup();
+            $info = count($info) ? ' [' . implode('|', $info) . ']' : '';
 
-        $type = strToCamelCase($type);
-
-        self::$count[$type] = self::$count[$type] ?? 0;
-        self::$count[$type]++;
-
-        $line = [
-            'type' => $type,
-            'message' => $message,
-            'isGroup' => $isGroup,
-        ];
-
-        if ($isGroup) {
-            $line['closed'] = false;
-            $line['time'] = microtime(true);
-            $line['memory'] = memory_get_usage(true);
-            $line['lines'] = [];
+            $output .= str_repeat('| ', $scope) . "[$type] $message$info" . "\n";
         }
 
-        $log['lines'][] = $line;
+        $output .= "-------------------------\n";
+
+        foreach ($count as $type => $qty)
+            $output .= "[$qty] $type\n";
+
+        $output .= "-------------------------\n";
+
+        return trim($output);
     }
 
-    /** Altera a linha de log aberta */
-    static function change($type = null, $message = null)
+    /** Adciona uma nova linhe ao log */
+    protected static function set(string $type, ?string $message = null, bool $isScope = false)
     {
-        if (!self::$started) return;
-        $log = &self::currentLogGroup();
+        self::$started = self::$started ?? microtime(true);
 
-        if ($type) {
-            $type = strToCamelCase($type);
-            self::$count[$log['type']]--;
-            self::$count[$type] = self::$count[$type] ?? 0;
-            self::$count[$type]++;
-            $log['type'] = $type;
-        }
+        $scope = count(self::$scope);
 
-        if ($message) {
-            $log['message'] = $message;
+        self::$log[] = [$type, $message, $scope, null, null];
+    }
+
+    /** Abre um novo escopo de log */
+    protected static function openScope(string $type, ?string $message = null)
+    {
+        self::set($type, $message);
+        $index = count(self::$log) - 1;
+
+        self::$log[$index][3] = memory_get_peak_usage(true);
+        self::$log[$index][4] = microtime(true);
+
+        self::$scope[] = $index;
+    }
+
+    /** Fecha o ultimo escopo de log aberto */
+    protected static function closeScope()
+    {
+        if (count(self::$scope)) {
+            $scopeKey = array_pop(self::$scope);
+            self::closeLine(self::$log[$scopeKey]);
         }
     }
 
-    /** Fecha o escopo atual do logo */
-    static function close()
+    /** Fecha uma linha */
+    protected static function closeLine(&$line)
     {
-        if (!self::$started) return;
-        $log = &self::currentLogGroup();
-
-        $duration = microtime(true) - $log['time'];
-        $memory = memory_get_usage() - $log['memory'];
-        $log['closed'] = true;
-        $log['time'] = $duration > 1 ? self::formatTime($duration) : '';
-        $log['memory'] = $memory > 1 ? self::formatMemory($memory) : '';
+        $line[3] = $line[3] ? memory_get_peak_usage(true) - $line[3] : null;
+        $line[4] = $line[4] ? microtime(true) - $line[4] : $line[4];
     }
 
-    static protected function &currentLogGroup(?array &$group = null): ?array
+    /** Formata um tempo de execução */
+    protected static function formatTime(?float $seconds): ?string
     {
+        if (is_null($seconds)) return null;
 
-        if (is_null($group)) {
-            $lastKey = array_key_last(self::$log);
-            return self::currentLogGroup(self::$log[$lastKey]);
-        }
+        if ($seconds < 1) return null;
 
-        if ($group['closed']) {
-            $null = null;
-            return $null;
-        }
-
-        if (empty($group['lines'])) return $group;
-
-        $lastKey = array_key_last($group['lines']);
-        $last = &$group['lines'][$lastKey];
-
-        if (!$last['isGroup']) return $group;
-
-        $lastGroup = &self::currentLogGroup($last);
-
-        if (is_null($lastGroup)) return $group;
-
-        return self::currentLogGroup($last);
-    }
-
-    protected static function formatTime(float $seconds): string
-    {
         if ($seconds < 1) return round($seconds * 1000, 2) . 'ms';
+
         if ($seconds < 60) return round($seconds, 2) . 's';
+
         if ($seconds < 3600) return round($seconds / 60, 2) . 'm';
+
         return round($seconds / 3600, 2) . 'h';
     }
 
-    protected static function formatMemory(int $bytes): string
+    /** Formata memória utilizada */
+    protected static function formatMemory(?int $bytes): ?string
     {
+        if (is_null($bytes)) return null;
+
+        if ($bytes < 1) return null;
+
         if ($bytes < 1024) return $bytes . 'b';
+
         if ($bytes < 1048576) return round($bytes / 1024, 2) . 'kb';
+
         if ($bytes < 1073741824) return round($bytes / 1048576, 2) . 'mb';
+
         return round($bytes / 1073741824, 2) . 'gb';
-    }
-
-    protected static function mountLogString(array $logGroup, int $level = 0): string
-    {
-        $output = '';
-        $indent = str_repeat('| ', $level);
-
-        foreach ($logGroup as $entry) {
-            $type = $entry['type'];
-            $message = $entry['message'];
-            $time = $entry['time'] ? ' ' . $entry['time'] : '';
-            $memory = $entry['memory'] ? ' ' . $entry['memory'] : '';
-            $line = "[$type] $message$time$memory";
-            $output .= "$indent$line\n";
-            if ($entry['isGroup'] && !empty($entry['lines']))
-                $output .= self::mountLogString($entry['lines'], $level + 1);
-        }
-
-        return $output;
-    }
-
-    protected static function mountLogArray(array $logGroup): array
-    {
-        $output = [];
-
-        foreach ($logGroup as $entry) {
-            $type = $entry['type'];
-            $message = str_replace('\\', '.', $entry['message']);
-            $time = $entry['time'] ? ' ' . $entry['time'] : '';
-            $memory = $entry['memory'] ? ' ' . $entry['memory'] : '';
-            $line = "[$type] $message$time$memory";
-            $output[] = $line;
-            if ($entry['isGroup'] && !empty($entry['lines']))
-                $output[] = self::mountLogArray($entry['lines']);
-        }
-
-        return $output;
     }
 }

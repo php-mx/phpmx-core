@@ -23,7 +23,6 @@
             "system/helper/function/env.php",
             "system/helper/function/idkey.php",
             "system/helper/function/is.php",
-            "system/helper/function/log.php",
             "system/helper/function/num.php",
             "system/helper/function/path.php",
             "system/helper/function/prepare.php",

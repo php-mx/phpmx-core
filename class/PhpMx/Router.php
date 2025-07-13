@@ -74,7 +74,7 @@ abstract class Router
     /** Resolve a requisição atual enviando a reposta ao cliente */
     static function solve(array $globalMiddlewares = [])
     {
-        list($middlewares, $wrapper) = log_add('mx', 'router solve', function () use ($globalMiddlewares) {
+        list($middlewares, $wrapper) = Log::add('mx', 'router solve', function () use ($globalMiddlewares) {
             $routes = cache('routes-' . Request::type(), function () {
                 foreach (array_reverse(Path::seekForDirs('system/routes')) as $path)
                     foreach (Dir::seekForFile($path, true) as $file)
@@ -98,8 +98,8 @@ abstract class Router
             return [$middlewares, $wrapper];
         });
 
-        log_add('mx', 'route dispatch', function () use ($middlewares, $wrapper) {
-            $wrapper = fn() => log_add('mx', 'route action', $wrapper);
+        Log::add('mx', 'route dispatch', function () use ($middlewares, $wrapper) {
+            $wrapper = fn() => Log::add('mx', 'route action', $wrapper);
 
             $response = Middleware::run($middlewares, $wrapper);
 
@@ -170,7 +170,7 @@ abstract class Router
         foreach ($routes as $template => $route)
             if (self::checkRouteMatch($template))
                 return $route;
-        log_add('mx', 'route matching not found');
+        Log::add('mx', 'route matching not found');
         return null;
     }
     /** Verifica se um template combina com a URL atual */

@@ -6,6 +6,7 @@ use PDO;
 use PhpMx\Cif;
 use PhpMx\Datalayer;
 use PhpMx\Datalayer\Query;
+use PhpMx\Log;
 use PhpMx\Prepare;
 
 class Mysql extends BaseConnection
@@ -44,7 +45,7 @@ class Mysql extends BaseConnection
     protected function &pdo(): PDO
     {
         if (is_array($this->instancePDO)) {
-            log_add('datalayer.start', prepare('[#] mysql', Datalayer::externalName($this->dbName, 'Db')), function () {
+            Log::add('datalayer.start', prepare('[#] mysql', Datalayer::externalName($this->dbName, 'Db')), function () {
                 $this->instancePDO = new PDO(...$this->instancePDO);
             });
         }

@@ -33,7 +33,7 @@ abstract class Datalayer
     {
         $dbName = self::internalName($dbName);
 
-        log_add('datalayer.register', self::externalName($dbName, 'Db'), function () use ($dbName, $data) {
+        Log::add('datalayer.register', self::externalName($dbName, 'Db'), function () use ($dbName, $data) {
             $envName = strtoupper($dbName);
 
             $data['type'] = $data['type'] ?? env("DB_{$envName}_TYPE");

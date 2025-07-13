@@ -7,6 +7,7 @@ use PhpMx\Datalayer;
 use PhpMx\Datalayer\Query;
 use PhpMx\Dir;
 use PhpMx\File;
+use PhpMx\Log;
 use PhpMx\Prepare;
 
 class Sqlite extends BaseConnection
@@ -47,7 +48,7 @@ class Sqlite extends BaseConnection
     protected function &pdo(): PDO
     {
         if (is_array($this->instancePDO)) {
-            log_add('datalayer.start', prepare('[#] sqlite', Datalayer::externalName($this->dbName, 'Db')), function () {
+            Log::add('datalayer.start', prepare('[#] sqlite', Datalayer::externalName($this->dbName, 'Db')), function () {
                 if (!File::check($this->data['file']))
                     Dir::create($this->data['file']);
                 $this->instancePDO = new PDO(...(array) $this->instancePDO);

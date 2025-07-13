@@ -6,6 +6,7 @@ use Exception;
 use PDO;
 use PhpMx\Datalayer\Query;
 use PhpMx\Datalayer\Query\BaseQuery;
+use PhpMx\Log;
 use Throwable;
 
 abstract class BaseConnection
@@ -74,7 +75,7 @@ abstract class BaseConnection
         if (is_class($query, BaseQuery::class))
             list($query, $data) = $query->query();
 
-        return log_add('datalayer.query', $query, function () use ($query, $data) {
+        return Log::add('datalayer.query', $query, function () use ($query, $data) {
 
             $pdoQuery = $this->pdo()->prepare($query);
 

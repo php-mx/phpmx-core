@@ -1,6 +1,7 @@
 <?php
 
 use PhpMx\Json;
+use PhpMx\Log;
 
 if (!function_exists('cache')) {
 
@@ -8,7 +9,7 @@ if (!function_exists('cache')) {
     function cache(string $cacheName, Closure $action): mixed
     {
         $cacheName = strToCamelCase($cacheName);
-        return log_add('cache', $cacheName, function () use ($cacheName, $action) {
+        return Log::add('cache', $cacheName, function () use ($cacheName, $action) {
             $file = path('library/cache', $cacheName);
 
             if (!env('USE_CACHE_FILE'))
