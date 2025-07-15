@@ -2,8 +2,6 @@
 
 namespace PhpMx\Datalayer\Query;
 
-use PhpMx\Prepare;
-
 class Select extends BaseQuery
 {
     protected array $fields = [];
@@ -19,7 +17,7 @@ class Select extends BaseQuery
 
         $query = 'SELECT [#fields] FROM [#table] [#where][#group][#order][#limit];';
 
-        $query = Prepare::prepare($query, [
+        $query = prepare($query, [
             'fields' => $this->mountFields(),
             'table'  => $this->mountTable(),
             'where'  => $this->mountWhere(),

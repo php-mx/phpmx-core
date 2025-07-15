@@ -3,7 +3,6 @@
 namespace PhpMx\Datalayer\Query;
 
 use Error;
-use PhpMx\Prepare;
 
 class Update extends BaseQuery
 {
@@ -17,7 +16,7 @@ class Update extends BaseQuery
 
         $query = 'UPDATE [#table] SET [#values] [#where];';
 
-        $query = Prepare::prepare($query, [
+        $query = prepare($query, [
             'table'   => $this->mountTable(),
             'values' => $this->mountValues(),
             'where'   => $this->mountWhere(),

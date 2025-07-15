@@ -3,7 +3,6 @@
 namespace PhpMx\Datalayer\Query;
 
 use Error;
-use PhpMx\Prepare;
 
 class Insert extends BaseQuery
 {
@@ -23,7 +22,7 @@ class Insert extends BaseQuery
             $query = 'INSERT INTO [#table] [#column] VALUES [#values];';
         }
 
-        $query = Prepare::prepare($query, [
+        $query = prepare($query, [
             'table'  => $this->mountTable(),
             'column'  => $this->mountColumn(),
             'values'  => $this->mountValues(),

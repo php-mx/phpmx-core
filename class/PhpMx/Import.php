@@ -24,7 +24,7 @@ abstract class Import
 
         return Log::add('import', "content $filePath", function () use ($filePath, $prepare) {
             $content = File::check($filePath) ? file_get_contents($filePath) : '';
-            $return = Prepare::prepare($content, $prepare);
+            $return = prepare($content, $prepare);
             return $return;
         });
     }

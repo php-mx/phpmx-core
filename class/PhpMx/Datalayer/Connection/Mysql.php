@@ -7,7 +7,6 @@ use PhpMx\Cif;
 use PhpMx\Datalayer;
 use PhpMx\Datalayer\Query;
 use PhpMx\Log;
-use PhpMx\Prepare;
 
 class Mysql extends BaseConnection
 {
@@ -22,15 +21,13 @@ class Mysql extends BaseConnection
         $this->data['pass'] = $this->data['pass'] ?? env("DB_{$envName}_PASS");
         $this->data['port'] = $this->data['port'] ?? env("DB_{$envName}_PORT");
 
-        if (empty($this->data['port']))
-            unset($this->data['port']);
+        if (empty($this->data['port'])) unset($this->data['port']);
 
         $this->data['pass'] = Cif::off($this->data['pass']);
 
         $dsn = "mysql:host={$this->data['host']}";
 
-        if ($this->data['port'])
-            $dsn .= ";port={$this->data['port']}";
+        if ($this->data['port']) $dsn .= ";port={$this->data['port']}";
 
         $dsn .= ";dbname={$this->data['data']};charset=utf8";
 
@@ -81,7 +78,7 @@ class Mysql extends BaseConnection
                 $queryFields[] = $this->schemeTemplateField($fielName, $field);
 
         return [
-            Prepare::prepare("CREATE TABLE `[#name]` ([#fields]) DEFAULT CHARSET=utf8[#comment] ENGINE=InnoDB;", [
+            prepare("CREATE TABLE `[#name]` ([#fields]) DEFAULT CHARSET=utf8[#comment] ENGINE=InnoDB;", [
                 'name' => $tableName,
                 'fields' => implode(', ', $queryFields),
                 'comment' => $comment ? " COMMENT='$comment'" : ''
@@ -95,28 +92,28 @@ class Mysql extends BaseConnection
         $query = [];
 
         if (!is_null($comment)) {
-            $query[] = Prepare::prepare("ALTER TABLE `[#table]` COMMENT='[#comment]'", [
+            $query[] = prepare("ALTER TABLE `[#table]` COMMENT='[#comment]'", [
                 'table' => $tableName,
                 'comment' => $comment
             ]);
         }
 
         foreach ($fields['add'] as $fieldName => $fieldData) {
-            $query[] = Prepare::prepare('ALTER TABLE `[#table]` ADD COLUMN [#fieldQuery]', [
+            $query[] = prepare('ALTER TABLE `[#table]` ADD COLUMN [#fieldQuery]', [
                 'table' => $tableName,
                 'fieldQuery' => $this->schemeTemplateField($fieldName, $fieldData)
             ]);
         }
 
         foreach ($fields['drop'] as $fieldName => $fieldData) {
-            $query[] = Prepare::prepare('ALTER TABLE `[#table]` DROP COLUMN `[#fieldName]`', [
+            $query[] = prepare('ALTER TABLE `[#table]` DROP COLUMN `[#fieldName]`', [
                 'table' => $tableName,
                 'fieldName' => $fieldName
             ]);
         }
 
         foreach ($fields['alter'] as $fieldName => $fieldData) {
-            $query[] = Prepare::prepare('ALTER TABLE `[#table]` MODIFY COLUMN [#fieldQuery]', [
+            $query[] = prepare('ALTER TABLE `[#table]` MODIFY COLUMN [#fieldQuery]', [
                 'table' => $tableName,
                 'fieldQuery' => $this->schemeTemplateField($fieldName, $fieldData)
             ]);
@@ -145,7 +142,7 @@ class Mysql extends BaseConnection
                     $query[] = "CREATE INDEX `$name.$indexName` ON `$name`(`$field`);";
                 }
             } else {
-                $query[] = "DROP INDEX IF EXISTS `$name.$indexName` ON `$name`;";
+                $query[] = "DROP INDEX `$name.$indexName` ON `$name`;";
             }
         }
 
@@ -194,6 +191,6 @@ class Mysql extends BaseConnection
                 $prepare = "`[#name]` varchar([#size])[#default][#null] COMMENT '[#comment]'";
                 break;
         }
-        return Prepare::prepare($prepare, $field);
+        return prepare($prepare, $field);
     }
 }

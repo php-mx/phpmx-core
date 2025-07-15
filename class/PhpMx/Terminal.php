@@ -82,7 +82,7 @@ abstract class Terminal
     /** Exibe uma linha de texto no terminal */
     static function echo(string $line = '', string|array $prepare = []): void
     {
-        echo Prepare::prepare("$line\n", $prepare);
+        echo prepare("$line\n", $prepare);
     }
 
     /** Exibe uma linha de separação no terminal */

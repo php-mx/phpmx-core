@@ -53,7 +53,7 @@ abstract class BaseQuery
             if (is_array($this->table)) {
                 $table = [];
                 foreach ($this->table as $name => $alias)
-                    $table[] = !is_numeric($name) ? "`$name` as `$alias" : "`$alias`";
+                    $table[] = !is_numeric($name) ? "`$name` as `$alias`" : "`$alias`";
                 return implode(', ', $table);
             } else {
                 return substr_count($this->table, '.') ? $this->table : "`$this->table`";

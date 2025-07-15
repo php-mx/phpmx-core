@@ -4,7 +4,6 @@ namespace PhpMx\Input;
 
 use Closure;
 use Exception;
-use PhpMx\Prepare;
 
 class InputField
 {

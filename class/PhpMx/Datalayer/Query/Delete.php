@@ -2,8 +2,6 @@
 
 namespace PhpMx\Datalayer\Query;
 
-use PhpMx\Prepare;
-
 class Delete extends BaseQuery
 {
     protected array $order = [];
@@ -16,7 +14,7 @@ class Delete extends BaseQuery
 
         $query = 'DELETE FROM [#table] [#where][#order];';
 
-        $query = Prepare::prepare($query, [
+        $query = prepare($query, [
             'table' => $this->mountTable(),
             'where' => $this->mountWhere(),
             'order'  => $this->mountOrder(),

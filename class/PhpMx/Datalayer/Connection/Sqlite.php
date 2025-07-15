@@ -8,7 +8,6 @@ use PhpMx\Datalayer\Query;
 use PhpMx\Dir;
 use PhpMx\File;
 use PhpMx\Log;
-use PhpMx\Prepare;
 
 class Sqlite extends BaseConnection
 {
@@ -88,7 +87,7 @@ class Sqlite extends BaseConnection
                 $queryFields[] = $this->schemeTemplateField($fielName, $field);
 
         return [
-            Prepare::prepare("CREATE TABLE [[#name]] ([#fields])", [
+            prepare("CREATE TABLE [[#name]] ([#fields])", [
                 'name' => $tableName,
                 'fields' => implode(', ', $queryFields)
             ])
@@ -157,7 +156,7 @@ class Sqlite extends BaseConnection
         array_push($query, ...$this->schemeQueryCreateTable($tableName, $comment, ['add' => $newFields]));
 
         if (count($insert)) {
-            $query[] = Prepare::prepare(
+            $query[] = prepare(
                 "INSERT INTO [[#table]] ([#fieldsName]) VALUES ([#insert])",
                 [
                     'table' => $tableName,
@@ -241,6 +240,6 @@ class Sqlite extends BaseConnection
                 $prepare = "[[#name]] varchar([#size])[#default][#null]";
                 break;
         }
-        return Prepare::prepare($prepare, $field);
+        return prepare($prepare, $field);
     }
 }
