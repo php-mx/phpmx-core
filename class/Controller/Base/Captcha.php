@@ -4,7 +4,6 @@ namespace Controller\Base;
 
 use Exception;
 use PhpMx\Cif;
-use PhpMx\Code;
 use PhpMx\Mime;
 use PhpMx\Path;
 
@@ -32,7 +31,7 @@ class Captcha
 
     protected function getKey($captcha): string
     {
-        return Cif::on(Code::on($captcha));
+        return Cif::on(mx5($captcha));
     }
 
     protected function getImage($captcha, $fg, $bg): string

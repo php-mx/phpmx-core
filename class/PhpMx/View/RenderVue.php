@@ -2,7 +2,6 @@
 
 namespace PhpMx\View;
 
-use PhpMx\Code;
 use PhpMx\View;
 
 abstract class RenderVue extends View
@@ -27,7 +26,7 @@ abstract class RenderVue extends View
 
         $content = str_replace(array_keys(self::$PREPARE_REPLACE),  array_values(self::$PREPARE_REPLACE),  $content);
 
-        $hash = Code::on([$content, self::__currentGet('data'), self::$SCOPE]);
+        $hash = mx5([$content, self::__currentGet('data'), self::$SCOPE]);
 
         if (isset(self::$IMPORTED_HASH[$hash])) return '';
 

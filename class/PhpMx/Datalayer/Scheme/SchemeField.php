@@ -3,8 +3,8 @@
 namespace PhpMx\Datalayer\Scheme;
 
 use Exception;
-use PhpMx\Code;
 use PhpMx\Datalayer;
+use PhpMx\Mx5;
 
 class SchemeField
 {
@@ -213,8 +213,8 @@ class SchemeField
     {
         $map['size'] = 34;
 
-        if (isset($map['default']) && !Code::check($map['default']))
-            $map['default'] = Code::on($map['default']);
+        if (isset($map['default']) && !Mx5::check($map['default']))
+            $map['default'] = mx5($map['default']);
 
         return $map;
     }

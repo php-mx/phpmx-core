@@ -2,8 +2,8 @@
 
 namespace PhpMx\Datalayer\Driver\Field;
 
-use PhpMx\Code;
 use PhpMx\Datalayer\Driver\Field;
+use PhpMx\Mx5;
 
 /** Armazena um Code */
 class FCode extends Field
@@ -11,7 +11,7 @@ class FCode extends Field
     /** Define um novo valor para o campo */
     function set($value): static
     {
-        $value = is_null($value) ? $value : Code::on($value);
+        $value = is_null($value) ? $value : mx5($value);
 
         return parent::set($value);
     }
@@ -19,6 +19,6 @@ class FCode extends Field
     /** Verifica se  baum valor bate com o valor do campo */
     function compare($value): bool
     {
-        return Code::compare(Code::on($value), $this->get());
+        return Mx5::compare($value, $this->get());
     }
 }

@@ -2,7 +2,6 @@
 
 namespace PhpMx;
 
-use PhpMx\Code;
 use PhpMx\Dir;
 use PhpMx\File;
 use PhpMx\Import;
@@ -135,7 +134,7 @@ abstract class View
     /** Inicializa uma view */
     protected static function __currentOpen(array $scheme, array $data = [], ?string $importOnly = null)
     {
-        $scope = Code::on([self::$SCOPE, $scheme['scope']]);
+        $scope = mx5([self::$SCOPE, $scheme['scope']]);
 
         if (isset(self::$CURRENT[$scope])) return false;
 

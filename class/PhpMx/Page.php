@@ -2,8 +2,6 @@
 
 namespace PhpMx;
 
-use PhpMx\Code;
-
 abstract class Page
 {
     protected static array $HEAD = [];
@@ -21,7 +19,7 @@ abstract class Page
     /** Define o estado do layout */
     static function layoutState(?string $layoutState): void
     {
-        self::$LAYOUT_STATE = Code::on([self::$LAYOUT ?? uuid(), $layoutState]);
+        self::$LAYOUT_STATE = mx5([self::$LAYOUT ?? uuid(), $layoutState]);
     }
 
     /** Define um valor para uma subpropriedade da tag [#HEAD] */

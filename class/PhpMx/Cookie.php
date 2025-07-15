@@ -15,7 +15,7 @@ abstract class Cookie
     {
         $safe = str_starts_with($name, '#');
 
-        if ($safe) $name = Code::on($name);
+        if ($safe) $name = mx5($name);
 
         if (!isset(self::$COOKIES[$name]))
             self::$COOKIES[$name] = self::__getCookie($name);
@@ -38,7 +38,7 @@ abstract class Cookie
         $safe = str_starts_with($name, '#');
 
         if ($safe) {
-            $name = Code::on($name);
+            $name = mx5($name);
             $value = Cif::on("Cookie:$value");
         }
 

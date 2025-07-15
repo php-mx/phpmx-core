@@ -1,5 +1,32 @@
 <?php
 
+use PhpMx\Cif;
+use PhpMx\Mx5;
+
+if (!function_exists('is_base64')) {
+
+    /** Verifica se uma variavel é uma string base64 */
+    function is_base64(mixed $var): bool
+    {
+        if (empty($var) || !is_string($var))
+            return false;
+
+        return base64_encode(base64_decode($var, true)) === $var;
+    }
+}
+
+if (!function_exists('is_blank')) {
+
+    /** Verifica se uma variavel é nula, vazia ou composta de espaços em branco */
+    function is_blank(mixed $var): bool
+    {
+        if (is_string($var))
+            $var = trim($var);
+
+        return (empty($var) && !is_numeric($var) && !is_bool($var));
+    }
+}
+
 if (!function_exists('is_class')) {
 
     /** Verifica se um objeto é ou extende uma classe */
@@ -17,6 +44,24 @@ if (!function_exists('is_class')) {
     }
 }
 
+if (!function_exists('is_cif')) {
+
+    /** Verifica se uma variavel atende os requisitos para ser uma cifra */
+    function is_cif(mixed $var): bool
+    {
+        return Cif::check($var);
+    }
+}
+
+if (!function_exists('is_closure')) {
+
+    /** Verifica se uma variavel é uma função anonima ou objeto callable */
+    function is_closure(mixed $var): bool
+    {
+        return ($var instanceof Closure) || (is_object($var) && is_callable($var));
+    }
+}
+
 if (!function_exists('is_extend')) {
 
     /** Verifica se um objeto extende uma classe */
@@ -28,6 +73,57 @@ if (!function_exists('is_extend')) {
 
             if (class_exists($object) && class_exists($class))
                 return isset(class_parents($object)[$class]);
+        }
+
+        return false;
+    }
+}
+
+if (!function_exists('is_httpStatus')) {
+
+    /** Verifica se uma variavel corresponde a um status HTTP (100~599) */
+    function is_httpStatus($var): bool
+    {
+        return is_numeric($var) && $var >= 100 && $var <= 599;
+    }
+}
+
+if (!function_exists('is_httpStatusError')) {
+
+    /** Verifica se uma variavel corresponde a um status de erro HTTP (300~599) */
+    function is_httpStatusError($var): bool
+    {
+        return is_numeric($var) && $var >= 300 && $var <= 599;
+    }
+}
+
+if (!function_exists('is_idKey')) {
+
+    /** Verifica se uma variavel é um idKey */
+    function is_idKey(mixed $idKey): bool
+    {
+        if (Cif::check($idKey)) {
+            $idKey = Cif::off($idKey);
+            if (is_array($idKey) && is_string(array_shift($idKey)) && is_int(array_shift($idKey)))
+                return true;
+        }
+        return false;
+    }
+}
+
+if (!function_exists('is_image_base64')) {
+
+    /** Verifica se uma variavel é uma url de imagem base64 */
+    function is_image_base64(mixed $var): bool
+    {
+        if (empty($var) || !is_string($var))
+            return false;
+
+
+        if (preg_match('/^data:image\/(jpeg|jpg|png|gif|bmp|webp);base64,/', $var)) {
+            $data = explode(',', $var);
+            if (isset($data[1]) && is_base64($data[1]))
+                return true;
         }
 
         return false;
@@ -50,49 +146,6 @@ if (!function_exists('is_implement')) {
     }
 }
 
-if (!function_exists('is_trait')) {
-
-    /** Verifica se um objeto utiliza uma trait */
-    function is_trait(mixed $object, object|string|null $trait): bool
-    {
-        if (is_string($object) || is_object($object)) {
-            $object = is_string($object) ? $object : $object::class;
-
-            if (class_exists($object) && trait_exists($trait)) {
-                if (isset(class_uses($object)[$trait]))
-                    return true;
-
-                foreach (class_parents($object) as $parrent)
-                    if (isset(class_uses($parrent)[$trait]))
-                        return true;
-            }
-        }
-
-        return false;
-    }
-}
-
-if (!function_exists('is_blank')) {
-
-    /** Verifica se uma variavel é nula, vazia ou composta de espaços em branco */
-    function is_blank(mixed $var): bool
-    {
-        if (is_string($var))
-            $var = trim($var);
-
-        return (empty($var) && !is_numeric($var) && !is_bool($var));
-    }
-}
-
-if (!function_exists('is_md5')) {
-
-    /** Verifica se uma variavel é MD5 */
-    function is_md5(mixed $var): bool
-    {
-        return is_string($var) ? boolval(preg_match('/^[a-fA-F0-9]{32}$/', $var)) : false;
-    }
-}
-
 if (!function_exists('is_json')) {
 
     /** Verifica se uma variavel é uma string JSON */
@@ -109,52 +162,21 @@ if (!function_exists('is_json')) {
     }
 }
 
-if (!function_exists('is_closure')) {
+if (!function_exists('is_md5')) {
 
-    /** Verifica se uma variavel é uma função anonima ou objeto callable */
-    function is_closure(mixed $var): bool
+    /** Verifica se uma variavel é MD5 */
+    function is_md5(mixed $var): bool
     {
-        return ($var instanceof Closure) || (is_object($var) && is_callable($var));
+        return is_string($var) ? boolval(preg_match('/^[a-fA-F0-9]{32}$/', $var)) : false;
     }
 }
 
-if (!function_exists('is_stringable')) {
+if (!function_exists('is_mx5')) {
 
-    /** Verifica se uma variavel é uma string ou algo que possa ser convertido para string */
-    function is_stringable(mixed $var): bool
+    /** Verifica se uma variavel é um MX5 */
+    function is_mx5(mixed $var): bool
     {
-        return is_string($var) || is_numeric($var) || ($var instanceof Stringable);
-    }
-}
-
-if (!function_exists('is_base64')) {
-
-    /** Verifica se uma variavel é uma string base64 */
-    function is_base64(mixed $var): bool
-    {
-        if (empty($var) || !is_string($var))
-            return false;
-
-        return base64_encode(base64_decode($var, true)) === $var;
-    }
-}
-
-if (!function_exists('is_image_base64')) {
-
-    /** Verifica se uma variavel é uma url de imagem base64 */
-    function is_image_base64(mixed $var): bool
-    {
-        if (empty($var) || !is_string($var))
-            return false;
-
-
-        if (preg_match('/^data:image\/(jpeg|jpg|png|gif|bmp|webp);base64,/', $var)) {
-            $data = explode(',', $var);
-            if (isset($data[1]) && is_base64($data[1]))
-                return true;
-        }
-
-        return false;
+        return Mx5::check($var);
     }
 }
 
@@ -218,20 +240,33 @@ if (!function_exists('is_serialized')) {
     }
 }
 
-if (!function_exists('is_httpStatus')) {
+if (!function_exists('is_stringable')) {
 
-    /** Verifica se uma variavel corresponde a um status HTTP (100~599) */
-    function is_httpStatus($var): bool
+    /** Verifica se uma variavel é uma string ou algo que possa ser convertido para string */
+    function is_stringable(mixed $var): bool
     {
-        return is_numeric($var) && $var >= 100 && $var <= 599;
+        return is_string($var) || is_numeric($var) || ($var instanceof Stringable);
     }
 }
 
-if (!function_exists('is_httpStatusError')) {
+if (!function_exists('is_trait')) {
 
-    /** Verifica se uma variavel corresponde a um status de erro HTTP (300~599) */
-    function is_httpStatusError($var): bool
+    /** Verifica se um objeto utiliza uma trait */
+    function is_trait(mixed $object, object|string|null $trait): bool
     {
-        return is_numeric($var) && $var >= 300 && $var <= 599;
+        if (is_string($object) || is_object($object)) {
+            $object = is_string($object) ? $object : $object::class;
+
+            if (class_exists($object) && trait_exists($trait)) {
+                if (isset(class_uses($object)[$trait]))
+                    return true;
+
+                foreach (class_parents($object) as $parrent)
+                    if (isset(class_uses($parrent)[$trait]))
+                        return true;
+            }
+        }
+
+        return false;
     }
 }

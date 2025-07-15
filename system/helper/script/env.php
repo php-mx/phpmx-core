@@ -7,15 +7,15 @@ Env::loadFile('./.conf');
 
 Env::default('DEV', false);
 
-Env::default('CIF', 'base');
-
-Env::default('CODE', 'mxcodekey');
-
 Env::default('FORCE_SSL', true);
+
+Env::default('CIF', 'base');
 
 Env::default('TERMINAL_URL', 'http://localhost:8888');
 
-Env::default('JWT', 'jwtkey');
+Env::default('MX5_KEY', 'mx5key');
+
+Env::default('JWT_KEY', 'jwtkey');
 
 Env::default('CACHE', null);
 Env::default('CACHE_JS', '+30 days');

@@ -3,7 +3,7 @@
 namespace PhpMx\Input;
 
 use PhpMx\Cif;
-use PhpMx\Code;
+use PhpMx\Mx5;
 use Throwable;
 
 class InputFieldCaptcha extends InputField
@@ -18,8 +18,8 @@ class InputFieldCaptcha extends InputField
             try {
                 $captcha = explode('|', $recived);
                 $key = Cif::off($captcha[0]);
-                $value = Code::on(strtoupper($captcha[1]));
-                return Code::compare($key, $value);
+                $value = mx5(strtoupper($captcha[1]));
+                return Mx5::compare($key, $value);
             } catch (Throwable $e) {
                 return false;
             }

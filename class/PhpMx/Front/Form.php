@@ -2,7 +2,6 @@
 
 namespace PhpMx\Front;
 
-use PhpMx\Code;
 use PhpMx\Input;
 use PhpMx\Request;
 
@@ -12,7 +11,7 @@ class Form extends Input
 
     function __construct(string $name, ?array $dataValue = null)
     {
-        $this->formKey = Code::on(["form-$name", url('.')]);
+        $this->formKey = mx5(["form-$name", url('.')]);
         parent::__construct($dataValue);
     }
 
