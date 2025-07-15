@@ -6,6 +6,7 @@ use Exception;
 use PDO;
 use PhpMx\Datalayer\Query;
 use PhpMx\Datalayer\Query\BaseQuery;
+use PhpMx\Json;
 use PhpMx\Log;
 use Throwable;
 
@@ -88,9 +89,7 @@ abstract class BaseConnection
                 throw new Exception("[$query] [$error]");
             }
 
-            $type = explode(' ', $query);
-            $type = array_shift($type);
-            $type = strtolower($type);
+            $type = strtolower(strtok(trim($query), ' '));
 
             return match ($type) {
                 'update', 'delete' => true,
