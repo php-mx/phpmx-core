@@ -189,7 +189,7 @@ class Mysql extends BaseConnection
             case 'string':
             case 'email':
             case 'md5':
-            case 'code':
+            case 'mx5':
                 $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
                 $prepare = "`[#name]` varchar([#size])[#default][#null] COMMENT '[#comment]'";
                 break;

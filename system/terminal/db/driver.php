@@ -179,7 +179,7 @@ return new class extends Terminal {
 
                 $fieldMap['phpType'] = match ($fieldMap['type']) {
                     'boolean' => 'bool',
-                    'code', 'email', 'md5', 'string', 'text' => 'string',
+                    'email', 'md5', 'md5', 'string', 'text' => 'string',
                     'float' => 'float',
                     'idx', 'int' => 'int',
                     'time' => 'int|string',

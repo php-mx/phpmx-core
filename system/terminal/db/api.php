@@ -60,7 +60,7 @@ return new class extends Terminal {
         $updateInputFields = [];
 
         foreach ($tableMap['fields'] as $fieldName => $fieldMap) {
-            if ($fieldMap['type'] == 'code' || $fieldMap['type'] == 'hash')
+            if ($fieldMap['type'] == 'mx5' || $fieldMap['type'] == 'md5')
                 $ignoredFields[] = $fieldName;
 
             if (!str_starts_with($fieldName, '_')) {
@@ -76,7 +76,7 @@ return new class extends Terminal {
 
                 $createInputFields[] =  $this->template('controller/api/inputField', $data);
 
-                if ($fieldMap['type'] == 'code' || $fieldMap['type'] == 'hash')
+                if ($fieldMap['type'] == 'mx5' || $fieldMap['type'] == 'md5')
                     $data['fieldRequired'] = '->required(false)';
 
                 $updateInputFields[] =  $this->template('controller/api/inputField', $data);

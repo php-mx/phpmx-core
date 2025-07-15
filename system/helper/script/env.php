@@ -13,7 +13,7 @@ Env::default('CIF', 'base');
 
 Env::default('TERMINAL_URL', 'http://localhost:8888');
 
-Env::default('MX5_KEY', 'mx5key');
+Env::default('mx5_KEY', 'mx5key');
 
 Env::default('JWT_KEY', 'jwtkey');
 

@@ -5,8 +5,8 @@ namespace PhpMx\Datalayer\Driver\Field;
 use PhpMx\Datalayer\Driver\Field;
 use PhpMx\Mx5;
 
-/** Armazena um Code */
-class FCode extends Field
+/** Armazena um mx5 */
+class FMx5 extends Field
 {
     /** Define um novo valor para o campo */
     function set($value): static

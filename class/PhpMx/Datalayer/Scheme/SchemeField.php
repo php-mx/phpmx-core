@@ -45,10 +45,10 @@ class SchemeField
         return $this;
     }
 
-    /** Define o valor padrão do campo (f_boolean, f_code, f_email, f_float, f_md5, f_idx, f_int, f_json, f_string, f_text, f_time) */
+    /** Define o valor padrão do campo (f_boolean,  f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_json, f_string, f_text, f_time) */
     function default(mixed $default): static
     {
-        if (!$this->isType('boolean', 'code', 'email', 'float', 'md5', 'idx', 'int', 'json', 'string', 'text', 'time'))
+        if (!$this->isType('boolean',  'email', 'float', 'md5', 'mx5', 'idx', 'int', 'json', 'string', 'text', 'time'))
             throw new Exception(prepare("Unsoported [detault] to fields [[#]]", $this->map['type']));
 
         $this->map['default'] = $default;
@@ -66,20 +66,20 @@ class SchemeField
         return $this;
     }
 
-    /** Define se o campo aceita valores nulos (f_code, f_email, f_float, f_md5, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo aceita valores nulos ( f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_string, f_time) */
     function null(bool $null): static
     {
-        if (!$this->isType('code', 'email', 'float', 'md5', 'idx', 'int', 'string', 'time'))
+        if (!$this->isType('email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
             throw new Exception(prepare("Unsoported [null] to fields [[#]]", $this->map['type']));
 
         $this->map['null'] = boolval($null);
         return $this;
     }
 
-    /** Define se o campo deve ser indexado (f_boolean, f_code, f_email, f_float, f_md5, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo deve ser indexado (f_boolean, f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_string, f_time) */
     function index(bool $index): static
     {
-        if (!$this->isType('boolean', 'code', 'email', 'float', 'md5', 'idx', 'int', 'string', 'time'))
+        if (!$this->isType('boolean', 'email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
             throw new Exception(prepare("Unsoported [index] to fields [[#]]", $this->map['type']));
 
         if (!$index) $this->indexUnique(false);
@@ -87,10 +87,10 @@ class SchemeField
         return $this;
     }
 
-    /** Define se o campo deve ser indexado com valor unico (f_code, f_email, f_float, f_md5, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo deve ser indexado com valor unico (f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_string, f_time) */
     function indexUnique(bool $index): static
     {
-        if (!$this->isType('code', 'email', 'float', 'md5', 'idx', 'int', 'string', 'time'))
+        if (!$this->isType('email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
             throw new Exception(prepare("Unsoported [indexUnique] to fields [[#]]", $this->map['type']));
 
         if ($index) $this->index(true);
@@ -182,10 +182,10 @@ class SchemeField
 
         return match ($this->map['type']) {
             'boolean' => $this->__mapBoolean($this->map),
-            'code' => $this->__mapCode($this->map),
             'email' => $this->__mapEmail($this->map),
             'float' => $this->__mapFloat($this->map),
             'md5' => $this->__mapMd5($this->map),
+            'mx5' => $this->__mapMx5($this->map),
             'idx' => $this->__mapIdx($this->map),
             'int' => $this->__mapInt($this->map),
             'json' => $this->__mapJson($this->map),
@@ -204,17 +204,6 @@ class SchemeField
 
         if (is_bool($map['default']))
             $map['default'] = intval(boolval($map['default'] ?? 0));
-
-        return $map;
-    }
-
-    /** Retorna o mapa de campos CODE */
-    protected function __mapCode(array $map): array
-    {
-        $map['size'] = 34;
-
-        if (isset($map['default']) && !Mx5::check($map['default']))
-            $map['default'] = mx5($map['default']);
 
         return $map;
     }
@@ -271,13 +260,24 @@ class SchemeField
         return $map;
     }
 
-    /** Retorna o mapa de campos Md5 */
+    /** Retorna o mapa de campos md5 */
     protected function __mapMd5(array $map): array
     {
         $map['size'] = 32;
 
         if (isset($map['default']) && !is_md5($map['default']))
             $map['default'] = md5($map['default']);
+
+        return $map;
+    }
+
+    /** Retorna o mapa de campos mx5 */
+    protected function __mapMx5(array $map): array
+    {
+        $map['size'] = 34;
+
+        if (isset($map['default']) && !Mx5::check($map['default']))
+            $map['default'] = mx5($map['default']);
 
         return $map;
     }

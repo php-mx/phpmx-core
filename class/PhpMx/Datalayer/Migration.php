@@ -44,12 +44,6 @@ abstract class Migration
         return new SchemeField($name, ['type' => 'boolean', 'comment' => $comment]);
     }
 
-    /** Retorna um objeto campo do tipo Code */
-    function fieldCode(string $name, ?string $comment = null): SchemeField
-    {
-        return new SchemeField($name, ['type' => 'code', 'comment' => $comment]);
-    }
-
     /** Retorna um objeto campo do tipo Email */
     function fieldEmail(string $name, ?string $comment = null): SchemeField
     {
@@ -62,10 +56,16 @@ abstract class Migration
         return new SchemeField($name, ['type' => 'float', 'comment' => $comment]);
     }
 
-    /** Retorna um objeto campo do tipo Md5 */
+    /** Retorna um objeto campo do tipo md5 */
     function fieldMd5(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'md5', 'comment' => $comment]);
+    }
+
+    /** Retorna um objeto campo do tipo mx5 */
+    function fieldMx5(string $name, ?string $comment = null): SchemeField
+    {
+        return new SchemeField($name, ['type' => 'mx5', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo IDx */

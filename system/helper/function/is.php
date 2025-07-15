@@ -164,7 +164,7 @@ if (!function_exists('is_json')) {
 
 if (!function_exists('is_md5')) {
 
-    /** Verifica se uma variavel é MD5 */
+    /** Verifica se uma variavel é md5 */
     function is_md5(mixed $var): bool
     {
         return is_string($var) ? boolval(preg_match('/^[a-fA-F0-9]{32}$/', $var)) : false;
@@ -173,7 +173,7 @@ if (!function_exists('is_md5')) {
 
 if (!function_exists('is_mx5')) {
 
-    /** Verifica se uma variavel é um MX5 */
+    /** Verifica se uma variavel é um mx5 */
     function is_mx5(mixed $var): bool
     {
         return Mx5::check($var);
