@@ -12,7 +12,7 @@ abstract class Jwt
             "typ" => "JWT"
         ]);
 
-        $key = $key ?? env('JWT');
+        $key = $key ?? env('JWT_KEY');
 
         $payload = json_encode($payload);
 
@@ -29,7 +29,7 @@ abstract class Jwt
         if (!is_stringable($token))
             return false;
 
-        $key = $key ?? env('JWT');
+        $key = $key ?? env('JWT_KEY');
 
         $token = explode('.', $token . '...');
         $payload = self::base64_decode_url($token[1]);
