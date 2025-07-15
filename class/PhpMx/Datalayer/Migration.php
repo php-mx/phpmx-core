@@ -32,74 +32,74 @@ abstract class Migration
     function &table(string $table, ?string $comment = null): SchemeTable
     {
         $returnTable = $this->scheme->table($table, $comment)->fields([
-            $this->fTime('=_created', 'moment of record creation')->default(0)->index(true),
-            $this->fTime('=_updated', 'moment of last record update')->default(0)->index(true),
+            $this->fieldTime('=_created', 'moment of record creation')->default(0)->index(true),
+            $this->fieldTime('=_updated', 'moment of last record update')->default(0)->index(true),
         ]);
         return $returnTable;
     }
 
     /** Retorna um objeto campo do tipo Boolean */
-    function fBoolean(string $name, ?string $comment = null): SchemeField
+    function fieldBoolean(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'boolean', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo Email */
-    function fEmail(string $name, ?string $comment = null): SchemeField
+    function fieldEmail(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'email', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo Float */
-    function fFloat(string $name, ?string $comment = null): SchemeField
+    function fieldFloat(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'float', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo md5 */
-    function fMd5(string $name, ?string $comment = null): SchemeField
+    function fieldMd5(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'md5', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo MX5 */
-    function fMx5(string $name, ?string $comment = null): SchemeField
+    function fieldMx5(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'mx5', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo IDx */
-    function fIdx(string $name, ?string $comment = null): SchemeField
+    function fieldIdx(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'idx', 'comment' => $comment, 'index' => true, 'settings' => ['datalayer' => $this->dbName, 'table' => $name]]);
     }
 
     /** Retorna um objeto campo do tipo Int */
-    function fInt(string $name, ?string $comment = null): SchemeField
+    function fieldInt(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'int', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo Json */
-    function fJson(string $name, ?string $comment = null): SchemeField
+    function fieldJson(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'json', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo String */
-    function fString(string $name, ?string $comment = null): SchemeField
+    function fieldString(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'string', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo Text */
-    function fText(string $name, ?string $comment = null): SchemeField
+    function fieldText(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'text', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo Time */
-    function fTime(string $name, ?string $comment = null): SchemeField
+    function fieldTime(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'time', 'comment' => $comment]);
     }
