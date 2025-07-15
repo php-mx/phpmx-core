@@ -18,7 +18,7 @@ abstract class Datalayer
         'MYSQL' => Mysql::class,
         'MARIADB' => Mariadb::class,
         'SQLITE' => Sqlite::class,
-        'POSTGRESL' => Postgresql::class,
+        'POSTGRESQL' => Postgresql::class,
     ];
 
     /** Retorna um objeto datalayer */
