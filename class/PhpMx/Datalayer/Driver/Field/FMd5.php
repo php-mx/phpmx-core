@@ -4,8 +4,8 @@ namespace PhpMx\Datalayer\Driver\Field;
 
 use PhpMx\Datalayer\Driver\Field;
 
-/** Armazena um hash MD5 */
-class FHash extends Field
+/** Armazena um MD5 */
+class FMd5 extends Field
 {
     /** Define um novo valor para o campo */
     function set($value): static

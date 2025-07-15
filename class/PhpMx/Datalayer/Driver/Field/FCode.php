@@ -5,7 +5,7 @@ namespace PhpMx\Datalayer\Driver\Field;
 use PhpMx\Code;
 use PhpMx\Datalayer\Driver\Field;
 
-/** Armazena um hash Code */
+/** Armazena um Code */
 class FCode extends Field
 {
     /** Define um novo valor para o campo */

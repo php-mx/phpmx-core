@@ -86,7 +86,7 @@ if (!function_exists('is_blank')) {
 
 if (!function_exists('is_md5')) {
 
-    /** Verifica se uma variavel é hash MD5 */
+    /** Verifica se uma variavel é MD5 */
     function is_md5(mixed $var): bool
     {
         return is_string($var) ? boolval(preg_match('/^[a-fA-F0-9]{32}$/', $var)) : false;

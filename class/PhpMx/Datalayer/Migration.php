@@ -44,16 +44,10 @@ abstract class Migration
         return new SchemeField($name, ['type' => 'boolean', 'comment' => $comment]);
     }
 
-    /** Retorna um objeto campo do tipo Hash Code */
+    /** Retorna um objeto campo do tipo Code */
     function fieldCode(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'code', 'comment' => $comment]);
-    }
-
-    /** Retorna um objeto campo do tipo Config */
-    function fieldConfig(string $name, ?string $comment = null): SchemeField
-    {
-        return new SchemeField($name, ['type' => 'config', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo Email */
@@ -68,16 +62,10 @@ abstract class Migration
         return new SchemeField($name, ['type' => 'float', 'comment' => $comment]);
     }
 
-    /** Retorna um objeto campo do tipo Hash Md5 */
-    function fieldHash(string $name, ?string $comment = null): SchemeField
+    /** Retorna um objeto campo do tipo Md5 */
+    function fieldMd5(string $name, ?string $comment = null): SchemeField
     {
-        return new SchemeField($name, ['type' => 'hash', 'comment' => $comment]);
-    }
-
-    /** Retorna um objeto campo do tipo IDs */
-    function fieldIds(string $name, ?string $comment = null): SchemeField
-    {
-        return new SchemeField($name, ['type' => 'ids', 'comment' => $comment, 'settings' => ['datalayer' => $this->dbName, 'table' => $name]]);
+        return new SchemeField($name, ['type' => 'md5', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo IDx */
@@ -96,12 +84,6 @@ abstract class Migration
     function fieldJson(string $name, ?string $comment = null): SchemeField
     {
         return new SchemeField($name, ['type' => 'json', 'comment' => $comment]);
-    }
-
-    /** Retorna um objeto campo do tipo Log */
-    function fieldLog(string $name, ?string $comment = null): SchemeField
-    {
-        return new SchemeField($name, ['type' => 'log', 'comment' => $comment]);
     }
 
     /** Retorna um objeto campo do tipo String */

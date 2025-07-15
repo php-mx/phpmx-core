@@ -180,18 +180,15 @@ class Mysql extends BaseConnection
                 $prepare = "`[#name]` float([#size])[#default][#null] COMMENT '[#comment]'";
                 break;
 
-            case 'ids':
-            case 'log':
             case 'text':
             case 'json':
-            case 'config':
                 $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
                 $prepare = "`[#name]` text[#null] COMMENT '[#comment]'";
                 break;
 
             case 'string':
             case 'email':
-            case 'hash':
+            case 'md5':
             case 'code':
                 $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
                 $prepare = "`[#name]` varchar([#size])[#default][#null] COMMENT '[#comment]'";

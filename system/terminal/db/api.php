@@ -64,24 +64,22 @@ return new class extends Terminal {
                 $ignoredFields[] = $fieldName;
 
             if (!str_starts_with($fieldName, '_')) {
-                if ($fieldMap['type'] != 'log') {
-                    $data = [
-                        'fieldName' => $fieldName,
-                        'fieldRequired' => $fieldMap['null'] || !is_null($fieldMap['default']) ? '->required(false)' : '',
-                    ];
+                $data = [
+                    'fieldName' => $fieldName,
+                    'fieldRequired' => $fieldMap['null'] || !is_null($fieldMap['default']) ? '->required(false)' : '',
+                ];
 
-                    $data['fieldInputType'] = match ($fieldMap['type']) {
-                        'boolean' => 'fieldBool',
-                        default => 'field',
-                    };
+                $data['fieldInputType'] = match ($fieldMap['type']) {
+                    'boolean' => 'fieldBool',
+                    default => 'field',
+                };
 
-                    $createInputFields[] =  $this->template('controller/api/inputField', $data);
+                $createInputFields[] =  $this->template('controller/api/inputField', $data);
 
-                    if ($fieldMap['type'] == 'code' || $fieldMap['type'] == 'hash')
-                        $data['fieldRequired'] = '->required(false)';
+                if ($fieldMap['type'] == 'code' || $fieldMap['type'] == 'hash')
+                    $data['fieldRequired'] = '->required(false)';
 
-                    $updateInputFields[] =  $this->template('controller/api/inputField', $data);
-                }
+                $updateInputFields[] =  $this->template('controller/api/inputField', $data);
             }
         }
 

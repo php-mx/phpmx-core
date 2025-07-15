@@ -166,7 +166,6 @@ return new class extends Terminal {
                         if (isset($fieldMap['settings']['crop'])) $settings['crop'] = $fieldMap['settings']['crop'];
                         break;
                     case 'idx':
-                    case 'ids':
                         $settings['datalayer'] = $fieldMap['settings']['datalayer'];
                         $settings['table'] = $fieldMap['settings']['table'];
                         break;
@@ -180,10 +179,8 @@ return new class extends Terminal {
 
                 $fieldMap['phpType'] = match ($fieldMap['type']) {
                     'boolean' => 'bool',
-                    'code', 'email', 'hash', 'string', 'text' => 'string',
-                    'config' => 'mixed',
+                    'code', 'email', 'md5', 'string', 'text' => 'string',
                     'float' => 'float',
-                    'ids', 'log' => 'array',
                     'idx', 'int' => 'int',
                     'time' => 'int|string',
                     default => 'mixed'

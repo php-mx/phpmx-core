@@ -45,10 +45,10 @@ class SchemeField
         return $this;
     }
 
-    /** Define o valor padrão do campo (f_boolean, f_code, f_config, f_email, f_float, f_hash, f_idx, f_int, f_json, f_string, f_text, f_time) */
+    /** Define o valor padrão do campo (f_boolean, f_code, f_email, f_float, f_md5, f_idx, f_int, f_json, f_string, f_text, f_time) */
     function default(mixed $default): static
     {
-        if (!$this->isType('boolean', 'code', 'config', 'email', 'float', 'hash', 'idx', 'int', 'json', 'string', 'text', 'time'))
+        if (!$this->isType('boolean', 'code', 'email', 'float', 'md5', 'idx', 'int', 'json', 'string', 'text', 'time'))
             throw new Exception(prepare("Unsoported [detault] to fields [[#]]", $this->map['type']));
 
         $this->map['default'] = $default;
@@ -66,20 +66,20 @@ class SchemeField
         return $this;
     }
 
-    /** Define se o campo aceita valores nulos (f_code, f_email, f_float, f_hash, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo aceita valores nulos (f_code, f_email, f_float, f_md5, f_idx, f_int, f_string, f_time) */
     function null(bool $null): static
     {
-        if (!$this->isType('code', 'email', 'float', 'hash', 'idx', 'int', 'string', 'time'))
+        if (!$this->isType('code', 'email', 'float', 'md5', 'idx', 'int', 'string', 'time'))
             throw new Exception(prepare("Unsoported [null] to fields [[#]]", $this->map['type']));
 
         $this->map['null'] = boolval($null);
         return $this;
     }
 
-    /** Define se o campo deve ser indexado (f_boolean, f_code, f_email, f_float, f_hash, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo deve ser indexado (f_boolean, f_code, f_email, f_float, f_md5, f_idx, f_int, f_string, f_time) */
     function index(bool $index): static
     {
-        if (!$this->isType('boolean', 'code', 'email', 'float', 'hash', 'idx', 'int', 'string', 'time'))
+        if (!$this->isType('boolean', 'code', 'email', 'float', 'md5', 'idx', 'int', 'string', 'time'))
             throw new Exception(prepare("Unsoported [index] to fields [[#]]", $this->map['type']));
 
         if (!$index) $this->indexUnique(false);
@@ -87,10 +87,10 @@ class SchemeField
         return $this;
     }
 
-    /** Define se o campo deve ser indexado com valor unico (f_code, f_email, f_float, f_hash, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo deve ser indexado com valor unico (f_code, f_email, f_float, f_md5, f_idx, f_int, f_string, f_time) */
     function indexUnique(bool $index): static
     {
-        if (!$this->isType('code', 'email', 'float', 'hash', 'idx', 'int', 'string', 'time'))
+        if (!$this->isType('code', 'email', 'float', 'md5', 'idx', 'int', 'string', 'time'))
             throw new Exception(prepare("Unsoported [indexUnique] to fields [[#]]", $this->map['type']));
 
         if ($index) $this->index(true);
@@ -134,19 +134,19 @@ class SchemeField
         return $this->settings('decimal', num_positive($decimal));
     }
 
-    /** Determina a conexão referenciada pelo campo (f_idx, f_ids) */
+    /** Determina a conexão referenciada pelo campo (f_idx) */
     function datalayer(string $datalayer): static
     {
-        if (!$this->isType('idx', 'ids'))
+        if (!$this->isType('idx'))
             throw new Exception(prepare("Unsoported [datalayer] to fields [[#]]", $this->map['type']));
 
         return $this->settings('datalayer', Datalayer::internalName($datalayer));
     }
 
-    /** Determina a tabela referenciada pelo campo (f_idx, f_ids) */
+    /** Determina a tabela referenciada pelo campo (f_idx) */
     function table(string $table): static
     {
-        if (!$this->isType('idx', 'ids'))
+        if (!$this->isType('idx'))
             throw new Exception(prepare("Unsoported [table] to fields [[#]]", $this->map['type']));
 
         return $this->settings('table', Datalayer::internalName($table));
@@ -183,15 +183,12 @@ class SchemeField
         return match ($this->map['type']) {
             'boolean' => $this->__mapBoolean($this->map),
             'code' => $this->__mapCode($this->map),
-            'config' => $this->__mapConfig($this->map),
             'email' => $this->__mapEmail($this->map),
             'float' => $this->__mapFloat($this->map),
-            'hash' => $this->__mapHash($this->map),
-            'ids' => $this->__mapIds($this->map),
+            'md5' => $this->__mapMd5($this->map),
             'idx' => $this->__mapIdx($this->map),
             'int' => $this->__mapInt($this->map),
             'json' => $this->__mapJson($this->map),
-            'log' => $this->__mapLog($this->map),
             'string' => $this->__mapString($this->map),
             'text' => $this->__mapText($this->map),
             'time' => $this->__mapTime($this->map),
@@ -222,34 +219,6 @@ class SchemeField
         return $map;
     }
 
-    /** Retorna o mapa de campos CONFIG */
-    protected function __mapConfig(array $map): array
-    {
-        $map['size'] = null;
-        $map['null'] = false;
-
-        if (isset($map['default'])) {
-            $default = $map['default'];
-
-            if (is_json($default))
-                $default = json_decode($default, true);
-
-            if (!is_array($default))
-                throw new Exception("Invalid field default value in [$this->name]");
-
-            foreach ($default as $name => $value) {
-                if (is_array($value))
-                    throw new Exception("Invalid config inner value in [$this->name].[$name]");
-                $map['default'][$name] = $value;
-            }
-        }
-
-        $map['default'] = $map['default'] ?? [];
-        $map['default'] = json_encode($map['default']);
-
-        return $map;
-    }
-
     /** Retorna o mapa de campos EMAIL */
     protected function __mapEmail(array $map): array
     {
@@ -268,30 +237,6 @@ class SchemeField
 
         if (!isset($map['settings']['decimal']))
             $map['settings']['decimal'] = 2;
-
-        return $map;
-    }
-
-    /** Retorna o mapa de campos HASH */
-    protected function __mapHash(array $map): array
-    {
-        $map['size'] = 32;
-
-        if (isset($map['default']) && !is_md5($map['default']))
-            $map['default'] = md5($map['default']);
-
-        return $map;
-    }
-
-    /** Retorna o mapa de campos IDS */
-    protected function __mapIds(array $map): array
-    {
-        $map['size'] = null;
-        $map['null'] = false;
-        $map['settings']['datalayer'] = Datalayer::internalName($map['settings']['datalayer']);
-        $map['settings']['table'] = Datalayer::internalName($map['settings']['table']);
-
-        $map['default'] = '';
 
         return $map;
     }
@@ -326,14 +271,13 @@ class SchemeField
         return $map;
     }
 
-    /** Retorna o mapa de campos LOG */
-    protected function __mapLog(array $map): array
+    /** Retorna o mapa de campos Md5 */
+    protected function __mapMd5(array $map): array
     {
-        $map['size'] = null;
-        $map['null'] = false;
+        $map['size'] = 32;
 
-        $map['default'] =  [];
-        $map['default'] = json_encode($map['default']);
+        if (isset($map['default']) && !is_md5($map['default']))
+            $map['default'] = md5($map['default']);
 
         return $map;
     }
