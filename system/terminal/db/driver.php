@@ -266,12 +266,12 @@ return new class extends Terminal {
     /** Retrona um teplate de driver */
     protected function template(string $file, array $data = []): string
     {
-        $template = Path::seekForFile("library/template/terminal/datalayer/model/$file.txt");
+        $template = Path::seekForFile("library/template/terminal/db/$file.txt");
 
         $data['dbName'] = $this->dbName;
         $data['namespace'] = $this->namespace;
 
-        $template = Import::content($file, $data);
+        $template = Import::content($template, $data);
 
         return prepare($template, $data);
     }
