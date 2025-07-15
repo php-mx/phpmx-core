@@ -4,7 +4,9 @@ namespace PhpMx;
 
 use Exception;
 use PhpMx\Datalayer\Connection\BaseConnection;
+use PhpMx\Datalayer\Connection\Mariadb;
 use PhpMx\Datalayer\Connection\Mysql;
+use PhpMx\Datalayer\Connection\Postgresql;
 use PhpMx\Datalayer\Connection\Sqlite;
 
 abstract class Datalayer
@@ -14,7 +16,9 @@ abstract class Datalayer
 
     protected static $type = [
         'MYSQL' => Mysql::class,
-        'SQLITE' => Sqlite::class
+        'MARIADB' => Mariadb::class,
+        'SQLITE' => Sqlite::class,
+        'POSTGRESL' => Postgresql::class,
     ];
 
     /** Retorna um objeto datalayer */
