@@ -18,6 +18,8 @@ abstract class BaseConnection
 
     protected $instancePDO;
 
+    protected string $pdoDriver;
+
     /** Inicializa a conexão */
     abstract protected function load();
 
@@ -41,6 +43,9 @@ abstract class BaseConnection
 
     final function __construct(string $dbName, protected array $data = [])
     {
+        if (!extension_loaded($this->pdoDriver))
+            throw new Exception("Extension [{$this->pdoDriver}] is required.", STS_INTERNAL_SERVER_ERROR);
+
         $this->dbName = $dbName;
         $this->load();
         foreach ($this->data as $var => $value)

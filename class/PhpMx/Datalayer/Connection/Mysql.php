@@ -2,6 +2,7 @@
 
 namespace PhpMx\Datalayer\Connection;
 
+use Exception;
 use PDO;
 use PhpMx\Cif;
 use PhpMx\Datalayer;
@@ -10,6 +11,8 @@ use PhpMx\Log;
 
 class Mysql extends BaseConnection
 {
+    protected string $pdoDriver = 'pdo_mysql';
+
     /** Inicializa a conexão */
     protected function load()
     {
@@ -61,7 +64,7 @@ class Mysql extends BaseConnection
                 ->limit(1);
 
             if (!count($this->executeQuery($configTableExistsQuery)))
-                $this->executeQuery('CREATE TABLE __config (`name` VARCHAR(100) PRIMARY KEY, `value` TEXT);');
+                $this->executeQuery('CREATE TABLE __config (`id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(100) NOT NULL UNIQUE, `value` TEXT NOT NULL);');
 
             foreach ($this->executeQuery(Query::select('__config')) as $config)
                 $this->config[$config['name']] = is_serialized($config['value']) ? unserialize($config['value']) : $config['value'];
@@ -134,15 +137,16 @@ class Mysql extends BaseConnection
         $query = [];
 
         foreach ($index as $indexName => $scheme) {
+            $quotedIndex = "`{$name}_{$indexName}`";
             if ($scheme) {
                 list($field, $unique) = $scheme;
                 if ($unique) {
-                    $query[] = "CREATE UNIQUE INDEX `$name.$indexName` ON `$name`(`$field`);";
+                    $query[] = "CREATE UNIQUE INDEX $quotedIndex ON `$name`(`$field`);";
                 } else {
-                    $query[] = "CREATE INDEX `$name.$indexName` ON `$name`(`$field`);";
+                    $query[] = "CREATE INDEX $quotedIndex ON `$name`(`$field`);";
                 }
             } else {
-                $query[] = "DROP INDEX `$name.$indexName` ON `$name`;";
+                $query[] = "DROP INDEX $quotedIndex ON `$name`;";
             }
         }
 
@@ -155,32 +159,30 @@ class Mysql extends BaseConnection
         $prepare = '';
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
+        $field['comment'] = isset($field['comment']) && $field['comment'] !== '' ? " COMMENT '{$field['comment']}'" : '';
+
         switch ($field['type']) {
             case 'idx':
             case 'time':
-                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` int([#size]) [#default][#null] COMMENT '[#comment]'";
-                break;
-
             case 'int':
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` int([#size])[#default][#null] COMMENT '[#comment]'";
+                $prepare = "`[#name]` int([#size])[#default][#null][#comment]";
                 break;
 
             case 'boolean':
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` tinyint([#size])[#default][#null] COMMENT '[#comment]'";
+                $prepare = "`[#name]` tinyint([#size])[#default][#null][#comment]";
                 break;
 
             case 'float':
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` float([#size])[#default][#null] COMMENT '[#comment]'";
+                $prepare = "`[#name]` float([#size])[#default][#null][#comment]";
                 break;
 
             case 'text':
             case 'json':
-                $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
-                $prepare = "`[#name]` text[#null] COMMENT '[#comment]'";
+                $field['default'] = '';
+                $prepare = "`[#name]` text[#null][#comment]";
                 break;
 
             case 'string':
@@ -188,9 +190,13 @@ class Mysql extends BaseConnection
             case 'md5':
             case 'mx5':
                 $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
-                $prepare = "`[#name]` varchar([#size])[#default][#null] COMMENT '[#comment]'";
+                $prepare = "`[#name]` varchar([#size])[#default][#null][#comment]";
                 break;
+
+            default:
+                throw new Exception("Type [$field[type]] not suported", STS_INTERNAL_SERVER_ERROR);
         }
+
         return prepare($prepare, $field);
     }
 }

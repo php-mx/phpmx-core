@@ -2,6 +2,7 @@
 
 namespace PhpMx\Datalayer\Connection;
 
+use Exception;
 use PDO;
 use PhpMx\Datalayer;
 use PhpMx\Datalayer\Query;
@@ -11,6 +12,8 @@ use PhpMx\Log;
 
 class Sqlite extends BaseConnection
 {
+    protected string $pdoDriver = 'pdo_sqlite';
+
     /** Inicializa a conexão */
     protected function load()
     {
@@ -68,7 +71,7 @@ class Sqlite extends BaseConnection
                 ->limit(1);
 
             if (!count($this->executeQuery($configTableExistsQuery)))
-                $this->executeQuery('CREATE TABLE __config (name TEXT PRIMARY KEY, value TEXT);');
+                $this->executeQuery('CREATE TABLE __config (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, value TEXT NOT NULL);');
 
             foreach ($this->executeQuery(Query::select('__config')) as $config)
                 $this->config[$config['name']] = is_serialized($config['value']) ? unserialize($config['value']) : $config['value'];
@@ -183,15 +186,16 @@ class Sqlite extends BaseConnection
         $query = [];
 
         foreach ($index as $indexName => $scheme) {
+            $quotedIndex = "[{$name}_{$indexName}]";
             if ($scheme) {
                 list($field, $unique) = $scheme;
                 if ($unique) {
-                    $query[] = "CREATE UNIQUE INDEX [$name.$indexName] ON $name($field);";
+                    $query[] = "CREATE UNIQUE INDEX $quotedIndex ON $name($field);";
                 } else {
-                    $query[] = "CREATE INDEX [$name.$indexName] ON $name($field);";
+                    $query[] = "CREATE INDEX $quotedIndex ON $name($field);";
                 }
             } else {
-                $query[] = "DROP INDEX IF EXISTS [$name.$indexName];";
+                $query[] = "DROP INDEX IF EXISTS $quotedIndex;";
             }
         }
 
@@ -204,42 +208,38 @@ class Sqlite extends BaseConnection
         $prepare = '';
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
+
         switch ($field['type']) {
             case 'idx':
             case 'time':
-                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "[[#name]] int([#size]) [#default][#null]";
-                break;
-
             case 'int':
-                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "[[#name]] int([#size])[#default][#null]";
-                break;
-
             case 'boolean':
+                $field['type'] = 'INTEGER';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "[[#name]] tinyint([#size])[#default][#null]";
+                $prepare = "[[#name]] [#type][#default][#null]";
                 break;
 
             case 'float':
+                $field['type'] = 'REAL';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "[[#name]] float([#size])[#default][#null]";
-                break;
-
-            case 'text':
-            case 'json':
-                $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
-                $prepare = "[[#name]] text[#default][#null]";
+                $prepare = "[[#name]] [#type][#default][#null]";
                 break;
 
             case 'string':
             case 'email':
             case 'md5':
             case 'mx5':
+            case 'text':
+            case 'json':
+                $field['type'] = 'VARCHAR';
                 $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
-                $prepare = "[[#name]] varchar([#size])[#default][#null]";
+                $prepare = "[[#name]] [#type][#default][#null]";
                 break;
+
+            default:
+                throw new Exception("Type [$field[type]] not suported", STS_INTERNAL_SERVER_ERROR);
         }
+
         return prepare($prepare, $field);
     }
 }
