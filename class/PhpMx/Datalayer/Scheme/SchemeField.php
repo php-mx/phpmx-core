@@ -45,7 +45,7 @@ class SchemeField
         return $this;
     }
 
-    /** Define o valor padrão do campo (f_boolean,  f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_json, f_string, f_text, f_time) */
+    /** Define o valor padrão do campo (fBoolean,  fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fJson, fString, fText, fTime) */
     function default(mixed $default): static
     {
         if (!$this->isType('boolean',  'email', 'float', 'md5', 'mx5', 'idx', 'int', 'json', 'string', 'text', 'time'))
@@ -56,7 +56,7 @@ class SchemeField
         return $this;
     }
 
-    /** Define o tamanho maximo ( f_float, f_int, f_string) */
+    /** Define o tamanho maximo ( fFloat, fInt, fString) */
     function size(int $size): static
     {
         if (!$this->isType('float', 'int', 'string'))
@@ -66,7 +66,7 @@ class SchemeField
         return $this;
     }
 
-    /** Define se o campo aceita valores nulos ( f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo aceita valores nulos ( fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fString, fTime) */
     function null(bool $null): static
     {
         if (!$this->isType('email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
@@ -76,7 +76,7 @@ class SchemeField
         return $this;
     }
 
-    /** Define se o campo deve ser indexado (f_boolean, f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo deve ser indexado (fBoolean, fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fString, fTime) */
     function index(bool $index): static
     {
         if (!$this->isType('boolean', 'email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
@@ -87,7 +87,7 @@ class SchemeField
         return $this;
     }
 
-    /** Define se o campo deve ser indexado com valor unico (f_email, f_float, f_md5, f_mx5, f_idx, f_int, f_string, f_time) */
+    /** Define se o campo deve ser indexado com valor unico (fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fString, fTime) */
     function indexUnique(bool $index): static
     {
         if (!$this->isType('email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
@@ -98,7 +98,7 @@ class SchemeField
         return $this;
     }
 
-    /** Determina o valor máximo do campo (f_int, f_float) */
+    /** Determina o valor máximo do campo (fInt, fFloat) */
     function max(int $max): static
     {
         if (!$this->isType('int', 'float'))
@@ -107,7 +107,7 @@ class SchemeField
         return $this->settings('min', num_positive($max));
     }
 
-    /** Determina o valor minimo do campo (f_int, f_float) */
+    /** Determina o valor minimo do campo (fInt, fFloat) */
     function min(int $min): static
     {
         if (!$this->isType('int', 'float'))
@@ -116,7 +116,7 @@ class SchemeField
         return $this->settings('min', num_positive($min));
     }
 
-    /** Determina a forma de arredondamento do campo [-1:baixo,0:automático,1:cima] (f_int, f_float) */
+    /** Determina a forma de arredondamento do campo [-1:baixo,0:automático,1:cima] (fInt, fFloat) */
     function round(int $round): static
     {
         if (!$this->isType('int', 'float'))
@@ -125,7 +125,7 @@ class SchemeField
         return $this->settings('round', num_interval($round, -1, 1));
     }
 
-    /** Determina quantas casas decimais o campo deve ter (f_float) */
+    /** Determina quantas casas decimais o campo deve ter (fFloat) */
     function decimal(int $decimal): static
     {
         if (!$this->isType('float'))
@@ -134,7 +134,7 @@ class SchemeField
         return $this->settings('decimal', num_positive($decimal));
     }
 
-    /** Determina a conexão referenciada pelo campo (f_idx) */
+    /** Determina a conexão referenciada pelo campo (fIdx) */
     function datalayer(string $datalayer): static
     {
         if (!$this->isType('idx'))
@@ -143,7 +143,7 @@ class SchemeField
         return $this->settings('datalayer', Datalayer::internalName($datalayer));
     }
 
-    /** Determina a tabela referenciada pelo campo (f_idx) */
+    /** Determina a tabela referenciada pelo campo (fIdx) */
     function table(string $table): static
     {
         if (!$this->isType('idx'))
@@ -152,7 +152,7 @@ class SchemeField
         return $this->settings('table', Datalayer::internalName($table));
     }
 
-    /** Determina se o campo deve cortar conteúdo com mais caracteres que o permitido (f_string) */
+    /** Determina se o campo deve cortar conteúdo com mais caracteres que o permitido (fString) */
     function crop(bool $crop): static
     {
         if (!$this->isType('string'))
@@ -260,7 +260,7 @@ class SchemeField
         return $map;
     }
 
-    /** Retorna o mapa de campos md5 */
+    /** Retorna o mapa de campos MD5 */
     protected function __mapMd5(array $map): array
     {
         $map['size'] = 32;
@@ -271,7 +271,7 @@ class SchemeField
         return $map;
     }
 
-    /** Retorna o mapa de campos mx5 */
+    /** Retorna o mapa de campos MX5 */
     protected function __mapMx5(array $map): array
     {
         $map['size'] = 34;
