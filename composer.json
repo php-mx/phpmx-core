@@ -32,7 +32,6 @@
             "system/helper/function/str_to.php",
             "system/helper/function/url.php",
             "system/helper/function/uuid.php",
-            "system/helper/function/view.php",
             "system/helper/script/env.php",
             "system/helper/script/error.php",
             "system/helper/script/log.php",

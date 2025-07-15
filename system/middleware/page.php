@@ -4,6 +4,7 @@ use PhpMx\Log;
 use PhpMx\Page;
 use PhpMx\Request;
 use PhpMx\Response;
+use PhpMx\View;
 
 return new class extends Page {
 
@@ -63,11 +64,11 @@ return new class extends Page {
     protected function renderizeBase($content = ''): string
     {
         $version = cache('front-version', fn() => [
-            'script' => md5(view("_front/script")),
-            'style' => md5(view("_front/style"))
+            'script' => md5(View::render("_front/script")),
+            'style' => md5(View::render("_front/style"))
         ]);
 
-        $template = view('_front/base', ['HEAD' => self::$HEAD]);
+        $template = View::render('_front/base', ['HEAD' => self::$HEAD]);
 
         return prepare($template, [
             'CONTENT' => $content,
@@ -83,7 +84,7 @@ return new class extends Page {
         if (is_null(self::$LAYOUT))
             return "<div id='CONTENT'>\n$content\n</div>";
 
-        $template = view("_front/layout/" . self::$LAYOUT, ['HEAD' => self::$HEAD]);
+        $template = View::render("_front/layout/" . self::$LAYOUT, ['HEAD' => self::$HEAD]);
 
         return prepare($template, [
             'CONTENT' => $content

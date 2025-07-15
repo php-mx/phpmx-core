@@ -3,6 +3,7 @@
 namespace Controller\Base;
 
 use PhpMx\Page;
+use PhpMx\View;
 use Throwable;
 
 class Error
@@ -15,6 +16,6 @@ class Error
         Page::title($message);
         Page::layout(null);
 
-        return view('_front/error', ['status' => $status, 'message' => $message]);
+        View::render('_front/error', ['status' => $status, 'message' => $message]);
     }
 }
