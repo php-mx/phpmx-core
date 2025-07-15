@@ -66,7 +66,7 @@ class Insert extends BaseQuery
 
     protected function mountColumn(): string
     {
-        $columns = array_map(fn($v) => substr_count($v, '(') ? $v : "`$v`", $this->columns);
+        $columns = array_map(fn($v) => substr_count($v, '(') ? $v : $v, $this->columns);
 
         return '(' . implode(', ', $columns) . ')';
     }

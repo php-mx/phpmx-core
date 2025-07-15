@@ -95,13 +95,11 @@ class Update extends BaseQuery
         $change = [];
         foreach ($this->values as $name => $value) {
             if (is_numeric($name)) {
-                $value = substr_count($value, '(') ? $value : "`$value`";
                 $change[] = "$value = NULL";
             } else if (is_null($value)) {
-                $name = substr_count($name, '(') ? $name : "`$name`";
                 $change[] =  "$name = NULL";
             } else {
-                $fname = substr_count($name, '(') ? $name : "`$name`";
+                $fname = $name;
                 $change[] = "$fname = :value_$name";
             }
         }

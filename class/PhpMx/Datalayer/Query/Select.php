@@ -87,7 +87,7 @@ class Select extends BaseQuery
     function group(string $field)
     {
         $field = explode('.', $field);
-        $field = array_map(fn($v) => "`$v`", $field);
+        $field = array_map(fn($v) => $v, $field);
         $field = implode('.', $field);
 
         $this->group = $field;
@@ -111,7 +111,7 @@ class Select extends BaseQuery
             return $this;
 
         $field = explode('.', $field);
-        $field = array_map(fn($v) => "`$v`", $field);
+        $field = array_map(fn($v) => $v, $field);
         $field = implode('.', $field);
 
         $order = "CASE $field ";
@@ -162,7 +162,7 @@ class Select extends BaseQuery
     /** Adiciona um WHERE para ser utilizado na query verificando se um campo é nulo */
     function whereNull(string $campo, bool $status = true): static
     {
-        $campo = substr_count($campo, '(') ? $campo : "`$campo`";
+        $campo = substr_count($campo, '(') ? $campo : $campo;
         $this->where($status ? "$campo is null" : "$campo is not null");
         return $this;
     }
@@ -175,7 +175,7 @@ class Select extends BaseQuery
                 if (!substr_count($name, '(')) {
                     if (substr_count($name, '.')) {
                         $name = explode('.', $name);
-                        $name = array_map(fn($v) => $v != '*' ? "`$v`" : $v, $name);
+                        $name = array_map(fn($v) => $v != '*' ? $v : $v, $name);
                         $name = implode('.', $name);
                     }
                 }
