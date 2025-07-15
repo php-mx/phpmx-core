@@ -70,27 +70,19 @@ abstract class Cif
     /** Verifica se uma variavel atende os requisitos para ser uma cifra */
     static function check(mixed $var): bool
     {
-        if (func_num_args() > 1) {
-            $check = true;
-            foreach (func_get_args() as $v)
-                $check = $check && self::check($v);
-            return $check && self::compare(...func_get_args());
-        }
-
         return $var == self::on($var);
-
-        return false;
     }
 
     /** Verifica se todas as variaveis tem a mesma cifra */
     static function compare(mixed $initial, mixed ...$compare): bool
     {
-        $result = true;
+        $initial = self::off($initial);
 
-        while ($result && count($compare))
-            $result = boolval(self::off($initial) == self::off(array_shift($compare)));
+        foreach ($compare as $item)
+            if ($initial != self::off($item))
+                return false;
 
-        return $result;
+        return true;
     }
 
     /** Realiza o replace interno de uma string */
