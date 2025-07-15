@@ -17,7 +17,7 @@ return new class extends Terminal {
 
         $tables = $tables == '*' ? array_keys($import) : explode(',', $tables);
 
-        $map = Datalayer::get($dbName)->getConfig('__dbMap') ?? [];
+        $map = Datalayer::get($dbName)->getConfig('__dbmap') ?? [];
 
         self::echo("Starting import from [$file] to [$dbName]");
         self::echoLine();

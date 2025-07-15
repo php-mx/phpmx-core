@@ -11,7 +11,7 @@ return new class extends Terminal {
     {
         $dbName = Datalayer::internalName($dbName);
 
-        $map = Datalayer::get($dbName)->getConfig('__dbMap') ?? [];
+        $map = Datalayer::get($dbName)->getConfig('__dbmap') ?? [];
 
         $tables = $tables == '*' ? array_keys($map) : explode(',', $tables);
 

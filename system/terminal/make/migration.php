@@ -7,7 +7,7 @@ use PhpMx\Terminal;
 
 return new class extends Terminal {
 
-    function __invoke($migrationName)
+    function __invoke($migrationName = '')
     {
         $migrationRef = explode('.', $migrationName);
 

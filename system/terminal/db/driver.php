@@ -18,7 +18,7 @@ return new class extends Terminal {
     {
         $dbName = Datalayer::internalName($dbName);
 
-        $map = Datalayer::get($dbName)->getConfig('__dbMap') ?? [];
+        $map = Datalayer::get($dbName)->getConfig('__dbmap') ?? [];
 
         $namespace = 'Model\\' . strToPascalCase("db $dbName");
 

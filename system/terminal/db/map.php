@@ -10,7 +10,7 @@ return new class extends Terminal {
     {
         $dbName = Datalayer::internalName($dbName);
 
-        $map = Datalayer::get($dbName)->getConfig('__dbMap') ?? [];
+        $map = Datalayer::get($dbName)->getConfig('__dbmap') ?? [];
 
         $file = path("system/datalayer/$dbName/scheme/map.json");
 

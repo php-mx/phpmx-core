@@ -102,7 +102,7 @@ class Sqlite extends BaseConnection
 
         $listIndexTable = $this->executeQuery("SELECT name FROM sqlite_master WHERE tbl_name='$tableName' and  type = 'index'");
 
-        $newFields = $this->getConfig('__dbMap')[$tableName]['fields'];
+        $newFields = $this->getConfig('__dbmap')[$tableName]['fields'];
 
         foreach (array_keys($fields['drop']) as $fieldName) {
             if (isset($newFields[$fieldName]))
