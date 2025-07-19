@@ -8,7 +8,7 @@ use PhpMx\Request;
 
 class Download
 {
-    function default()
+    function __invoke()
     {
         $file = Path::seekForFile('library/download', ...Request::route());
         Assets::download($file);

@@ -9,7 +9,7 @@ use PhpMx\Path;
 
 class Captcha
 {
-    function default($color = '000', $background = 'fff')
+    function __invoke($color = '000', $background = 'fff')
     {
         $fg = $color;
         $bg = $background;

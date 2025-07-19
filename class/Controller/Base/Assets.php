@@ -7,7 +7,7 @@ use PhpMx\Request;
 
 class Assets
 {
-    function default()
+    function __invoke()
     {
         $file = Path::seekForFile('library/assets', ...Request::route());
         \PhpMx\Assets::send($file);

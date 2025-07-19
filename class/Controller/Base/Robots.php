@@ -6,7 +6,7 @@ use PhpMx\Response;
 
 class Robots
 {
-    function default()
+    function __invoke()
     {
         Response::type('text');
         Response::content("User-agent: *\nDisallow: /");

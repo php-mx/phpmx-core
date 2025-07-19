@@ -9,7 +9,7 @@ use PhpMx\Response;
 
 class Favicon
 {
-    function default()
+    function __invoke()
     {
         $file = path('library/assets/favicon.ico');
 

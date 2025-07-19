@@ -4,7 +4,7 @@ namespace [#namespace];
 
 class [#class]
 {
-    function default()
+    function __invoke()
     {
         return STS_NOT_IMPLEMENTED;
     }

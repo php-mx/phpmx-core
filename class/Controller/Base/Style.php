@@ -7,7 +7,7 @@ use PhpMx\View;
 
 class Style
 {
-    function default()
+    function __invoke()
     {
         Response::type('css');
         Response::content(View::render('_front/style'));

@@ -7,7 +7,7 @@ use PhpMx\View;
 
 class Script
 {
-    function default()
+    function __invoke()
     {
         Response::type('js');
         Response::content(View::render('_front/script'));

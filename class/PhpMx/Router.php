@@ -12,35 +12,35 @@ abstract class Router
     protected static array $MIDDLEWARES = [[]];
     protected static array $PATH = [];
 
+    /** Adiciona uma rota para responder por requisições GET e POST */
+    static function add(string $route, string|array|int $response, array $middlewares = []): void
+    {
+        self::get($route, $response, $middlewares);
+        self::post($route, $response, $middlewares);
+    }
+
     /** Adiciona uma rota para responder por requisições GET */
-    static function get(string $route, string $response, array $middlewares = []): void
+    static function get(string $route, string|array|int $response, array $middlewares = []): void
     {
         if (IS_GET) self::defineRoute($route, $response, $middlewares);
     }
 
     /** Adiciona uma rota para responder por requisições POST */
-    static function post(string $route, string $response, array $middlewares = []): void
+    static function post(string $route, string|array|int $response, array $middlewares = []): void
     {
         if (IS_POST) self::defineRoute($route, $response, $middlewares);
     }
 
     /** Adiciona uma rota para responder por requisições PUT */
-    static function put(string $route, string $response, array $middlewares = []): void
+    static function put(string $route, string|array|int $response, array $middlewares = []): void
     {
         if (IS_PUT) self::defineRoute($route, $response, $middlewares);
     }
 
     /** Adiciona uma rota para responder por requisições DELETE */
-    static function delete(string $route, string $response, array $middlewares = []): void
+    static function delete(string $route, string|array|int $response, array $middlewares = []): void
     {
         if (IS_DELETE) self::defineRoute($route, $response, $middlewares);
-    }
-
-    /** Adiciona uma rota para responder por chamadas do tipo página GET e POST */
-    static function page(string $route, string $response, array $middlewares = []): void
-    {
-        self::get($route, $response, $middlewares);
-        self::post($route, $response, $middlewares);
     }
 
     /** Adiciona um caminho padrão para um conjunto de rotas */
@@ -109,7 +109,7 @@ abstract class Router
     }
 
     /** Adiciona uma rota para interpretação */
-    protected static function defineRoute(string $route, string $response, array $middlewares = []): void
+    protected static function defineRoute(string $route, string|array|int $response, array $middlewares = []): void
     {
         $route = implode('/', [...self::$PATH, $route]);
 
@@ -252,7 +252,7 @@ abstract class Router
     }
 
     /** Executa uma resposta de rota */
-    protected static function executeActionResponse(string $response, array $data = [])
+    protected static function executeActionResponse(string|array|int $response, array $data = [])
     {
         if (is_httpStatus($response))
             throw new Exception('', $response);
@@ -260,51 +260,44 @@ abstract class Router
         if (is_int($response))
             throw new Exception('response route error', STS_INTERNAL_SERVER_ERROR);
 
+        $response = is_array($response) ? $response : [$response, '__invoke'];
 
-        list($class, $method) = explode(':', "$response:default");
-
-        $class = str_replace('.', '/', $class);
-        $class = explode('/', $class);
-        $class = array_map(fn($v) => ucfirst($v), $class);
-        $class = path('Controller', ...$class);
-        $class = str_replace('/', '\\', $class);
+        list($class, $method) = $response;
 
         if (!class_exists($class))
             throw new Exception('route not implemented', STS_NOT_IMPLEMENTED);
 
-        $params = [];
-        if (method_exists($class, '__construct')) {
-            $reflection = new ReflectionMethod($class, '__construct');
-            foreach ($reflection->getParameters() as $param) {
-                $name = $param->getName();
-                if (isset($data[$name])) {
-                    $params[] = $data[$name];
-                } else if ($param->isDefaultValueAvailable()) {
-                    $params[] = $param->getDefaultValue();
-                } else {
-                    throw new Exception("Parameter [$name] is required", STS_INTERNAL_SERVER_ERROR);
-                }
-            }
-        }
+        $__constructParams = [];
 
-        $response = new $class(...$params);
+        if (method_exists($class, '__construct'))
+            $__constructParams = self::getMethodParams($class, '__construct', $data);
+
+        $response = new $class(...$__constructParams);
 
         if (!method_exists($response, $method))
             throw new Exception("Method [$method] does not exist in response class", STS_NOT_IMPLEMENTED);
 
+        $response = $response->{$method}(...self::getMethodParams($class, $method, $data));
+
+        return $response;
+    }
+
+    /** Retorna os parametros que deve ser utilizados para chamar um metodo de um objeto de resposa */
+    protected static function getMethodParams(string|Object $class, string $method, array $data): array
+    {
         $params = [];
-        $reflection = new ReflectionMethod($response, $method);
+
+        $reflection = new ReflectionMethod($class, $method);
         foreach ($reflection->getParameters() as $param) {
             $name = $param->getName();
-            if (isset($data[$name])) {
+            if (isset($data[$name]))
                 $params[] = $data[$name];
-            } else if ($param->isDefaultValueAvailable()) {
+            else if ($param->isDefaultValueAvailable())
                 $params[] = $param->getDefaultValue();
-            } else {
+            else
                 throw new Exception("Parameter [$name] is required", STS_INTERNAL_SERVER_ERROR);
-            }
         }
 
-        return $response->{$method}(...$params) ?? null;
+        return $params;
     }
 }

@@ -1,16 +1,18 @@
 <?php
 
+namespace Controller;
+
 use PhpMx\Router;
 
-Router::get('assets/...', 'base.assets');
-Router::get('download/...', 'base.download');
+Router::get('assets/...', Base\Assets::class);
+Router::get('download/...', Base\Download::class);
 
-Router::get('favicon.ico', 'base.favicon');
-Router::get('robots.txt', 'base.robots');
-Router::get('sitemap.xml', 'base.sitemap');
-Router::get('style.css', 'base.style');
-Router::get('script.js', 'base.script');
+Router::get('favicon.ico', Base\Favicon::class);
+Router::get('robots.txt', Base\Robots::class);
+Router::get('sitemap.xml', Base\Sitemap::class);
+Router::get('style.css', Base\Style::class);
+Router::get('script.js', Base\Script::class);
 
-Router::get('captcha', 'base.captcha');
+Router::get('captcha', Base\Captcha::class);
 
-Router::get('', STS_OK);
+Router::get('', Base\ErrorPage::class);
