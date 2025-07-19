@@ -3,128 +3,109 @@
 namespace PhpMx;
 
 use Closure;
+use Exception;
 
 $interceptor = new class extends Terminal {
 
-    protected static ?string $METHOD = null;
-    protected static ?string $URI = null;
+    public bool $intercepting = false;
 
-    protected static array $MIDDLEWARES = [];
-    protected static array $PATH = [];
+    protected ?string $METHOD = null;
+    protected ?string $URI = null;
 
-    protected static array $USED = ['get' => [], 'post' => [], 'put' => [], 'delete' => []];
-
-    protected static array $ROUTE = [];
-
-    function __invoke($method = '*', $uri = null)
+    function __invoke($uri = null)
     {
-        if ($uri) list($uri) = $this->parseRouteTemplate($uri);
-        self::$METHOD = $method == '*' ? null : $method;
-        self::$URI = $uri;
+        if (!$this->intercepting)
+            throw new Exception('Class [phpMx\Router] has already been declared and not be intercepted');
 
         Import::only('index.php');
-    }
 
-    function solve(array $globalMiddlewares)
-    {
-        self::$MIDDLEWARES[] = $globalMiddlewares;
+        $routes = Router::scan();
 
-        foreach (Path::seekForDirs('system/routes') as $path) {
-            $origin = $this->getOrigim($path);
-            self::echo('[#]', $origin);
-            self::echoLine();
+        $routes = $this->organize($routes);
 
-            foreach (Dir::seekForFile($path, true) as $routeFile) {
-                $file = path($path, $routeFile);
+        if (!is_null($uri))
+            $routes = array_filter($routes, fn($v) => $this->checkRouteMatch($v['template'], $uri));
 
-                self::$ROUTE = [];
-                Import::only($file, true);
+        self::echo();
 
-                if (count(self::$ROUTE)) {
-                    self::echo(' - [#]', $file);
-                    self::$ROUTE = array_reverse(self::$ROUTE);
-
-                    foreach (self::$ROUTE as &$route) {
-                        $method = $route['method'];
-                        $template = $route['template'];
-
-                        $replaced = '';
-                        if (self::$USED[$method][$template] ?? false) {
-                            $replaced = self::$USED[$method][$template];
-
-                            if ($replaced['origin'] == $origin) {
-                                $replaced = prepare(' [replaced in [#file] ([#line])]', $replaced);
-                            } else {
-                                $replaced = prepare(' [replaced in [#origin]: [#file] ([#line])]', $replaced);
-                            }
-                        }
-
-                        self::$USED[$method][$template] = self::$USED[$method][$template] ?? [
-                            'origin' => $origin,
-                            'file' => $file,
-                            'line' => $route['line'],
-                        ];
-
-                        $route['status'] = $replaced;
-                    }
-
-                    self::$ROUTE = array_reverse(self::$ROUTE);
-
-                    foreach (self::$ROUTE as $route)
-                        self::echo('    - [[#method]]: [#call] {[#middlewares]}[#status]', $route);
-
-                    self::echo();
-                }
-            }
+        foreach ($routes as $route) {
+            self::echo(' [[#method]]: [#call]', $route);
+            self::echo('   response: [#]', $route['response']);
+            self::echo('   middlewares: [#]', $route['middlewares']);
+            self::echo('   registred: [#]', $route['registred_in']);
+            if ($route['replaced_in'])
+                self::echo('   replaced: [#]', $route['replaced_in']);
+            self::echo();
         }
     }
 
-    function route(string $method, string $route, string $response, array $middlewares = [])
+    protected function  checkRouteMatch(string $template, string $uri): bool
     {
-        if (is_null(self::$METHOD) || self::$METHOD == $method) {
-            $route = implode('/', [...self::$PATH, $route]);
-            list($template, $params) = $this->parseRouteTemplate($route);
+        $uri = trim($uri, '/');
+        $uri = explode('/', $uri);
 
-            if ($this->checkRouteMatch($template)) {
-                $middlewares = [...end(self::$MIDDLEWARES), ...$middlewares];
-                $middlewares = implode(',', $middlewares);
+        $template = trim($template, '/');
+        $template = explode('/', $template);
 
-                $line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'];
+        while (count($template)) {
+            $expected = array_shift($template);
+            $received = array_shift($uri) ?? '';
 
-                $params = array_map(fn($v) => is_null($v) ? $v : "[#$v]", $params);
-                $call = str_replace('#', '[#]', $template);
-                $call = prepare($call, $params);
+            if ($expected === '...') return true;
 
-                self::$ROUTE[] = [
-                    'method' => strtoupper($method),
-                    'template' => $template,
-                    'call' => $call,
-                    'line' => $line,
-                    'middlewares' => $middlewares,
-                ];
+            if (is_blank($received) && !is_blank($expected)) return false;
+
+            if (count($uri)) {
+                if ($expected !== '#' && $received !== $expected) return false;
+            } else {
+                if ($expected !== '#' && !str_starts_with($expected, $received)) return false;
             }
         }
+
+        return count($uri) === 0;
     }
 
-    function path(string $path, Closure $wrapper)
+    protected function organize(array $routes): array
     {
-        self::$PATH[] = $path;
-        $wrapper();
-        array_pop(self::$PATH);
-    }
+        $scheme = [];
+        $used = [];
 
-    function middleware(array $middlewares, Closure $wrapper)
-    {
-        self::$MIDDLEWARES[] = [...end(self::$MIDDLEWARES), ...$middlewares];
-        $wrapper();
-        array_pop(self::$MIDDLEWARES);
-    }
+        foreach (array_reverse($routes) as $route) {
 
-    function group(string $path, array $middlewares, Closure $wrapper)
-    {
-        $wrapper = fn() => $this->middleware($middlewares, $wrapper);
-        $wrapper = fn() => $this->path($path, $wrapper);
-        $wrapper();
+            $method = $route['method'];
+            $template = $route['template'];
+            $params = $route['params'];
+            $file = $route['file'];
+            $line = $route['line'];
+            $response = $this->getResponse($route['response']);
+            $middlewares = $route['middlewares'];
+
+            $key = md5("$method:$template");
+
+            $callParams = array_map(fn($v) => is_null($v) ? $v : "[#$v]", $params);
+            $call = str_replace('#', '[#]', $template);
+            $call = prepare($call, $callParams);
+            $call = trim($call, '/');
+
+            $routeScheme = [
+                'template' => $template,
+                'method' => strtoupper($method),
+                'call' => "/$call",
+                'response' => $response,
+                'middlewares' => $middlewares,
+                'registred_in' => "$file ($line)",
+                'replaced_in' => $used[$key] ?? null,
+            ];
+
+            if (!$routeScheme['replaced_in'])
+                $used[$key] = $routeScheme['registred_in'];
+
+            $scheme[] = $routeScheme;
+        }
+
+        $scheme = array_reverse($scheme);
+
+        return $scheme;
     }
 
     protected function getOrigim($path)
@@ -139,71 +120,51 @@ $interceptor = new class extends Terminal {
         return 'unknown';
     }
 
-    protected function parseRouteTemplate(string $route): array
+    protected function getResponse($response)
     {
-        $params = [];
-        $route = $this->normalizeRoute($route);
-        $route = explode('/', $route);
+        if (is_numeric($response)) return "[$response]";
 
-        foreach ($route as $pos => $param) {
-            if (str_starts_with($param, '[')) {
-                $param = trim($param, '[]');
-                if (str_starts_with($param, '#')) $param = substr($param, 1);
-                if (empty($param)) $param = null;
-                $params[$pos] = $param;
-                $route[$pos] = '#';
-            }
-        }
+        $response = is_array($response) ? $response : [$response, '__invoke'];
 
-        $route = implode('/', $route);
-        return [$route, $params];
-    }
+        $class = array_shift($response);
+        $method = array_shift($response);
 
-    protected function normalizeRoute(string $route): string
-    {
-        $route = explode('/', $route);
-        $route = array_filter($route, fn($v) => trim($v) != '');
-        $route = implode('/', $route);
-        $route .= '/';
-
-        if (strpos($route, '...') !== false) {
-            $route = explode('...', $route);
-            $route = array_shift($route);
-            $route = trim($route, '/');
-            $route .= '/...';
-        }
-
-        return $route;
-    }
-
-    protected function checkRouteMatch(string $template): bool
-    {
-        if (is_null(self::$URI)) return true;
-
-        $uri = self::$URI;
-        $uri = trim($uri, '/');
-        $uri = explode('/', $uri);
-
-        $template = trim($template, '/');
-        $template = explode('/', $template);
-
-        while (count($uri)) {
-            $received = array_shift($uri) ?? '';
-            if ($received === '...') return true;
-            if (!count($template)) return false;
-            $expected = array_shift($template);
-            if ($expected !== '#' && $received !== $expected) return false;
-            if (is_blank($received) && !is_blank($expected)) return false;
-        }
-
-        return true;
+        return prepare("[$class][$method]");
     }
 };
 
-if (!class_exists('\PhpMx\Router', false)) {
+$interceptor->intercepting = !class_exists('\PhpMx\Router', false);
+
+if ($interceptor->intercepting) {
+
+    Log::add('mx', 'interceptor [PhpMx.Router]');
     abstract class Router
     {
-        static $interceptor;
+        protected static array $ROUTE = [];
+        protected static array $MIDDLEWARES = [[]];
+        protected static array $PATH = [];
+
+        protected static function registerRoute(string $method, string $route, string|array|int $response, array $middlewares = []): void
+        {
+            $route = implode('/', [...self::$PATH, $route]);
+            list($template, $params) = self::parseRouteTemplate($route);
+
+            $middlewares = [...end(self::$MIDDLEWARES), ...$middlewares];
+            $middlewares = implode(',', $middlewares);
+
+            $line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'];
+            $file = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'];
+
+            self::$ROUTE[] = [
+                'method' => $method,
+                'template' => $template,
+                'params' => $params,
+                'middlewares' => $middlewares,
+                'response' => $response,
+                'file' => path($file),
+                'line' => $line,
+            ];
+        }
 
         static function __callStatic($name, $arguments)
         {
@@ -211,17 +172,91 @@ if (!class_exists('\PhpMx\Router', false)) {
                 'get',
                 'post',
                 'put',
-                'delete', => self::$interceptor->route($name, ...$arguments),
-                'solve',
-                'path',
-                'middleware',
-                'group' => self::$interceptor->{$name}(...$arguments),
+                'delete', => self::registerRoute($name, ...$arguments),
+                'add', => [
+                    self::get(...$arguments),
+                    self::post(...$arguments),
+                ],
                 default => null,
             };
         }
-    };
 
-    Router::$interceptor = $interceptor;
+        static function path(string $path, Closure $wrapper): void
+        {
+            list($template) = self::parseRouteTemplate("$path...");
+            $template = implode("/", [...self::$PATH, $template]);
+            self::$PATH[] = $path;
+            $wrapper();
+            array_pop(self::$PATH);
+        }
+
+        static function middleware(array $middlewares, Closure $wrapper): void
+        {
+            self::$MIDDLEWARES[] = [...end(self::$MIDDLEWARES), ...$middlewares];
+            $wrapper();
+            array_pop(self::$MIDDLEWARES);
+        }
+
+        static function group(string $path, array $middlewares, Closure $wrapper): void
+        {
+            $wrapper = fn() => self::middleware($middlewares, $wrapper);
+            $wrapper = fn() => self::path($path, $wrapper);
+            $wrapper();
+        }
+
+        static function solve(array $globalMiddlewares = [])
+        {
+            self::$MIDDLEWARES = [$globalMiddlewares];
+        }
+
+        static function scan(): array
+        {
+            self::$ROUTE = [];
+
+            foreach (array_reverse(Path::seekForDirs('system/routes')) as $path)
+                foreach (Dir::seekForFile($path, true) as $file)
+                    Import::only("$path/$file", false);
+
+            return self::$ROUTE;
+        }
+
+        protected static function parseRouteTemplate(string $route): array
+        {
+            $params = [];
+            $route = self::normalizeRoute($route);
+            $route = explode('/', $route);
+
+            foreach ($route as $pos => $param) {
+                if (str_starts_with($param, '[')) {
+                    $param = trim($param, '[]');
+                    if (str_starts_with($param, '#')) $param = substr($param, 1);
+                    if (empty($param)) $param = null;
+                    $params[$pos] = $param;
+                    $route[$pos] = '#';
+                }
+            }
+
+            $route = implode('/', $route);
+            return [$route, $params];
+        }
+
+        protected static function normalizeRoute(string $route): string
+        {
+            $route = explode('/', $route);
+            $route = array_filter($route, fn($v) => trim($v) != '');
+            $route = implode('/', $route);
+            $route .= '/';
+
+            if (strpos($route, '...') !== false) {
+                $route = explode('...', $route);
+                $route = array_shift($route);
+                $route = trim($route, '/');
+                $route .= '/...';
+            }
+
+            return $route;
+        }
+    }
 }
 
 return $interceptor;
