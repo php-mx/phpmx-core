@@ -255,7 +255,7 @@ abstract class Router
     protected static function executeActionResponse(string|array|int $response, array $data = [])
     {
         if (is_httpStatus($response))
-            throw new Exception('', $response);
+            return $response;
 
         if (is_int($response))
             throw new Exception('response route error', STS_INTERNAL_SERVER_ERROR);
