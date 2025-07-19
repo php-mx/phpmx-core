@@ -47,3 +47,8 @@ Env::default('DB_MAIN_TYPE', 'sqlite');
 Env::default('COOKIE_LIFE', '+30 days');
 
 Env::default('USE_CACHE_FILE', true);
+
+Env::default('PAGE_TITLE', 'PHP-MX');
+Env::default('PAGE_FAVICON', '/favicon.ico');
+Env::default('PAGE_DESCRIPTION', 'Simplesmente PHP');
+Env::default('PAGE_LAYOUT', 'default');

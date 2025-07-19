@@ -1,5 +1,6 @@
 <?php
 
+use Controller\Base\ErrorPage;
 use PhpMx\Log;
 use PhpMx\Page;
 use PhpMx\Request;
@@ -13,6 +14,11 @@ return new class extends Page {
         if (IS_API) return $next();
 
         try {
+            self::title(env('PAGE_TITLE'));
+            self::favicon(env('PAGE_FAVICON'));
+            self::description(env('PAGE_DESCRIPTION'));
+            self::layout(env('PAGE_LAYOUT'));
+
             $content = $next();
             if (is_httpStatus($content)) throw new Exception(env("STM_$content"), $content);
             $content = $this->renderize($content);
@@ -121,7 +127,7 @@ return new class extends Page {
         }
 
         if (IS_GET) {
-            $content = \Controller\Base\Error::handlePageThrowable($e);
+            $content = ErrorPage::handlePageThrowable($e);
             $content = $this->renderize($content);
         }
 
