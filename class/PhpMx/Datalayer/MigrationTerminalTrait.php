@@ -41,8 +41,6 @@ trait MigrationTerminalTrait
 
     protected static function loadDatalayer($dbName)
     {
-        $dbName = $dbName ?? 'main';
-
         Datalayer::get($dbName);
         self::$dbName = Datalayer::internalName($dbName);
         self::$path = path('system/datalayer', self::$dbName, 'migration');

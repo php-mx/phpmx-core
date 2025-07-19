@@ -7,14 +7,9 @@ use PhpMx\Terminal;
 
 return new class extends Terminal {
 
-    function __invoke($migrationName = '')
+    function __invoke(string $dbName, string $migrationName)
     {
-        $migrationRef = explode('.', $migrationName);
-
-        $migrationName = array_pop($migrationRef) ?? '';
-        $migrationDbName = array_pop($migrationRef) ?? 'main';
-
-        $migrationDbName = strToCamelCase($migrationDbName);
+        $migrationDbName = strToCamelCase($dbName);
 
         usleep(1);
         $time = microtime(true);

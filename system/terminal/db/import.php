@@ -7,7 +7,7 @@ use PhpMx\Terminal;
 
 return new class extends Terminal {
 
-    function __invoke($dbName = 'main', $tables = '*')
+    function __invoke($dbName, $tables = '*')
     {
         $dbName = Datalayer::internalName($dbName);
 
