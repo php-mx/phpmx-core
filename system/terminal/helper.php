@@ -20,9 +20,9 @@ return new class extends Terminal {
 
             foreach ($this->getCommandsIn($path, $origin) as $cmd) {
                 if (is_null($command) || str_starts_with($cmd['terminal'], $command)) {
-                    self::echo(' - [#terminal] ([#file])[#status]', $cmd);
+                    self::echo(' [#terminal] ([#file])[#status]', $cmd);
                     foreach ($cmd['variations'] as $variation)
-                        self::echo('     php mx [#][#]', [$cmd['terminal'], $variation]);
+                        self::echo('   php mx [#][#]', [$cmd['terminal'], $variation]);
                     self::echo();
                 }
             };
