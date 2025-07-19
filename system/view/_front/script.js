@@ -1,1 +1,1 @@
-// [#VIEW:./mx/script.js]
+// [#VIEW:./mx/script]
