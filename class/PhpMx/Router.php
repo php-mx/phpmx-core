@@ -12,6 +12,8 @@ abstract class Router
     protected static array $MIDDLEWARES = [[]];
     protected static array $PATH = [];
 
+    protected static ?string $SCAN_TYPE = null;
+
     /** Adiciona uma rota para responder por requisições GET e POST */
     static function add(string $route, string|array|int $response, array $middlewares = []): void
     {
@@ -22,25 +24,25 @@ abstract class Router
     /** Adiciona uma rota para responder por requisições GET */
     static function get(string $route, string|array|int $response, array $middlewares = []): void
     {
-        if (IS_GET) self::defineRoute($route, $response, $middlewares);
+        if (self::$SCAN_TYPE == 'get') self::defineRoute($route, $response, $middlewares);
     }
 
     /** Adiciona uma rota para responder por requisições POST */
     static function post(string $route, string|array|int $response, array $middlewares = []): void
     {
-        if (IS_POST) self::defineRoute($route, $response, $middlewares);
+        if (self::$SCAN_TYPE == 'post') self::defineRoute($route, $response, $middlewares);
     }
 
     /** Adiciona uma rota para responder por requisições PUT */
     static function put(string $route, string|array|int $response, array $middlewares = []): void
     {
-        if (IS_PUT) self::defineRoute($route, $response, $middlewares);
+        if (self::$SCAN_TYPE == 'put') self::defineRoute($route, $response, $middlewares);
     }
 
     /** Adiciona uma rota para responder por requisições DELETE */
     static function delete(string $route, string|array|int $response, array $middlewares = []): void
     {
-        if (IS_DELETE) self::defineRoute($route, $response, $middlewares);
+        if (self::$SCAN_TYPE == 'delete') self::defineRoute($route, $response, $middlewares);
     }
 
     /** Adiciona um caminho padrão para um conjunto de rotas */
@@ -48,11 +50,9 @@ abstract class Router
     {
         list($template) = self::parseRouteTemplate("$path...");
         $template = implode("/", [...self::$PATH, $template]);
-        if (self::checkRouteMatch($template)) {
-            self::$PATH[] = $path;
-            $wrapper();
-            array_pop(self::$PATH);
-        }
+        self::$PATH[] = $path;
+        $wrapper();
+        array_pop(self::$PATH);
     }
 
     /** Adiciona um middlewares padrão para um conjunto de rotas */
@@ -74,14 +74,10 @@ abstract class Router
     /** Resolve a requisição atual enviando a reposta ao cliente */
     static function solve(array $globalMiddlewares = [])
     {
-        list($middlewares, $wrapper) = Log::add('mx', 'router solve', function () use ($globalMiddlewares) {
-            $routes = cache('routes-' . Request::type(), function () {
-                foreach (array_reverse(Path::seekForDirs('system/routes')) as $path)
-                    foreach (Dir::seekForFile($path, true) as $file)
-                        Import::only("$path/$file", true);
+        self::$MIDDLEWARES = [$globalMiddlewares];
 
-                return self::organize(self::$ROUTE);
-            });
+        list($middlewares, $wrapper) = Log::add('mx', 'router solve', function () {
+            $routes = self::scan(Request::type());
 
             $routeMatch = self::getRouteMatch($routes);
 
@@ -89,10 +85,9 @@ abstract class Router
                 list($template, $response, $params, $middlewares) = $routeMatch;
                 self::setRequestRouteParams($template, $params);
                 $wrapper = fn() => self::executeActionResponse($response, Request::data());
-                $middlewares = [...$globalMiddlewares, ...$middlewares];
             } else {
                 $wrapper = fn() => throw new Exception('Route not found', STS_NOT_FOUND);
-                $middlewares = $globalMiddlewares;
+                $middlewares = self::$MIDDLEWARES;
             }
 
             return [$middlewares, $wrapper];
@@ -106,6 +101,26 @@ abstract class Router
             Response::content($response);
             Response::send();
         });
+    }
+
+    /** Retorna o esquema de rotas para um tipo de requisição */
+    static function scan(string $method): array
+    {
+        self::$SCAN_TYPE = strtolower($method);
+
+        $routes = cache("routes-$method", function () {
+            self::$ROUTE = [];
+
+            foreach (array_reverse(Path::seekForDirs('system/routes')) as $path)
+                foreach (Dir::seekForFile($path, true) as $file)
+                    Import::only("$path/$file", false);
+
+            return self::organize(self::$ROUTE);
+        });
+
+        self::$SCAN_TYPE = null;
+
+        return $routes;
     }
 
     /** Adiciona uma rota para interpretação */
