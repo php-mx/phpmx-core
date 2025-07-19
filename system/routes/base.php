@@ -15,4 +15,4 @@ Router::get('script.js', Base\Script::class);
 
 Router::get('captcha', Base\Captcha::class);
 
-Router::get('', Base\ErrorPage::class);
+Router::get('', STS_OK);
