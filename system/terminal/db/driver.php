@@ -16,6 +16,9 @@ return new class extends Terminal {
 
     function __invoke($dbName)
     {
+        self::echo('Installing drivers');
+        self::echoLine();
+
         $dbName = Datalayer::internalName($dbName);
 
         $map = Datalayer::get($dbName)->getConfig('__dbmap') ?? [];
@@ -28,8 +31,6 @@ return new class extends Terminal {
         $this->map = $map;
         $this->namespace = $namespace;
         $this->path = $path;
-
-        self::echoLine();
 
         Dir::remove($this->path . "/Driver", true);
 
@@ -266,7 +267,7 @@ return new class extends Terminal {
     /** Retrona um teplate de driver */
     protected function template(string $file, array $data = []): string
     {
-        $template = Path::seekForFile("library/template/terminal/db/$file.txt");
+        $template = Path::seekForFile("library/template/terminal/db/model/$file.txt");
 
         $data['dbName'] = $this->dbName;
         $data['namespace'] = $this->namespace;
