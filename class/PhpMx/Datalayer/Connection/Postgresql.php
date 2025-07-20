@@ -23,6 +23,7 @@ class Postgresql extends BaseConnection
         $this->data['user'] = $this->data['user'] ?? env("DB_{$envName}_USER");
         $this->data['pass'] = $this->data['pass'] ?? env("DB_{$envName}_PASS");
         $this->data['port'] = $this->data['port'] ?? env("DB_{$envName}_PORT");
+        $this->data['scheme'] = $this->data['scheme'] ?? env("DB_{$envName}_SCHEME") ?? 'public';
 
         if (empty($this->data['port'])) unset($this->data['port']);
 
@@ -37,7 +38,8 @@ class Postgresql extends BaseConnection
         $this->instancePDO = [
             $dsn,
             $this->data['user'],
-            $this->data['pass']
+            $this->data['pass'],
+            $this->data['scheme']
         ];
     }
 
@@ -46,7 +48,9 @@ class Postgresql extends BaseConnection
     {
         if (is_array($this->instancePDO)) {
             Log::add('datalayer.start', prepare('[#] postgresql', Datalayer::externalName($this->dbName, 'Db')), function () {
+                $scheme = array_pop($this->instancePDO);
                 $this->instancePDO = new \PDO(...$this->instancePDO);
+                $this->instancePDO->exec("SET search_path TO $scheme");
             });
         }
         return $this->instancePDO;
