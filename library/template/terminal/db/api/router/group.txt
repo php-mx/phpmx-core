@@ -1,0 +1,7 @@
+<?php
+
+use PhpMx\Router;
+
+Router::group('api/[#dbName]', [], function () {
+[#routes]
+});
