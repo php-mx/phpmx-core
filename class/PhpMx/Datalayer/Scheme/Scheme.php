@@ -127,12 +127,6 @@ class Scheme
                 $fields['drop'][$fieldName] = $fieldMap;
 
                 $indexName = strToSnakeCase($fieldName);
-
-                // if ($this->map->checkIndex($tableName, "simple_$indexName", true))
-                //     $fields['index']["simple_$indexName"] = false;
-
-                // if ($this->map->checkIndex($tableName, "unique_$indexName", true))
-                //     $fields['index']["unique_$indexName"] = false;
             }
         }
 
