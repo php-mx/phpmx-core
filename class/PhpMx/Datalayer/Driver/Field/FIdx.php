@@ -77,8 +77,10 @@ class FIdx extends Field
     }
 
     /** Retorna a chave de identificação cifrada */
-    function idKey(): string
+    function idKey(): ?string
     {
+        if (!$this->_checkInDb()) return null;
+
         $datalayer = $this->SETTINGS['datalayer'];
         $table = $this->SETTINGS['table'];
         $driverClass = 'Model\\' . strToPascalCase("db $datalayer") . '\\' . strToPascalCase("db $datalayer");

@@ -45,8 +45,9 @@ abstract class Record
     }
 
     /** Retorna a chave de identificação cifrada */
-    final function idKey(): string
+    final function idKey(): ?string
     {
+        if (!$this->_checkInDb()) return null;
         $drvierClass = 'Model\\' . strToPascalCase("db $this->DATALAYER") . '\\' . strToPascalCase("db $this->DATALAYER");
         $tableMethod = strToCamelCase($this->TABLE);
         return $drvierClass::${$tableMethod}->idToIdkey($this->id);
@@ -82,8 +83,14 @@ abstract class Record
     {
         $scheme = [];
 
-        foreach ($fields as $field)
-            $scheme[$field] = $this->_schemeValue($field);
+        foreach ($fields as $pos => $field) {
+
+            $fieldName = is_numeric($pos) ? $field : $pos;
+            $schemeWraper =  is_numeric($pos) ? fn($record) => $record->_schemeValue($field) : $field;
+            $schemeWraper = !is_callable($schemeWraper) ? fn($record) => $schemeWraper : $schemeWraper;
+
+            $scheme[$fieldName] = $schemeWraper($this);
+        }
 
         return $scheme;
     }
