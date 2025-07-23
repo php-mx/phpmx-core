@@ -77,24 +77,14 @@ class SchemeField
     }
 
     /** Define se o campo deve ser indexado (fBoolean, fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fString, fTime) */
-    function index(bool $index): static
+    function index(bool $index, bool $unique = false): static
     {
         if (!$this->isType('boolean', 'email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
             throw new Exception(prepare("Unsoported [index] to fields [[#]]", $this->map['type']));
 
-        if (!$index) $this->indexUnique(false);
         $this->map['index'] = $index;
-        return $this;
-    }
+        $this->map['unique'] = $index && $unique;
 
-    /** Define se o campo deve ser indexado com valor unico (fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fString, fTime) */
-    function indexUnique(bool $index): static
-    {
-        if (!$this->isType('email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
-            throw new Exception(prepare("Unsoported [indexUnique] to fields [[#]]", $this->map['type']));
-
-        if ($index) $this->index(true);
-        $this->map['unique'] = $index;
         return $this;
     }
 
