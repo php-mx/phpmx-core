@@ -66,7 +66,9 @@ class Insert extends BaseQuery
 
     protected function mountColumn(): string
     {
-        $columns = array_map(fn($v) => substr_count($v, '(') ? $v : $v, $this->columns);
+        $columns = [];
+        foreach ($this->columns as $name)
+            $columns[] = "`$name`";
 
         return '(' . implode(', ', $columns) . ')';
     }
@@ -77,9 +79,7 @@ class Insert extends BaseQuery
         foreach ($this->values as $pos => $value) {
             $insert = [];
             foreach ($this->columns as  $field) {
-                if (!array_key_exists($field, $value)) {
-                    $insert[] = 'NULL';
-                } else if (is_null($value[$field])) {
+                if (!array_key_exists($field, $value) || is_null($value[$field])) {
                     $insert[] = 'NULL';
                 } else {
                     $insert[] = ':' . $field . '_' . $pos;

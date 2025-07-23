@@ -7,11 +7,34 @@ use PDO;
 use PhpMx\Cif;
 use PhpMx\Datalayer;
 use PhpMx\Datalayer\Query;
+use PhpMx\Datalayer\Query\BaseQuery;
 use PhpMx\Log;
 
 class Postgresql extends BaseConnection
 {
     protected string $pdoDriver = 'pdo_pgsql';
+
+    /** Executa uma query */
+    function executeQuery(string|BaseQuery $query, array $data = []): mixed
+    {
+        if (is_class($query, BaseQuery::class))
+            list($query, $data) = $query->query();
+
+        $placeholders = [];
+        $query = preg_replace_callback("/'(?:''|[^'])*'/", function ($match) use (&$placeholders) {
+            $key = '__LIT' . count($placeholders) . '__';
+            $placeholders[$key] = $match[0];
+            return $key;
+        }, $query);
+
+        $query = preg_replace('/`([^`]+)`/', '"$1"', $query);
+
+        foreach ($placeholders as $key => $value) {
+            $query = str_replace($key, $value, $query);
+        }
+
+        return parent::executeQuery($query, $data);
+    }
 
     /** Inicializa a conexão */
     protected function load()

@@ -79,12 +79,12 @@ class Select extends BaseQuery
     function page(int $page, int $limit): static
     {
         $page = $page ? $limit * $page : 0;
-        $this->limit = "$page, $limit";
+        $this->limit = "$limit OFFSET $page";
         return $this;
     }
 
     /** Define um agrupamento para a query */
-    function group(string $field)
+    function group(string $field): static
     {
         $field = explode('.', $field);
         $field = array_map(fn($v) => $v, $field);
@@ -97,9 +97,16 @@ class Select extends BaseQuery
     /** Define a ordem da query */
     function order(string|array $fields, bool $asc = true): static
     {
-        $fields = is_array($fields) ? $fields : [$fields];
-        foreach ($fields as $field) {
-            $this->order[] = $asc ? "$field ASC" : "$field DESC";
+        $fields = is_array($fields) ? $fields : [$fields => $asc];
+
+        foreach ($fields as $fieldName => $orderAsc) {
+            if (is_numeric($fieldName)) {
+                $fieldName = $orderAsc;
+                $orderAsc = $asc;
+            }
+            $orderAsc = $orderAsc ? 'ASC' : 'DESC';
+
+            $this->order[] = "`$fieldName` $orderAsc";
         }
         return $this;
     }
@@ -111,15 +118,22 @@ class Select extends BaseQuery
             return $this;
 
         $field = explode('.', $field);
-        $field = array_map(fn($v) => $v, $field);
+        $field = array_map(fn($name) => "`$name`", $field);
         $field = implode('.', $field);
 
-        $order = "CASE $field ";
+        $order = "CASE $field";
 
-        foreach ($orderValues as $pos => $id)
-            $order .= " WHEN $id THEN $pos ";
+        $orderValues = array_reverse($orderValues);
 
-        $order .= 'ELSE 9999 END';
+        foreach ($orderValues as $pos => $val) {
+            if (is_string($val)) {
+                $val = addslashes($val);
+                $val = "'$val'";
+            }
+            $order .= " WHEN $val THEN -" . $pos + 1;
+        }
+
+        $order .= " ELSE 0 END";
 
         $this->order[] = $order;
 
@@ -127,19 +141,10 @@ class Select extends BaseQuery
     }
 
     /** Adiciona um WHERE ao select */
-    function where(...$args): static
+    function where(): static
     {
-        if (count($args) == 2) {
-            if (is_array($args[1]))
-                return $this->whereIn(...$args);
-            if (is_bool($args[1])) {
-                $compare = $args[1] ? ' != ?' : ' = ?';
-                return $this->where("$args[0] $compare", 0);
-            }
-        }
-
-        if (count($args))
-            $this->where[] = $args;
+        if (func_num_args())
+            $this->where[] = func_get_args();
 
         return $this;
     }
@@ -156,14 +161,13 @@ class Select extends BaseQuery
             return $this->where('false');
 
         $ids = implode(',', $ids);
-        return $this->where("$field in ($ids)");
+        return $this->where("`$field` in ($ids)");
     }
 
     /** Adiciona um WHERE para ser utilizado na query verificando se um campo é nulo */
     function whereNull(string $campo, bool $status = true): static
     {
-        $campo = substr_count($campo, '(') ? $campo : $campo;
-        $this->where($status ? "$campo is null" : "$campo is not null");
+        $this->where($status ? "`$campo` is null" : "`$campo` is not null");
         return $this;
     }
 
@@ -192,7 +196,12 @@ class Select extends BaseQuery
 
     protected function mountOrder(): string
     {
-        return empty($this->order) ? '' : ' ORDER BY ' . implode(', ', $this->order);
+        if (empty($this->order))
+            return '';
+
+        $fields = implode(', ', $this->order);
+
+        return " ORDER BY $fields";
     }
 
     protected function mountGroup(): string
@@ -208,16 +217,21 @@ class Select extends BaseQuery
             if (count($where) == 1 || is_null($where[1])) {
                 $return[] = $where[0];
             } else {
-                $igualdade = array_shift($where);
-                if (!substr_count($igualdade, ' ') && !substr_count($igualdade, '?')) {
-                    $igualdade = "$igualdade = ?";
-                }
+                $expression = array_shift($where);
+                if (!substr_count($expression, ' ') && !substr_count($expression, '?'))
+                    $expression = "$expression = ?";
 
-                foreach ($where as $v) {
-                    $igualdade = str_replace(["'?'", '"?"'], '?', $igualdade);
-                    $igualdade = preg_replace("/\?/", ":where_" . ($parametros++), $igualdade, 1);
-                }
-                $return[] = $igualdade;
+                $expression = preg_replace_callback('/\b([a-z_][a-z0-9_]*)\b/i', function ($match) {
+                    $token = strtolower($match[1]);
+                    return in_array($token, $this->sqlKeywords) ? $match[0] : "`{$match[1]}`";
+                }, $expression);
+
+                $expression = str_replace_all(["'?'", '"?"'], '?', $expression);
+
+                foreach ($where as $v)
+                    $expression = str_replace_first('?', ":where_" . ($parametros++), $expression);
+
+                $return[] = $expression;
             }
         }
 

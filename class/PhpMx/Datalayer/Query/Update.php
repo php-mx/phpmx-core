@@ -62,9 +62,9 @@ class Update extends BaseQuery
     /** Adiciona um WHERE ao select */
     function where(): static
     {
-        if (func_num_args()) {
+        if (func_num_args())
             $this->where[] = func_get_args();
-        }
+
         return $this;
     }
 
@@ -80,13 +80,13 @@ class Update extends BaseQuery
             return $this->where('false');
 
         $ids = implode(',', $ids);
-        return $this->where("$field in ($ids)");
+        return $this->where("`$field` in ($ids)");
     }
 
     /** Adiciona um WHERE para ser utilizado na query verificando se um campo é nulo */
     function whereNull(string $campo, bool $status = true): static
     {
-        $this->where($status ? "$campo is null" : "$campo is not null");
+        $this->where($status ? "`$campo` is null" : "`$campo` is not null");
         return $this;
     }
 
@@ -95,12 +95,12 @@ class Update extends BaseQuery
         $change = [];
         foreach ($this->values as $name => $value) {
             if (is_numeric($name)) {
-                $change[] = "$value = NULL";
+                $change[] = "`$value` = NULL";
             } else if (is_null($value)) {
-                $change[] =  "$name = NULL";
+                $change[] =  "`$name` = NULL";
             } else {
                 $fname = $name;
-                $change[] = "$fname = :value_$name";
+                $change[] = "`$fname` = :value_$name";
             }
         }
         return implode(', ', $change);
@@ -114,16 +114,21 @@ class Update extends BaseQuery
             if (count($where) == 1 || is_null($where[1])) {
                 $return[] = $where[0];
             } else {
-                $igualdade = array_shift($where);
-                if (!substr_count($igualdade, ' ') && !substr_count($igualdade, '?')) {
-                    $igualdade = "$igualdade = ?";
-                }
+                $expression = array_shift($where);
+                if (!substr_count($expression, ' ') && !substr_count($expression, '?'))
+                    $expression = "$expression = ?";
 
-                foreach ($where as $v) {
-                    $igualdade = str_replace(["'?'", '"?"'], '?', $igualdade);
-                    $igualdade = preg_replace("/\?/", ":where_" . ($parametros++), $igualdade, 1);
-                }
-                $return[] = $igualdade;
+                $expression = preg_replace_callback('/\b([a-z_][a-z0-9_]*)\b/i', function ($match) {
+                    $token = strtolower($match[1]);
+                    return in_array($token, $this->sqlKeywords) ? $match[0] : "`{$match[1]}`";
+                }, $expression);
+
+                $expression = str_replace_all(["'?'", '"?"'], '?', $expression);
+
+                foreach ($where as $v)
+                    $expression = str_replace_first('?', ":where_" . ($parametros++), $expression);
+
+                $return[] = $expression;
             }
         }
 

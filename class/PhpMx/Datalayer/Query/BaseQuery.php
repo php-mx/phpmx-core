@@ -8,8 +8,29 @@ use PhpMx\Datalayer;
 abstract class BaseQuery
 {
     protected array $data = [];
+
     protected ?string $dbName = null;
+
     protected null|string|array $table = null;
+
+    protected $sqlKeywords = [
+        'select',
+        'from',
+        'where',
+        'and',
+        'or',
+        'not',
+        'in',
+        'is',
+        'null',
+        'like',
+        'between',
+        'exists',
+        'true',
+        'false',
+        'as',
+        '?'
+    ];
 
     function __construct(null|string|array $table)
     {
@@ -53,10 +74,15 @@ abstract class BaseQuery
             if (is_array($this->table)) {
                 $table = [];
                 foreach ($this->table as $name => $alias)
-                    $table[] = !is_numeric($name) ? "$name as $alias" : "$alias";
+                    $table[] = !is_numeric($name) ? "`$name` as `$alias`" : "`$alias`";
                 return implode(', ', $table);
+            } elseif (substr_count($this->table, '.')) {
+                $table = explode('.', $this->table);
+                foreach ($table as &$name)
+                    $name = "`$name`";
+                return implode('.', $table);
             } else {
-                return substr_count($this->table, '.') ? $this->table : "$this->table";
+                return "`$this->table`";
             }
         }
         return '';
