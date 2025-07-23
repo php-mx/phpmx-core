@@ -71,7 +71,7 @@ class Sqlite extends BaseConnection
                 ->limit(1);
 
             if (!count($this->executeQuery($configTableExistsQuery)))
-                $this->executeQuery('CREATE TABLE __config (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, value TEXT NOT NULL);');
+                $this->executeQuery('CREATE TABLE `__config` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL UNIQUE, `value` TEXT NOT NULL);');
 
             foreach ($this->executeQuery(Query::select('__config')) as $config)
                 $this->config[$config['name']] = is_serialized($config['value']) ? unserialize($config['value']) : $config['value'];
@@ -82,7 +82,7 @@ class Sqlite extends BaseConnection
     protected function schemeQueryCreateTable(string $tableName, ?string $comment, array $fields): array
     {
         $queryFields = [
-            '[id] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT'
+            '`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT'
         ];
 
         foreach ($fields['add'] ?? [] as $fielName => $field)
@@ -90,7 +90,7 @@ class Sqlite extends BaseConnection
                 $queryFields[] = $this->schemeTemplateField($fielName, $field);
 
         return [
-            prepare("CREATE TABLE [[#name]] ([#fields])", [
+            prepare("CREATE TABLE `[#name]` ([#fields])", [
                 'name' => $tableName,
                 'fields' => implode(', ', $queryFields)
             ])
@@ -102,7 +102,7 @@ class Sqlite extends BaseConnection
     {
         $query = [];
 
-        $listIndexTable = $this->executeQuery("SELECT name FROM sqlite_master WHERE tbl_name='$tableName' and  type = 'index'");
+        $listIndexTable = $this->executeQuery("SELECT `name` FROM `sqlite_master` WHERE `tbl_name`='$tableName' and `type` = 'index'");
 
         $newFields = $this->getConfig('__dbmap')[$tableName]['fields'];
 
@@ -141,6 +141,8 @@ class Sqlite extends BaseConnection
 
         array_push($fieldsName, ...array_keys($newFields));
 
+        $fieldsName = array_map(fn($v) => "`$v`", $fieldsName);
+
         $fieldsName = implode(', ', $fieldsName);
 
         $insert = [];
@@ -160,7 +162,7 @@ class Sqlite extends BaseConnection
 
         if (count($insert)) {
             $query[] = prepare(
-                "INSERT INTO [[#table]] ([#fieldsName]) VALUES ([#insert])",
+                "INSERT INTO `[#table]` ([#fieldsName]) VALUES ([#insert])",
                 [
                     'table' => $tableName,
                     'fieldsName' => $fieldsName,
@@ -186,16 +188,16 @@ class Sqlite extends BaseConnection
         $query = [];
 
         foreach ($index as $indexName => $scheme) {
-            $quotedIndex = "[{$name}_{$indexName}]";
+            $quotedIndex = "{$name}_{$indexName}";
             if ($scheme) {
                 list($field, $unique) = $scheme;
                 if ($unique) {
-                    $query[] = "CREATE UNIQUE INDEX $quotedIndex ON $name($field);";
+                    $query[] = "CREATE UNIQUE INDEX `$quotedIndex` ON `$name`(`$field`);";
                 } else {
-                    $query[] = "CREATE INDEX $quotedIndex ON $name($field);";
+                    $query[] = "CREATE INDEX `$quotedIndex` ON `$name`(`$field`);";
                 }
             } else {
-                $query[] = "DROP INDEX IF EXISTS $quotedIndex;";
+                $query[] = "DROP INDEX IF EXISTS `$quotedIndex`;";
             }
         }
 
@@ -216,13 +218,13 @@ class Sqlite extends BaseConnection
             case 'boolean':
                 $field['type'] = 'INTEGER';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "[[#name]] [#type][#default][#null]";
+                $prepare = "`[#name]` [#type][#default][#null]";
                 break;
 
             case 'float':
                 $field['type'] = 'REAL';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "[[#name]] [#type][#default][#null]";
+                $prepare = "`[#name]` [#type][#default][#null]";
                 break;
 
             case 'string':
@@ -233,7 +235,7 @@ class Sqlite extends BaseConnection
             case 'json':
                 $field['type'] = 'VARCHAR';
                 $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
-                $prepare = "[[#name]] [#type][#default][#null]";
+                $prepare = "`[#name]` [#type][#default][#null]";
                 break;
 
             default:
