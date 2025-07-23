@@ -124,7 +124,7 @@ return new class extends Terminal {
 
         $path = path($this->namespace);
 
-        File::create("class/$path/$className.php", $content, true);
+        File::create("class/$path/$className.php", $content);
     }
 
     protected function createRoute()
