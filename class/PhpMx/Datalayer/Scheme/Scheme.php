@@ -99,13 +99,13 @@ class Scheme
                         $indexName = strToSnakeCase($fieldName);
                         $indexType = $fieldMap['unique'] ? ('unique') : ($fieldMap['index'] ? 'simple' : false);
 
-                        if ($indexType == 'unique' && $this->map->checkIndex($tableName, "simple_$indexName", true))
+                        if ($indexType != 'simple' && $this->map->checkIndex($tableName, "simple_$indexName", true))
                             $fields['index']["simple_$indexName"] = false;
 
-                        if ($indexType == 'simple' && $this->map->checkIndex($tableName, "unique_$indexName", true))
+                        if ($indexType != 'unique' && $this->map->checkIndex($tableName, "unique_$indexName", true))
                             $fields['index']["unique_$indexName"] = false;
 
-                        if ($indexType)
+                        if ($indexType && !$this->map->checkIndex($tableName, "{$indexType}_{$indexName}", true))
                             $fields['index']["{$indexType}_{$indexName}"] = [$fieldName, $fieldMap['unique']];
                     }
                 } else {
@@ -114,13 +114,13 @@ class Scheme
                     $indexName = strToSnakeCase($fieldName);
                     $indexType = $fieldMap['unique'] ? ('unique') : ($fieldMap['index'] ? 'simple' : false);
 
-                    if ($indexType == 'unique' && $this->map->checkIndex($tableName, "simple_$indexName", true))
+                    if ($indexType != 'simple' && $this->map->checkIndex($tableName, "simple_$indexName", true))
                         $fields['index']["simple_$indexName"] = false;
 
-                    if ($indexType == 'simple' && $this->map->checkIndex($tableName, "unique_$indexName", true))
+                    if ($indexType != 'unique' && $this->map->checkIndex($tableName, "unique_$indexName", true))
                         $fields['index']["unique_$indexName"] = false;
 
-                    if ($indexType)
+                    if ($indexType && !$this->map->checkIndex($tableName, "{$indexType}_{$indexName}", true))
                         $fields['index']["{$indexType}_{$indexName}"] = [$fieldName, $fieldMap['unique']];
                 }
             } else if ($this->map->checkField($tableName, $fieldName, true)) {
