@@ -101,7 +101,7 @@ class InputField
                 $this->valueSanitized = $rule($this->valueSanitized);
             }
 
-            if (count($this->scapePrepare))
+            if (is_null($this->scapePrepare) || count($this->scapePrepare))
                 $this->valueSanitized = Prepare::scape($this->valueSanitized, $this->scapePrepare);
 
             $this->sanitized = true;
@@ -204,8 +204,8 @@ class InputField
     /** Define quais tags prepare o campo deve escapar */
     function scapePrepare(bool|array $scapePrepare = true): static
     {
-        if (!is_array($scapePrepare))
-            $scapePrepare = $scapePrepare ? [] : null;
+        if (is_bool($scapePrepare))
+            $scapePrepare = $scapePrepare ? null : [];
 
         $this->scapePrepare = $scapePrepare;
 
