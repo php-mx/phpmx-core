@@ -226,15 +226,6 @@ mx.submit = (form, appentData = {}) => {
     appentData.formKey = form.getAttribute("data-form-key");
     for (const [key, value] of Object.entries(appentData)) data.append(key, value);
 
-    // ⚠️ Suporte a arquivos ainda não implementado no backend
-    //   form.querySelectorAll("input[type=file]").forEach((input) => {
-    //     for (var i = 0; i < input.files.length; i++) {
-    //       if (input.getAttribute("name")) {
-    //         data.append(input.getAttribute("name") + "[]", input.files[i]);
-    //       }
-    //     }
-    //   });
-
     mx.core
         .request(url, form.getAttribute("method") ?? "post", data, header)
         .then((resp) => {
