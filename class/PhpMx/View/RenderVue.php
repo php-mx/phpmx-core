@@ -48,7 +48,7 @@ abstract class RenderVue extends View
         $content = "()=>{\n$script\n$template\nreturn vueApp;}";
 
         if (!self::parentType('vue')) {
-            $content = "<script>\mx.vue($content,'$name');\n</script>$style";
+            $content = "<script>mx.vue($content,'$name');\n</script>$style";
         } else {
             $content = "$name: ($content)(),$style";
         }
