@@ -1,6 +1,0 @@
-
-    Router::get('[#route]', [\[#namespace]\[#controller]::class, 'list']);
-    Router::post('[#route]', [\[#namespace]\[#controller]::class, 'create']);
-    Router::get('[#route]/[[#key]]', [\[#namespace]\[#controller]::class, 'show']);
-    Router::put('[#route]/[[#key]]', [\[#namespace]\[#controller]::class, 'update']);
-    Router::delete('[#route]/[[#key]]', [\[#namespace]\[#controller]::class, 'remove']);

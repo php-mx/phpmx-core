@@ -267,7 +267,7 @@ return new class extends Terminal {
     /** Retrona um teplate de driver */
     protected function template(string $file, array $data = []): string
     {
-        $template = Path::seekForFile("library/template/terminal/db/model/$file.txt");
+        $template = Path::seekForFile("library/template/terminal/db/$file.txt");
 
         $data['dbName'] = $this->dbName;
         $data['namespace'] = $this->namespace;
