@@ -16,7 +16,7 @@ abstract class Json
     }
 
     /** Exporta um array para um arquivo json */
-    static function export(array $array, string $path, bool $merge = false): void
+    static function export(string $path, array $array, bool $merge = false): void
     {
         $path = File::setEx($path, 'json');
 

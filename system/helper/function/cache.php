@@ -30,7 +30,7 @@ if (!function_exists('cache')) {
                 return $result;
 
             try {
-                Json::export([$result], $file);
+                Json::export($file, [$result]);
             } catch (Throwable) {
             }
 

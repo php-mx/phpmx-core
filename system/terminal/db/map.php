@@ -14,7 +14,7 @@ return new class extends Terminal {
 
         $file = path("system/datalayer/$dbName/scheme/map.json");
 
-        Json::export($map, $file);
+        Json::export($file, $map);
 
         self::echo("[$dbName] map exported to [$file]");
     }

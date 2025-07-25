@@ -32,7 +32,7 @@ return new class extends Terminal {
 
         self::echo("| Apply export");
 
-        Json::export($export, $file);
+        Json::export($file, $export);
 
         self::echoLine();
         self::echo("Export ended");

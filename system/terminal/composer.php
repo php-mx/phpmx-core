@@ -28,7 +28,7 @@ return new class extends Terminal {
 
         $composer['autoload']['files'] = $files;
 
-        Json::export($composer, 'composer', false);
+        Json::export('composer', $composer, false);
 
         self::echo('File [composer.json] updated');
 
