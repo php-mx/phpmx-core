@@ -1,6 +1,6 @@
 {
     "name": "phpmx/core",
-    "description": "Núcleo para criação de aplicações modernas com phpMX",
+    "description": "Núcleo leve, rastreável e modular para criação de aplicações modernas com PHP, orientado à manutenção e performance.",
     "license": "MIT",
     "authors": [
         {
