@@ -90,10 +90,10 @@ if (!function_exists('is_httpStatus')) {
 
 if (!function_exists('is_httpStatusError')) {
 
-    /** Verifica se uma variavel corresponde a um status de erro HTTP (300~599) */
+    /** Verifica se uma variavel corresponde a um status de erro HTTP (400~599) */
     function is_httpStatusError($var): bool
     {
-        return is_numeric($var) && $var >= 300 && $var <= 599;
+        return is_numeric($var) && $var >= 400 && $var < 600;
     }
 }
 

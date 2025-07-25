@@ -67,7 +67,7 @@ return new class {
                 'info' => [
                     'mx' => true,
                     'status' => $status,
-                    'error' => $status > 399,
+                    'error' => is_httpStatusError($status),
                     ...$message
                 ],
                 'data' => null
@@ -76,7 +76,7 @@ return new class {
             Response::header('Mx-Error-Message', $response['info']['message']);
             Response::header('Mx-Error-Status', $response['info']['status']);
 
-            if (env('DEV') && $response['info']['error']) {
+            if (env('DEV')) {
                 $response['info']['file'] = $e->getFile();
                 $response['info']['line'] = $e->getLine();
                 Response::header('Mx-Error-File', $response['info']['file']);

@@ -135,7 +135,7 @@ return new class extends Front {
 
         if (is_array($content)) {
             $content['info']['status'] = $status;
-            $content['info']['error'] = $status > 399;
+            $content['info']['error'] =  is_httpStatusError($status);
             $content['info'] = [...$content['info'], ...$message];
             $content['info']['alert'] = self::$ALERT;
         }
