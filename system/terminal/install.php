@@ -52,7 +52,6 @@ return new class extends Terminal {
 
         $mx = "<?php\n\n";
         $mx .= "chdir(__DIR__);\n\n";
-        $mx .= "date_default_timezone_set(\"America/Sao_Paulo\");\n\n";
         $mx .= "require_once \"./vendor/autoload.php\";\n\n";
         $mx .= "echo \"---< MX-CMD >---\\n\\n\";\n\n";
         $mx .= "\$terminalArgs = \$argv;\n\n";
