@@ -3,7 +3,7 @@
 namespace Controller\Base;
 
 use Exception;
-use PhpMx\Page;
+use PhpMx\Front;
 use PhpMx\View;
 use Throwable;
 
@@ -27,8 +27,8 @@ class ErrorPage
 
         $message = $message ?? env("STM_$status") ?? 'Erro desconhecido';
 
-        Page::title($message);
-        Page::layout(null);
+        Front::title($message);
+        Front::layout(null);
 
         return View::render('_front/error', ['status' => $status, 'message' => $message]);
     }

@@ -2,7 +2,7 @@
 
 namespace PhpMx;
 
-abstract class Page
+abstract class Front
 {
     protected static array $HEAD = [];
     protected static array $ALERT = [];

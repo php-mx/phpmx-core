@@ -2,22 +2,22 @@
 
 use Controller\Base\ErrorPage;
 use PhpMx\Log;
-use PhpMx\Page;
+use PhpMx\Front;
 use PhpMx\Request;
 use PhpMx\Response;
 use PhpMx\View;
 
-return new class extends Page {
+return new class extends Front {
 
     function __invoke(Closure $next)
     {
         if (IS_API) return $next();
 
         try {
-            self::title(env('PAGE_TITLE'));
-            self::favicon(env('PAGE_FAVICON'));
-            self::description(env('PAGE_DESCRIPTION'));
-            self::layout(env('PAGE_LAYOUT'));
+            self::title(env('FRONT_TITLE'));
+            self::favicon(env('FRONT_FAVICON'));
+            self::description(env('FRONT_DESCRIPTION'));
+            self::layout(env('FRONT_LAYOUT'));
 
             $content = $next();
             if (is_httpStatus($content)) throw new Exception(env("STM_$content"), $content);
