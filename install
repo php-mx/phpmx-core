@@ -94,6 +94,7 @@ return new class extends Terminal {
         if (!str_contains($fileContent, "# $blockName")) {
             $fileContent = empty($fileContent) ? "# $blockName\n\n" : "$fileContent\n# $blockName\n\n";
             $fileContent .=  implode("\n", $contentLines);
+            $fileContent .=  "\n";
             File::create($pathFile, $fileContent, true);
             self::echo("block file: $blockName ($pathFile) [added]");
         } else {
