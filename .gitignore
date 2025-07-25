@@ -1,14 +1,8 @@
 /.env
+/.conf
 /vendor
 /composer.lock
 
 /library/cache
 /library/certificate/*
 !/library/certificate/base.crt
-
-# MX CORE
-
-/.env
-/vendor
-/library/cache
-/library/certificate
