@@ -19,17 +19,19 @@ return new class extends Terminal {
 
         self::promote('system/helper/script/path.php');
 
-        self::blockFile('.env', 'PRIVATE ENVIRONMENT VARIABLES', [
+        self::blockFile('.env', 'MX CORE', [
             'DEV = true'
         ]);
-
-        self::blockFile('.conf', 'PUBLIC ENVIRONMENT VARIABLES', []);
 
         self::blockFile('.gitignore', 'MX CORE', [
             '/.env',
             '/vendor',
             '/library/cache',
             '/library/certificate',
+        ]);
+
+        self::createFile('.conf', [
+            'PUBLIC ENVIRONMENT VARIABLES'
         ]);
 
         self::createFile('mx', [
