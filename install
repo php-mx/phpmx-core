@@ -9,7 +9,46 @@ return new class extends Terminal {
 
     function __invoke()
     {
-        // Install code here
+        self::createDir('class');
+        self::createDir('library');
+        self::createDir('system');
+        self::createDir('system/helper');
+        self::createDir('system/helper/function');
+        self::createDir('system/helper/constant');
+        self::createDir('system/helper/script');
+
+        self::promote('system/helper/script/path.php');
+
+        self::blockFile('.env', 'PRIVATE ENVIRONMENT VARIABLES', [
+            'DEV = true'
+        ]);
+
+        self::blockFile('.conf', 'PUBLIC ENVIRONMENT VARIABLES', []);
+
+        self::blockFile('.gitignore', 'MX CORE', [
+            '/.env',
+            '/vendor',
+            '/library/cache',
+            '/library/certificate',
+        ]);
+
+        self::createFile('mx', [
+            '<?php',
+            '',
+            'chdir(__DIR__);',
+            '',
+            'require_once "./vendor/autoload.php";',
+            '',
+            'echo "---< MX-CMD >---\n\n";',
+            '',
+            '$terminalArgs = $argv;',
+            'array_shift($terminalArgs);',
+            '\PhpMx\Terminal::run(...$terminalArgs);',
+            '',
+            'echo "\n---< MX-CMD >---\n";',
+            '',
+            'die;',
+        ]);
     }
 
     /** Promove um arquivo para o projeto atual */
@@ -51,7 +90,8 @@ return new class extends Terminal {
         $fileContent = Import::content($pathFile) ?? '';
 
         if (!str_contains($fileContent, "# $blockName")) {
-            $fileContent .= "\n# $blockName\n\n" . implode("\n", $contentLines);
+            $fileContent = empty($fileContent) ? "# $blockName\n\n" : "$fileContent\n# $blockName\n\n";
+            $fileContent .=  implode("\n", $contentLines);
             File::create($pathFile, $fileContent, true);
             self::echo("block file: $blockName ($pathFile) [added]");
         } else {

@@ -2,11 +2,13 @@
 /vendor
 /composer.lock
 
-/class/Controller/Api
-/class/Model
-
 /library/cache
-/library/sqlite
+/library/certificate/*
+!/library/certificate/base.crt
 
-/system/datalayer
-/system/routes/api
+# MX CORE
+
+/.env
+/vendor
+/library/cache
+/library/certificate
