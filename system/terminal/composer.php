@@ -32,24 +32,24 @@ return new class extends Terminal {
 
         self::echo('File [composer.json] updated');
 
-        $forceDev || env('DEV') ? self::instalInDev() : self::instalInProd();
+        $forceDev || env('DEV') ? self::inDev() : self::inProd();
     }
 
-    protected static function instalInDev()
+    protected static function inDev()
     {
         self::echoLine();
-        self::echo('run [composer install]');
+        self::echo('run [composer dump-autoload]');
         self::echoLine();
-        echo shell_exec("composer install");
+        echo shell_exec("composer dump-autoload");
         self::echoLine();
     }
 
-    protected static function instalInProd()
+    protected static function inProd()
     {
         self::echoLine();
-        self::echo('run [composer install --no-dev --optimize-autoloader]');
+        self::echo('run [composer dump-autoload --no-dev --optimize-autoloader]');
         self::echoLine();
-        echo shell_exec("composer install --no-dev --optimize-autoloader");
+        echo shell_exec("composer dump-autoload --no-dev --optimize-autoloader");
         self::echoLine();
     }
 
