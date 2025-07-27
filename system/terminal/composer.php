@@ -47,9 +47,9 @@ return new class extends Terminal {
     protected static function inProd()
     {
         self::echoLine();
-        self::echo('run [composer dump-autoload --no-dev --optimize-autoloader]');
+        self::echo('run [composer dump-autoload --no-dev --optimize]');
         self::echoLine();
-        echo shell_exec("composer dump-autoload --no-dev --optimize-autoloader");
+        echo shell_exec("composer dump-autoload --no-dev --optimize");
         self::echoLine();
     }
 
