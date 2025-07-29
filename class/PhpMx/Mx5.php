@@ -57,7 +57,7 @@ abstract class Mx5
     private static function loadKey(): array
     {
         if (is_null(self::$KEY)) {
-            $key = env('mx5_KEY');
+            $key = env('MX5_KEY');
             $key = md5($key);
             $key = str_replace(self::$HEX_CHARS,  self::$MX_CHARS, $key);
             $key .= implode('', self::$MX_CHARS);
