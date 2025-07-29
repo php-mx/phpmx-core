@@ -6,6 +6,7 @@ use Exception;
 use ReflectionMethod;
 use Throwable;
 
+/** Classe base para criação e execução de comandos de terminal. */
 abstract class Terminal
 {
     /** Executa uma linha de comando */

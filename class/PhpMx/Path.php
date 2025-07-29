@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para gerenciamento e busca de caminhos. */
 abstract class Path
 {
     static protected array $paths = [];

@@ -4,6 +4,7 @@ namespace PhpMx;
 
 use Exception;
 
+/** Classe utilitária para cifrar e decifrar variáveis de forma segura. */
 abstract class Cif
 {
     protected static array $ENSURE;
@@ -85,7 +86,6 @@ abstract class Cif
         return true;
     }
 
-    /** Realiza o replace interno de uma string */
     protected static function replace(string $string, string $in, string $out): string
     {
         for ($i = 0; $i < strlen($string); $i++)
@@ -95,7 +95,6 @@ abstract class Cif
         return $string;
     }
 
-    /** Retorna o id que deve ser utilizado */
     protected static function getUseIdKey(?string $charKey): int
     {
         self::__load();
@@ -108,7 +107,6 @@ abstract class Cif
         return $idKey ?? self::$CURRENT_ID_KEY;
     }
 
-    /** Retorna o caracter de encapsulamento */
     protected static function getEncapsChar(int $idKey, bool $reverse = false): string
     {
         if ($reverse) $idKey = 61 - $idKey;
@@ -116,14 +114,12 @@ abstract class Cif
         return $charKey;
     }
 
-    /** Verifica os caracteres de encapsulamento de uma string */
     protected static function checkEncapsChar(string $string)
     {
         $idCharKeyStart = self::getUseIdKey(substr($string, 0, 1));
         return self::getEncapsChar($idCharKeyStart, true) == substr($string, -1, 1);
     }
 
-    /** Carrega o arquivo de certificado do projeto */
     protected static function __load()
     {
         if (is_null(self::$CIF)) {
@@ -138,7 +134,6 @@ abstract class Cif
         }
     }
 
-    /** Carrega a classe com um arquivo de certificado */
     private static function loadFileCif(string $path)
     {
         if (!File::check($path))

@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para substituição de templates em textos. */
 abstract class Prepare
 {
     /** Prepara um texto para ser exibido subistituindo ocorrencias do template */

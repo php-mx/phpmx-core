@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para importar e exportar arquivos JSON. */
 abstract class Json
 {
     /** Importa o conteúdo de um arquivo json para um array */

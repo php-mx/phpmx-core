@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para codificação e verificação com hash mx5. */
 abstract class Mx5
 {
     protected static ?array $KEY = null;

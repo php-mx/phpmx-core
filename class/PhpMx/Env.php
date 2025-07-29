@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para gerenciamento de variáveis de ambiente. */
 abstract class Env
 {
     protected static array $DEFAULT = [];

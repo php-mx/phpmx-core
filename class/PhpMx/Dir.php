@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para manipulação de diretórios. */
 abstract class Dir
 {
     /** Cria um diretório */

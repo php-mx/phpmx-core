@@ -5,6 +5,7 @@ namespace PhpMx;
 use Closure;
 use Throwable;
 
+/** Classe utilitária para registro estruturado de logs e escopos. */
 abstract class Log
 {
     protected static ?float $started = null;
@@ -154,7 +155,6 @@ abstract class Log
         return trim($output);
     }
 
-    /** Adciona uma nova linhe ao log */
     protected static function set(string $type, ?string $message = null, bool $isScope = false)
     {
         self::$started = self::$started ?? microtime(true);
@@ -164,7 +164,6 @@ abstract class Log
         self::$log[] = [$type, $message, $scope, null, null];
     }
 
-    /** Abre um novo escopo de log */
     protected static function openScope(string $type, ?string $message = null)
     {
         self::set($type, $message);
@@ -176,7 +175,6 @@ abstract class Log
         self::$scope[] = $index;
     }
 
-    /** Fecha o ultimo escopo de log aberto */
     protected static function closeScope()
     {
         if (count(self::$scope)) {
@@ -185,14 +183,12 @@ abstract class Log
         }
     }
 
-    /** Fecha uma linha */
     protected static function closeLine(&$line)
     {
         $line[3] = $line[3] ? memory_get_peak_usage(true) - $line[3] : null;
         $line[4] = $line[4] ? microtime(true) - $line[4] : $line[4];
     }
 
-    /** Formata um tempo de execução */
     protected static function formatTime(?float $seconds): ?string
     {
         if (is_null($seconds)) return null;
@@ -208,7 +204,6 @@ abstract class Log
         return round($seconds / 3600, 2) . 'h';
     }
 
-    /** Formata memória utilizada */
     protected static function formatMemory(?int $bytes): ?string
     {
         if (is_null($bytes)) return null;

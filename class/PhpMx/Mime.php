@@ -2,6 +2,7 @@
 
 namespace PhpMx;
 
+/** Classe utilitária para detecção e validação de MIME types. */
 abstract class Mime
 {
     protected static array $MIMETYPE = [
