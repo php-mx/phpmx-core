@@ -18,5 +18,6 @@ return new class extends Terminal {
         File::create('install', $template);
 
         self::echo('Install file created successfully');
+        self::echo('[install]');
     }
 };

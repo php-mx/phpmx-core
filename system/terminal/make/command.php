@@ -26,5 +26,6 @@ return new class extends Terminal {
         File::create($commandFile, $template);
 
         self::echo('Command [[#]] created successfully', $command);
+        self::echo('[[#]]', $commandFile);
     }
 };
