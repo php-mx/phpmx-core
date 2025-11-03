@@ -122,11 +122,11 @@ class DImage
     }
 
     /** Ajusta a imagem para um aspect-ratio */
-    function raito(?float $raito = null, int $position = 0): static
+    function ratio(?float $ratio = null, int $position = 0): static
     {
-        if ($raito) {
+        if ($ratio) {
             list($original_width, $original_height) = $this->size;
-            list($target_width, $target_height) = explode('.', "$raito");
+            list($target_width, $target_height) = explode('.', "$ratio");
 
             $target_ratio = $target_width / $target_height;
 
