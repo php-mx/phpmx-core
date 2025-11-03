@@ -19,7 +19,11 @@ class DImage
     protected string $name;
     protected string $path = '.';
 
-    protected function __construct() {}
+    protected function __construct()
+    {
+        if (!extension_loaded('gd'))
+            throw new Exception("Extension [gd] is required to use DImage.", STS_INTERNAL_SERVER_ERROR);
+    }
 
     function __destruct()
     {
@@ -79,7 +83,6 @@ class DImage
     /** Cria um objeto Image com base em um arquivo */
     static function _file(string $path): DImage
     {
-
         if (!File::check($path))
             throw new Exception('File not found');
 
