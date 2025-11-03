@@ -1,6 +1,6 @@
 {
     "name": "phpmx/core",
-    "description": "Ferramenta para criação de APIs modernas com PHP",
+    "description": "Núcleo leve para criação de aplicações modernas com PHP, orientado à manutenção e performance",
     "license": "MIT",
     "authors": [
         {
