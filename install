@@ -18,6 +18,7 @@ return new class extends TerminalInstall {
         self::createDir('system/helper/script');
         self::createDir('system/middleware');
         self::createDir('system/router');
+        self::createDir('system/view');
 
         self::promote('system/helper/script/path.php');
 
