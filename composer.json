@@ -46,10 +46,12 @@
         "ext-gd": "*",
         "ext-exif": "*",
         "ext-mbstring": "*",
-        "ext-fileinfo": "*",
-        "ext-pdo_mysql": "*",
-        "ext-pdo_sqlite": "*",
-        "ext-pdo_pgsql": "*"
+        "ext-fileinfo": "*"
+    },
+    "suggest": {
+        "ext-pdo_mysql": "Required if you intend to use MySQL or MariaDB connections.",
+        "ext-pdo_sqlite": "Required if you intend to use SQLite connections.",
+        "ext-pdo_pgsql": "Required if you intend to use PostgreSQL connections."
     },
     "bin": [
         "mx"
