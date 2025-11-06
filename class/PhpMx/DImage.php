@@ -23,6 +23,9 @@ class DImage
     {
         if (!extension_loaded('gd'))
             throw new Exception("Extension [gd] is required to use DImage.", STS_INTERNAL_SERVER_ERROR);
+
+        if (!extension_loaded('exif'))
+            throw new Exception("Extension [exif] is required to use DImage.", STS_INTERNAL_SERVER_ERROR);
     }
 
     function __destruct()

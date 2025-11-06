@@ -42,12 +42,12 @@
     },
     "require": {
         "php": "^8.1",
-        "ext-exif": "*",
         "ext-mbstring": "*",
         "ext-fileinfo": "*"
     },
     "suggest": {
         "ext-gd": "Required if you intend to use DImage or Captcha.",
+        "ext-exif": "Required if you intend to use DImage.",
         "ext-pdo_mysql": "Required if you intend to use MySQL or MariaDB connections.",
         "ext-pdo_sqlite": "Required if you intend to use SQLite connections.",
         "ext-pdo_pgsql": "Required if you intend to use PostgreSQL connections."
