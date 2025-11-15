@@ -23,8 +23,6 @@ return new class extends TerminalInstall {
         self::blockFile('.gitignore', 'MX CORE', [
             '/.env',
             '/vendor',
-            '/library/cache',
-            '/library/certificate',
         ]);
 
         self::createFile('.conf', [
