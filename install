@@ -7,27 +7,17 @@ return new class extends TerminalInstall {
     function __invoke()
     {
         self::createDir('class');
-        self::createDir('class/Controller');
         self::createDir('library');
-        self::createDir('library/assets');
-        self::createDir('library/download');
         self::createDir('system');
         self::createDir('system/helper');
         self::createDir('system/helper/function');
         self::createDir('system/helper/constant');
         self::createDir('system/helper/script');
-        self::createDir('system/middleware');
-        self::createDir('system/router');
-        self::createDir('system/view');
 
         self::promote('system/helper/script/path.php');
 
-        self::promote('.htaccess');
-        self::promote('index.php');
-
         self::blockFile('.env', 'MX CORE', [
-            'DEV = true',
-            'FORCE_SSL = false'
+            'DEV = true'
         ]);
 
         self::blockFile('.gitignore', 'MX CORE', [
@@ -35,9 +25,6 @@ return new class extends TerminalInstall {
             '/vendor',
             '/library/cache',
             '/library/certificate',
-            '/class/Model/Db*/Driver',
-            '/library/sqlite',
-            '/system/datalayer/*/scheme',
         ]);
 
         self::createFile('.conf', [
