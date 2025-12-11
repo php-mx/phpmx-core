@@ -8,13 +8,44 @@ use Throwable;
 /** Classe utilitária para registro estruturado de logs e escopos. */
 abstract class Log
 {
-    protected static ?float $started = null;
     protected static array $log = [];
     protected static array $scope = [];
+    protected static bool $useLog = true;
+
+    protected static array $snap = ['log' => [], 'scope' => [], 'useLog' => true];
+
+    /** Grava um snap do log */
+    static function snap(): void
+    {
+        self::$snap['log'] = self::$log;
+        self::$snap['scope'] = self::$scope;
+        self::$snap['useLog'] = self::$useLog;
+    }
+
+    /** Restaura o log ao ultimo snap */
+    static function reset(): void
+    {
+        self::$log = self::$snap['log'];
+        self::$scope = self::$snap['scope'];
+        self::$useLog = self::$snap['useLog'];
+    }
+
+    /** Define se o log deve ser utilizado */
+    static function useLog(bool $useLog): void
+    {
+        self::$useLog = $useLog;
+    }
 
     /** Adicona uma linha de log ou um escopo de linhas de log */
     static function add(string $type, string $message, ?Closure $scope = null): mixed
     {
+        if (!self::$useLog)
+            try {
+                return $scope();
+            } catch (Throwable $e) {
+                throw $e;
+            };
+
         if (is_null($scope))
             return self::set($type, $message);
 
@@ -33,6 +64,8 @@ abstract class Log
     /** Altera a linha de escopo aberta */
     static function changeScope(string $type, string $message): void
     {
+        if (!self::$useLog) return;
+
         if (count(self::$scope)) {
             $scopeKey = end(self::$scope);
             self::$log[$scopeKey][0] = $type;
@@ -43,6 +76,8 @@ abstract class Log
     /** Adiciona uma linha de exceção ao log */
     static function exception(Throwable $e): void
     {
+        if (!self::$useLog) return;
+
         $type = $e::class;
         $message = $e->getMessage();
         $file = path($e->getFile());
@@ -57,7 +92,7 @@ abstract class Log
         $currentLog = self::$log;
         $currentScope = self::$scope;
 
-        $encapsLine = ['mx', 'log', -1, memory_get_peak_usage(true), microtime(true) - self::$started];
+        $encapsLine = ['mx', 'log', -1, memory_get_peak_usage(true)];
 
         while (count($currentScope)) {
             $scopeKey = array_pop($currentScope);
@@ -68,13 +103,12 @@ abstract class Log
 
         $count = [];
         foreach ($currentLog as $pos => $line) {
-            list($type, $message, $scope, $memory, $time) = $line;
+            list($type, $message, $scope, $memory) = $line;
 
             $type = strToCamelCase($type);
             $message = str_replace('\\', '.', $message);
             $scope += 1;
             $memory = self::formatMemory($memory);
-            $time = self::formatTime($time);
 
             $count[$type] = $count[$type] ?? 0;
             $count[$type]++;
@@ -84,7 +118,6 @@ abstract class Log
                 $message,
                 $scope,
                 $memory,
-                $time,
             ];
         }
 
@@ -104,11 +137,9 @@ abstract class Log
         $output = [];
 
         foreach ($lines as $line) {
-            list($type, $message, $scope, $memory, $time) = $line;
+            list($type, $message, $scope, $memory) = $line;
 
             $info = [];
-
-            if ($time) $info[] = $time;
 
             if ($memory) $info[] = $memory;
 
@@ -132,11 +163,9 @@ abstract class Log
         $output = "-------------------------\n";
 
         foreach ($lines as $line) {
-            list($type, $message, $scope, $memory, $time) = $line;
+            list($type, $message, $scope, $memory) = $line;
 
             $info = [];
-
-            if ($time) $info[] = $time;
 
             if ($memory) $info[] = $memory;
 
@@ -157,11 +186,8 @@ abstract class Log
 
     protected static function set(string $type, ?string $message = null, bool $isScope = false)
     {
-        self::$started = self::$started ?? microtime(true);
-
         $scope = count(self::$scope);
-
-        self::$log[] = [$type, $message, $scope, null, null];
+        self::$log[] = [$type, $message, $scope, null];
     }
 
     protected static function openScope(string $type, ?string $message = null)
@@ -170,7 +196,6 @@ abstract class Log
         $index = count(self::$log) - 1;
 
         self::$log[$index][3] = memory_get_peak_usage(true);
-        self::$log[$index][4] = microtime(true);
 
         self::$scope[] = $index;
     }
@@ -186,22 +211,6 @@ abstract class Log
     protected static function closeLine(&$line)
     {
         $line[3] = $line[3] ? memory_get_peak_usage(true) - $line[3] : null;
-        $line[4] = $line[4] ? microtime(true) - $line[4] : $line[4];
-    }
-
-    protected static function formatTime(?float $seconds): ?string
-    {
-        if (is_null($seconds)) return null;
-
-        if ($seconds < 1) return null;
-
-        if ($seconds < 1) return round($seconds * 1000, 2) . 'ms';
-
-        if ($seconds < 60) return round($seconds, 2) . 's';
-
-        if ($seconds < 3600) return round($seconds / 60, 2) . 'm';
-
-        return round($seconds / 3600, 2) . 'h';
     }
 
     protected static function formatMemory(?int $bytes): ?string
