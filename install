@@ -45,8 +45,6 @@ return new class extends TerminalInstall {
             '\PhpMx\Terminal::run(...$terminalArgs);',
             '',
             'echo "\n---< MX-CMD >---\n";',
-            '',
-            'die;',
         ]);
     }
 };

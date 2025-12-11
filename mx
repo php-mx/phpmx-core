@@ -9,5 +9,3 @@ array_shift($terminalArgs);
 \PhpMx\Terminal::run(...$terminalArgs);
 
 echo "\n---< MX-CMD >---\n";
-
-die;
