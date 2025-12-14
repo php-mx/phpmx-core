@@ -40,11 +40,7 @@ abstract class Log
     static function add(string $type, string $message, ?Closure $scope = null): mixed
     {
         if (!self::$useLog)
-            try {
-                return $scope();
-            } catch (Throwable $e) {
-                throw $e;
-            };
+            return $scope();
 
         if (is_null($scope))
             return self::set($type, $message);
