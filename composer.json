@@ -19,7 +19,6 @@
             "system/helper/function/changes.php",
             "system/helper/function/dbug.php",
             "system/helper/function/env.php",
-            "system/helper/function/finalize.php",
             "system/helper/function/is.php",
             "system/helper/function/mx5.php",
             "system/helper/function/num.php",

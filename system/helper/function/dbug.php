@@ -31,7 +31,7 @@ if (!function_exists('dd')) {
     function dd(mixed ...$params): never
     {
         dbug(...$params);
-        finalize();
+        die;
     }
 }
 
@@ -41,6 +41,6 @@ if (!function_exists('ddpre')) {
     function ddpre(mixed ...$params): never
     {
         dbugpre(...$params);
-        finalize();
+        die;
     }
 }
