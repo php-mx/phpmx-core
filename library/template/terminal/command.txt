@@ -2,10 +2,10 @@
 
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke()
     {
-        self::echo('Command [[#command]] running');
+        Terminal::echo('Command [[#command]] running');
     }
 };

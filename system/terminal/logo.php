@@ -2,18 +2,18 @@
 
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke()
     {
-        self::echo('   @@@  @@@@@@   @@@@@@@     @@@@    @@@@@');
-        self::echo('  @@@@@@@%@@@@@@@@%@@@@@@     @@@@   @@@@');
-        self::echo('  @@@@     @@@@@     @@@@      @@@@@@@@@');
-        self::echo('  @@@@     @@@@      @@@@       @@@@@@');
-        self::echo('  @@@@     @@@@      %@@@        @@@@@');
-        self::echo('  @@@@     @@@@      @@@@       @@@@@@@');
-        self::echo('  @@@@     @@@@      @@@@      @@@@  @@@@');
-        self::echo('  @@@@     @@@@      @@@@    @@@@     @@@@');
-        self::echo(' @@@@@     @@@@      @@@@@  @@@@       @@@@');
+        Terminal::echo('   @@@  @@@@@@   @@@@@@@     @@@@    @@@@@');
+        Terminal::echo('  @@@@@@@%@@@@@@@@%@@@@@@     @@@@   @@@@');
+        Terminal::echo('  @@@@     @@@@@     @@@@      @@@@@@@@@');
+        Terminal::echo('  @@@@     @@@@      @@@@       @@@@@@');
+        Terminal::echo('  @@@@     @@@@      %@@@        @@@@@');
+        Terminal::echo('  @@@@     @@@@      @@@@       @@@@@@@');
+        Terminal::echo('  @@@@     @@@@      @@@@      @@@@  @@@@');
+        Terminal::echo('  @@@@     @@@@      @@@@    @@@@     @@@@');
+        Terminal::echo(' @@@@@     @@@@      @@@@@  @@@@       @@@@');
     }
 };

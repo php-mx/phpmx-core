@@ -4,7 +4,7 @@ use PhpMx\File;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke($file)
     {
@@ -19,6 +19,6 @@ return new class extends Terminal {
             throw new Exception("File [$promoted] already exists in [CURRENT PROJECT]");
 
         File::copy($current, $promoted);
-        self::echo('File [[#]] promoted to [[#]]', [$current, $promoted]);
+        Terminal::echo('File [[#]] promoted to [[#]]', [$current, $promoted]);
     }
 };

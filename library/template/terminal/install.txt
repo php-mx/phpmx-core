@@ -1,11 +1,13 @@
 <?php
 
 use PhpMx\TerminalInstall;
+use PhpMx\Terminal;
 
 return new class extends TerminalInstall {
 
     function __invoke()
     {
         // Install code here
+        Terminal::echo('installing');
     }
 };

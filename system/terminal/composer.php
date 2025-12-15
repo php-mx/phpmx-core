@@ -4,7 +4,7 @@ use PhpMx\Dir;
 use PhpMx\Json;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke($forceDev = 0)
     {
@@ -30,27 +30,27 @@ return new class extends Terminal {
 
         Json::export('composer', $composer, false);
 
-        self::echo('File [composer.json] updated');
+        Terminal::echo('File [composer.json] updated');
 
         $forceDev || env('DEV') ? self::inDev() : self::inProd();
     }
 
     protected static function inDev()
     {
-        self::echoLine();
-        self::echo('run [composer dump-autoload]');
-        self::echoLine();
+        Terminal::echoLine();
+        Terminal::echo('run [composer dump-autoload]');
+        Terminal::echoLine();
         echo shell_exec("composer dump-autoload");
-        self::echoLine();
+        Terminal::echoLine();
     }
 
     protected static function inProd()
     {
-        self::echoLine();
-        self::echo('run [composer dump-autoload --no-dev --optimize]');
-        self::echoLine();
+        Terminal::echoLine();
+        Terminal::echo('run [composer dump-autoload --no-dev --optimize]');
+        Terminal::echoLine();
         echo shell_exec("composer dump-autoload --no-dev --optimize");
-        self::echoLine();
+        Terminal::echoLine();
     }
 
     protected static function seekForFile($ref)

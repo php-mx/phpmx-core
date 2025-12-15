@@ -4,7 +4,7 @@ use PhpMx\Cif;
 use PhpMx\File;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke($cifName)
     {
@@ -37,9 +37,9 @@ return new class extends Terminal {
 
         File::create($file, $content, true);
 
-        self::echo('Certificate [[#].crt] created successfully.', $cifName);
-        self::echo('To use the new file in your project, add the line below to your environment variables');
-        self::echo('');
-        self::echo('CIF = [#]', $cifName);
+        Terminal::echo('Certificate [[#].crt] created successfully.', $cifName);
+        Terminal::echo('To use the new file in your project, add the line below to your environment variables');
+        Terminal::echo('');
+        Terminal::echo('CIF = [#]', $cifName);
     }
 };

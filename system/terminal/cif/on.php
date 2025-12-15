@@ -3,12 +3,12 @@
 use PhpMx\Cif;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke($content)
     {
         $content = implode(' ', func_get_args());
 
-        self::echo(Cif::on($content));
+        Terminal::echo(Cif::on($content));
     }
 };

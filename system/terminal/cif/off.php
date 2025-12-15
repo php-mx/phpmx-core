@@ -3,10 +3,10 @@
 use PhpMx\Cif;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke($cif)
     {
-        self::echo(Cif::off($cif));
+        Terminal::echo(Cif::off($cif));
     }
 };

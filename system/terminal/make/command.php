@@ -5,7 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke(string $command)
     {
@@ -25,7 +25,7 @@ return new class extends Terminal {
 
         File::create($file, $template);
 
-        self::echo('Command [[#]] created successfully', $command);
-        self::echo('[[#]]', $file);
+        Terminal::echo('Command [[#]] created successfully', $command);
+        Terminal::echo('[[#]]', $file);
     }
 };

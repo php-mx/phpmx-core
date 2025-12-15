@@ -3,16 +3,16 @@
 namespace PhpMx;
 
 /** Dedicada a scripts de instalação de pacotes. */
-abstract class TerminalInstall extends Terminal
+abstract class TerminalInstall
 {
     /** Promove um arquivo para o projeto atual */
     protected function promote(string $pathFile)
     {
         if (!File::check($pathFile)) {
             Terminal::run("promote $pathFile");
-            self::echo("promote: $pathFile [promoted]");
+            Terminal::echo("promote: $pathFile [promoted]");
         } else {
-            self::echo("promote: $pathFile [ignored]");
+            Terminal::echo("promote: $pathFile [ignored]");
         }
     }
 
@@ -21,9 +21,9 @@ abstract class TerminalInstall extends Terminal
     {
         if (!Dir::check($pathDir)) {
             Dir::create("$pathDir");
-            self::echo("create dir: $pathDir [created]");
+            Terminal::echo("create dir: $pathDir [created]");
         } else {
-            self::echo("create dir: $pathDir [ignored]");
+            Terminal::echo("create dir: $pathDir [ignored]");
         }
     }
 
@@ -32,9 +32,9 @@ abstract class TerminalInstall extends Terminal
     {
         if (!File::check($pathFile)) {
             File::create($pathFile, implode("\n", $contentLines));
-            self::echo("create file: $pathFile [created]");
+            Terminal::echo("create file: $pathFile [created]");
         } else {
-            self::echo("create file: $pathFile [ignored]");
+            Terminal::echo("create file: $pathFile [ignored]");
         }
     }
 
@@ -48,9 +48,9 @@ abstract class TerminalInstall extends Terminal
             $fileContent .=  implode("\n", $contentLines);
             $fileContent .=  "\n";
             File::create($pathFile, $fileContent, true);
-            self::echo("block file: $blockName ($pathFile) [added]");
+            Terminal::echo("block file: $blockName ($pathFile) [added]");
         } else {
-            self::echo("block file: $blockName ($pathFile) [ignored]");
+            Terminal::echo("block file: $blockName ($pathFile) [ignored]");
         }
     }
 }

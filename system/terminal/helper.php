@@ -5,7 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     protected $used = [];
 
@@ -14,16 +14,16 @@ return new class extends Terminal {
         foreach (Path::seekForDirs('system/terminal') as $path) {
             $origin = $this->getOrigim($path);
 
-            self::echo();
-            self::echo('[[#]]', $origin);
-            self::echoLine();
+            Terminal::echo();
+            Terminal::echo('[[#]]', $origin);
+            Terminal::echoLine();
 
             foreach ($this->getCommandsIn($path, $origin) as $cmd) {
                 if (is_null($command) || str_starts_with($cmd['terminal'], $command)) {
-                    self::echo(' [#terminal] ([#file])[#status]', $cmd);
+                    Terminal::echo(' [#terminal] ([#file])[#status]', $cmd);
                     foreach ($cmd['variations'] as $variation)
-                        self::echo('   php mx [#][#]', [$cmd['terminal'], $variation]);
-                    self::echo();
+                        Terminal::echo('   php mx [#][#]', [$cmd['terminal'], $variation]);
+                    Terminal::echo();
                 }
             };
         }

@@ -5,7 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke()
     {
@@ -17,7 +17,7 @@ return new class extends Terminal {
 
         File::create('install', $template);
 
-        self::echo('Install file created successfully');
-        self::echo('[install]');
+        Terminal::echo('Install file created successfully');
+        Terminal::echo('[install]');
     }
 };

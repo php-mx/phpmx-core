@@ -5,7 +5,7 @@ use PhpMx\Path;
 use PhpMx\Terminal;
 use PhpMx\TerminalInstall;
 
-return new class extends Terminal {
+return new class {
 
     function __invoke()
     {
@@ -21,9 +21,9 @@ return new class extends Terminal {
 
                     if (is_extend($script, TerminalInstall::class)) {
                         $script();
-                        self::echoLine();
-                        self::echo("$origin installed");
-                        self::echoLine();
+                        Terminal::echoLine();
+                        Terminal::echo("$origin installed");
+                        Terminal::echoLine();
                     }
                 });
             }

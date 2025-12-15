@@ -47,8 +47,8 @@ abstract class Terminal
 
                 $action = Import::return($commandFile);
 
-                if (!is_class($action, Terminal::class))
-                    throw new Exception("Command [$command] not extends [" . static::class . "]");
+                if (!is_object($action) || !is_callable($action))
+                    throw new Exception("Command [$command] not is object callable");
 
                 $reflection = new ReflectionMethod($action, '__invoke');
 
