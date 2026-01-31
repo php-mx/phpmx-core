@@ -22,7 +22,7 @@ return new class {
                 if (is_null($command) || str_starts_with($cmd['terminal'], $command)) {
                     Terminal::echo('[#cyan:#terminal] [#blueD:#file][#yellowD:#status]', $cmd);
                     foreach ($cmd['variations'] as $variation)
-                        Terminal::echo(' php [#whiteB:mx][#whiteB:#][#whiteD:#]', [$cmd['terminal'], $variation]);
+                        Terminal::echo(' php [#whiteB:mx] [#whiteB:#][#whiteD:#]', [$cmd['terminal'], $variation]);
                 }
             };
         }

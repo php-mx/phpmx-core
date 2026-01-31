@@ -6,3 +6,6 @@
 /library/cache
 /library/certificate/*
 !/library/certificate/base.crt
+
+/system/datalayer
+/library/sqlite
