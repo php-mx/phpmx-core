@@ -1,0 +1,11 @@
+<?php
+
+use PhpMx\Context;
+
+return new class extends Context  {
+
+    function __invoke(Closure $next)
+    {
+        return $next();
+    }
+};
