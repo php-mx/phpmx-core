@@ -1,46 +1,53 @@
 {
-    "name": "phpmx/core",
-    "description": "Núcleo leve para criação de aplicações modernas com PHP, orientado à manutenção e performance.",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "André Ricardo",
-            "email": "contatoadmx@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "": "class/"
-        },
-        "files": [
-            "system/helper/constant/char_normalizer.php",
-            "system/helper/constant/request_is.php",
-            "system/helper/function/cache.php",
-            "system/helper/function/changes.php",
-            "system/helper/function/dbug.php",
-            "system/helper/function/env.php",
-            "system/helper/function/is.php",
-            "system/helper/function/mx5.php",
-            "system/helper/function/num.php",
-            "system/helper/function/path.php",
-            "system/helper/function/prepare.php",
-            "system/helper/function/remove_accents.php",
-            "system/helper/function/str.php",
-            "system/helper/function/str_to.php",
-            "system/helper/function/uuid.php",
-            "system/helper/script/env.php",
-            "system/helper/script/error.php",
-            "system/helper/script/log.php",
-            "system/helper/script/path.php",
-            "system/helper/script/timezone.php"
-        ]
+  "name": "phpmx/core",
+  "description": "Núcleo leve para criação de aplicações modernas com PHP, orientado à manutenção e performance.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "André Ricardo",
+      "email": "contatoadmx@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "": "class/"
     },
-    "require": {
-        "ext-mbstring": "*",
-        "ext-fileinfo": "*",
-        "php": "^8.1"
-    },
-    "bin": [
-        "mx"
+    "files": [
+      "system/helper/constant/char_normalizer.php",
+      "system/helper/constant/request_is.php",
+      "system/helper/function/cache.php",
+      "system/helper/function/changes.php",
+      "system/helper/function/dbug.php",
+      "system/helper/function/env.php",
+      "system/helper/function/is.php",
+      "system/helper/function/mx5.php",
+      "system/helper/function/num.php",
+      "system/helper/function/path.php",
+      "system/helper/function/prepare.php",
+      "system/helper/function/remove_accents.php",
+      "system/helper/function/str.php",
+      "system/helper/function/str_to.php",
+      "system/helper/function/uuid.php",
+      "system/helper/script/env.php",
+      "system/helper/script/error.php",
+      "system/helper/script/log.php",
+      "system/helper/script/path.php",
+      "system/helper/script/timezone.php"
     ]
+  },
+  "require": {
+    "ext-mbstring": "*",
+    "ext-fileinfo": "*",
+    "php": "^8.1"
+  },
+  "suggest": {
+    "ext-gd": "Required for image manipulation and Captcha generation.",
+    "ext-exif": "Required for identifying file types and correcting JPEG orientation.",
+    "ext-pdo_mysql": "Required if you intend to use MySQL or MariaDB connections.",
+    "ext-pdo_sqlite": "Required if you intend to use SQLite connections.",
+    "ext-pdo_pgsql": "Required if you intend to use PostgreSQL connections."
+  },
+  "bin": [
+    "mx"
+  ]
 }
