@@ -38,13 +38,13 @@ return new class extends TerminalInstall {
             '',
             'require_once "./vendor/autoload.php";',
             '',
-            'echo "---< MX-CMD >---\n\n";',
+            'echo "\n";',
             '',
             '$terminalArgs = $argv;',
             'array_shift($terminalArgs);',
             '\PhpMx\Terminal::run(...$terminalArgs);',
             '',
-            'echo "\n---< MX-CMD >---\n";',
+            'echo "\n";',
         ]);
     }
 };
