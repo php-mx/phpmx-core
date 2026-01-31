@@ -10,24 +10,21 @@ return new class {
 
     function __invoke()
     {
-        foreach (Path::seekForDirs('library') as $path) {
+        foreach (Path::seekForDirs('library') as $n => $path) {
             $origin = $this->getOrigim($path);
 
-            Terminal::echo();
-            Terminal::echo('[[#]]', $origin);
-            Terminal::echoLine();
+            if ($n > 0) Terminal::echo();
 
-            foreach ($this->getFilesIn($path, $origin) as $file) {
-                Terminal::echo(' - [#ref] ([#file])[#status]', $file);
-            };
+            Terminal::echo('[#greenB:#]', $origin);
 
-            Terminal::echo();
+            foreach ($this->getFilesIn($path, $origin) as $file)
+                Terminal::echo(' - [#cyan:#ref] [#blueD:#file][#yellowD:#status]', $file);
         }
     }
 
     protected function getOrigim($path)
     {
-        if ($path === 'library') return 'CURRENT-PROJECT';
+        if ($path === 'library') return 'current-project';
 
         if (str_starts_with($path, 'vendor/')) {
             $parts = explode('/', $path);
@@ -44,11 +41,19 @@ return new class {
             $file = path($path, $ref);
             $this->used[$ref] = $this->used[$ref] ?? $origin;
 
-            $files[$ref] = [
-                'ref' => $ref,
-                'file' => $file,
-                'status' => $this->used[$ref] == $origin ? '' : ' [replaced in ' . $this->used[$ref] . ']'
-            ];
+            if ($this->used[$ref] == $origin) {
+                $files[$ref] = [
+                    'ref' => $ref,
+                    'file' => $file,
+                    'status' => ''
+                ];
+            } else {
+                $files[$ref] = [
+                    'ref' => $ref,
+                    'file' => '',
+                    'status' => 'replaced in ' . $this->used[$ref]
+                ];
+            }
         }
         ksort($files);
         return $files;

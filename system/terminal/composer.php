@@ -30,27 +30,21 @@ return new class {
 
         Json::export('composer', $composer, false);
 
-        Terminal::echo('File [composer.json] updated');
+        Terminal::echo('File [#blue:composer.json] updated');
 
         $forceDev || env('DEV') ? self::inDev() : self::inProd();
     }
 
     protected static function inDev()
     {
-        Terminal::echoLine();
-        Terminal::echo('run [composer dump-autoload]');
-        Terminal::echoLine();
+        Terminal::echo('run [#green:composer dump-autoload]');
         echo shell_exec("composer dump-autoload");
-        Terminal::echoLine();
     }
 
     protected static function inProd()
     {
-        Terminal::echoLine();
-        Terminal::echo('run [composer dump-autoload --no-dev --optimize]');
-        Terminal::echoLine();
+        Terminal::echo('run [#green:composer dump-autoload --no-dev --optimize]');
         echo shell_exec("composer dump-autoload --no-dev --optimize");
-        Terminal::echoLine();
     }
 
     protected static function seekForFile($ref)

@@ -10,9 +10,9 @@ abstract class TerminalInstall
     {
         if (!File::check($pathFile)) {
             Terminal::run("promote $pathFile");
-            Terminal::echo("promote: $pathFile [promoted]");
+            Terminal::echo("[#green:promote] $pathFile");
         } else {
-            Terminal::echo("promote: $pathFile [ignored]");
+            Terminal::echo("[#green:promote] $pathFile [#whiteD:ignored]");
         }
     }
 
@@ -21,9 +21,9 @@ abstract class TerminalInstall
     {
         if (!Dir::check($pathDir)) {
             Dir::create("$pathDir");
-            Terminal::echo("create dir: $pathDir [created]");
+            Terminal::echo("[#yellow:create] $pathDir");
         } else {
-            Terminal::echo("create dir: $pathDir [ignored]");
+            Terminal::echo("[#yellow:create] $pathDir [#whiteD:ignored]");
         }
     }
 
@@ -32,9 +32,9 @@ abstract class TerminalInstall
     {
         if (!File::check($pathFile)) {
             File::create($pathFile, implode("\n", $contentLines));
-            Terminal::echo("create file: $pathFile [created]");
+            Terminal::echo("[#yellow:create] $pathFile");
         } else {
-            Terminal::echo("create file: $pathFile [ignored]");
+            Terminal::echo("[#yellow:create] [#] [#whiteD:ignored]", $pathFile);
         }
     }
 
@@ -48,9 +48,9 @@ abstract class TerminalInstall
             $fileContent .=  implode("\n", $contentLines);
             $fileContent .=  "\n";
             File::create($pathFile, $fileContent, true);
-            Terminal::echo("block file: $blockName ($pathFile) [added]");
+            Terminal::echo("[#blue:block] $blockName $pathFile");
         } else {
-            Terminal::echo("block file: $blockName ($pathFile) [ignored]");
+            Terminal::echo("[#blue:block] $blockName $pathFile [#whiteD:ignored]");
         }
     }
 }

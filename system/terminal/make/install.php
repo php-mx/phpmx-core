@@ -17,7 +17,6 @@ return new class {
 
         File::create('install', $template);
 
-        Terminal::echo('Install file created successfully');
-        Terminal::echo('[install]');
+        Terminal::echo('Install file created successfully [#whiteD:install]');
     }
 };

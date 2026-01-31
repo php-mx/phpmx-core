@@ -19,6 +19,6 @@ return new class {
             throw new Exception("File [$promoted] already exists in [CURRENT PROJECT]");
 
         File::copy($current, $promoted);
-        Terminal::echo('File [[#]] promoted to [[#]]', [$current, $promoted]);
+        Terminal::echo('File [#blue:#] promoted to [#cyan:#]', [$current, $promoted]);
     }
 };

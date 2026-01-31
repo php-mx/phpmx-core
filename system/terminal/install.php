@@ -13,17 +13,16 @@ return new class {
 
             $origin = $this->getOrigim($installFile);
 
-            if ($origin != 'CURRENT-PROJECT') {
+            if ($origin != 'current-project') {
                 Log::add('mx', "Install [$origin]", function () use ($installFile, $origin) {
                     ob_start();
                     $script = require $installFile;
                     ob_end_clean();
 
                     if (is_extend($script, TerminalInstall::class)) {
+                        Terminal::echo("[#greenB:Install] [#whiteB:$origin]");
                         $script();
-                        Terminal::echoLine();
-                        Terminal::echo("$origin installed");
-                        Terminal::echoLine();
+                        Terminal::echo();
                     }
                 });
             }
@@ -34,7 +33,7 @@ return new class {
 
     protected function getOrigim($path)
     {
-        if ($path === 'install') return 'CURRENT-PROJECT';
+        if ($path === 'install') return 'current-project';
 
         if (str_starts_with($path, 'vendor/')) {
             $parts = explode('/', $path);

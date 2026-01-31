@@ -11,19 +11,18 @@ return new class {
 
     function __invoke($command = null)
     {
-        foreach (Path::seekForDirs('system/terminal') as $path) {
+        foreach (Path::seekForDirs('system/terminal') as $n => $path) {
             $origin = $this->getOrigim($path);
 
-            Terminal::echo();
-            Terminal::echo('[[#]]', $origin);
-            Terminal::echoLine();
+            if ($n > 0) Terminal::echo();
+
+            Terminal::echo('[#greenB:#]', $origin);
 
             foreach ($this->getCommandsIn($path, $origin) as $cmd) {
                 if (is_null($command) || str_starts_with($cmd['terminal'], $command)) {
-                    Terminal::echo(' [#terminal] ([#file])[#status]', $cmd);
+                    Terminal::echo('[#cyan:#terminal] [#blueD:#file][#yellowD:#status]', $cmd);
                     foreach ($cmd['variations'] as $variation)
-                        Terminal::echo('   php mx [#][#]', [$cmd['terminal'], $variation]);
-                    Terminal::echo();
+                        Terminal::echo(' php [#whiteB:mx][#whiteB:#][#whiteD:#]', [$cmd['terminal'], $variation]);
                 }
             };
         }
@@ -31,7 +30,7 @@ return new class {
 
     protected function getOrigim($path)
     {
-        if ($path === 'system/terminal') return 'CURRENT-PROJECT';
+        if ($path === 'system/terminal') return 'current-project';
 
         if (str_starts_with($path, 'vendor/')) {
             $parts = explode('/', $path);
@@ -70,12 +69,21 @@ return new class {
                 $variations = [' <???>'];
             }
 
-            $commands[$terminal] = [
-                'terminal' => $terminal,
-                'file' => $file,
-                'variations' => $variations,
-                'status' => $this->used[$terminal] == $origin ? '' : ' [replaced in ' . $this->used[$terminal] . ']'
-            ];
+            if ($this->used[$terminal] == $origin) {
+                $commands[$terminal] = [
+                    'terminal' => $terminal,
+                    'file' => " $file",
+                    'variations' => $variations,
+                    'status' => ''
+                ];
+            } else {
+                $commands[$terminal] = [
+                    'terminal' => $terminal,
+                    'file' => '',
+                    'variations' => [],
+                    'status' => 'replaced in ' . $this->used[$terminal]
+                ];
+            }
         }
         ksort($commands);
         return $commands;

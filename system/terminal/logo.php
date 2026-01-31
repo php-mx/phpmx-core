@@ -6,14 +6,14 @@ return new class {
 
     function __invoke()
     {
-        Terminal::echo('   @@@  @@@@@@   @@@@@@@     @@@@    @@@@@');
-        Terminal::echo('  @@@@@@@%@@@@@@@@%@@@@@@     @@@@   @@@@');
-        Terminal::echo('  @@@@     @@@@@     @@@@      @@@@@@@@@');
-        Terminal::echo('  @@@@     @@@@      @@@@       @@@@@@');
-        Terminal::echo('  @@@@     @@@@      %@@@        @@@@@');
-        Terminal::echo('  @@@@     @@@@      @@@@       @@@@@@@');
-        Terminal::echo('  @@@@     @@@@      @@@@      @@@@  @@@@');
-        Terminal::echo('  @@@@     @@@@      @@@@    @@@@     @@@@');
-        Terminal::echo(' @@@@@     @@@@      @@@@@  @@@@       @@@@');
+        Terminal::echo('[#blue:   @@@  @@@@@@   @@@@@@@  ][#cyan:   @@@@    @@@@@  ]');
+        Terminal::echo('[#blue:  @@@@@@@%@@@@@@@@%@@@@@@ ][#cyan:    @@@@   @@@@   ]');
+        Terminal::echo('[#blue:  @@@@     @@@@@     @@@@ ][#cyan:     @@@@@@@@@    ]');
+        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:      @@@@@@      ]');
+        Terminal::echo('[#blue:  @@@@     @@@@      %@@@ ][#cyan:       @@@@@      ]');
+        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:      @@@@@@@     ]');
+        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:     @@@@  @@@@   ]');
+        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:   @@@@     @@@@  ]');
+        Terminal::echo('[#blue: @@@@@     @@@@      @@@@@][#cyan:  @@@@       @@@@ ]');
     }
 };
