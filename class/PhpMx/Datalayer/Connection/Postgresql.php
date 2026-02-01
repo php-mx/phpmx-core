@@ -220,11 +220,36 @@ class Postgresql extends BaseConnection
     protected static function schemeTemplateFieldTypeOnly(array $field): string
     {
         return match ($field['type']) {
-            'int', 'idx', 'time', 'boolean' => "INTEGER",
-            'float' => "REAL",
-            'string', 'email', 'md5', 'mx5' => "VARCHAR({$field['size']})",
-            'text', 'json' => "TEXT",
-            default => throw new Exception("Type [$field[type]] not suported")
+            // Inteiros
+            'tinyint' => 'SMALLINT',
+            'smallint' => 'SMALLINT',
+            'mediumint' => 'INTEGER',
+            'int', 'idx' => 'INTEGER',
+            'bigint' => 'BIGINT',
+
+            // Ponto fixo e flutuante
+            'decimal' => 'DECIMAL(' . ($field['size'] ?? 10) . ',' . ($field['settings']['decimal'] ?? 2) . ')',
+            'float' => 'REAL',
+            'double' => 'DOUBLE PRECISION',
+
+            // Booleano
+            'boolean' => 'BOOLEAN',
+
+            // Strings
+            'char', 'md5' => 'CHAR(' . ($field['size'] ?? 1) . ')',
+            'varchar', 'email', 'password' => 'VARCHAR(' . ($field['size'] ?? 255) . ')',
+            'text' => 'TEXT',
+            'blob' => 'BYTEA',
+
+            // Data e hora
+            'date' => 'DATE',
+            'time' => 'TIME',
+            'datetime', 'timestamp' => 'TIMESTAMP',
+
+            // JSON
+            'json' => 'JSONB',
+
+            default => throw new Exception("Type [{$field['type']}] not supported")
         };
     }
 
@@ -256,35 +281,16 @@ class Postgresql extends BaseConnection
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
 
-        switch ($field['type']) {
-            case 'idx':
-            case 'time':
-            case 'int':
-            case 'boolean':
-                $field['type'] = 'INTEGER';
-                break;
+        $pgType = self::schemeTemplateFieldTypeOnly($field);
 
-            case 'float':
-                $field['type'] = 'REAL';
-                break;
-
-            case 'text':
-            case 'json':
-                $field['type'] = 'TEXT';
-                break;
-
-            case 'string':
-            case 'email':
-            case 'md5':
-            case 'mx5':
-                $field['type'] = "VARCHAR({$field['size']})";
-                break;
-
-            default:
-                throw new Exception("Type [$field[type]] not suported");
+        // text e blob não aceita DEFAULT no PostgreSQL
+        if (in_array($field['type'], ['text', 'blob', 'json'])) {
+            $field['default'] = '';
+        } else {
+            $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . self::formatDefault($field['default']);
         }
 
-        $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . self::formatDefault($field['default']);
+        $field['type'] = $pgType;
 
         return prepare('"[#name]" [#type][#default][#null]', $field);
     }
@@ -294,6 +300,7 @@ class Postgresql extends BaseConnection
     {
         if (is_null($value)) return 'NULL';
         if (is_bool($value)) return $value ? 'TRUE' : 'FALSE';
+        if ($value === 'CURRENT_TIMESTAMP') return 'CURRENT_TIMESTAMP';
         if (is_numeric($value)) return $value;
         return "'" . str_replace("'", "''", $value) . "'";
     }

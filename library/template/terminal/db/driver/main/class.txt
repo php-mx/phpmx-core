@@ -12,7 +12,6 @@ abstract class [#mainClass]
 }
 
 [#start]
-
 /***************************************************\
 |* Arquivo de driver gerado por PhpMx              *|
 |* ALTERAÇÕES REALIZADAS AQUI SERÃO PERDIDAS       *|

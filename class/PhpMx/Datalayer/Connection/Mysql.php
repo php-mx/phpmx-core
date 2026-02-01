@@ -65,7 +65,7 @@ class Mysql extends BaseConnection
                 ->limit(1);
 
             if (!count($this->executeQuery($configTableExistsQuery)))
-                $this->executeQuery('CREATE TABLE __config (`id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(100) NOT NULL UNIQUE, `value` TEXT NOT NULL);');
+                $this->executeQuery('CREATE TABLE __config (`id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(100) NOT NULL UNIQUE, `value` LONGTEXT NOT NULL);');
 
             foreach ($this->executeQuery(Query::select('__config')) as $config)
                 $this->config[$config['name']] = is_serialized($config['value']) ? unserialize($config['value']) : $config['value'];
@@ -75,7 +75,7 @@ class Mysql extends BaseConnection
     /** Query para criação de tabelas */
     protected function schemeQueryCreateTable(string $tableName, ?string $comment, array $fields): array
     {
-        $queryFields = ['`id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY'];
+        $queryFields = ['`id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY'];
 
         foreach ($fields['add'] ?? [] as $fielName => $field)
             if ($field)
@@ -157,47 +157,108 @@ class Mysql extends BaseConnection
     /** Retorna o template do campo para composição de querys */
     protected static function schemeTemplateField(string $fieldName, array $field): string
     {
-        $prepare = '';
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
         $field['comment'] = isset($field['comment']) && $field['comment'] !== '' ? " COMMENT '{$field['comment']}'" : '';
 
         switch ($field['type']) {
-            case 'idx':
-            case 'time':
-            case 'int':
+            // Inteiros
+            case 'tinyint':
+                $field['type'] = 'TINYINT';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` int([#size])[#default][#null][#comment]";
                 break;
 
-            case 'boolean':
+            case 'smallint':
+                $field['type'] = 'SMALLINT';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` tinyint([#size])[#default][#null][#comment]";
+                break;
+
+            case 'mediumint':
+                $field['type'] = 'MEDIUMINT';
+                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
+                break;
+
+            case 'int':
+            case 'idx':
+                $field['type'] = 'INT';
+                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
+                break;
+
+            case 'bigint':
+                $field['type'] = 'BIGINT';
+                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
+                break;
+
+            // Ponto fixo e flutuante
+            case 'decimal':
+                $field['type'] = 'DECIMAL(' . ($field['size'] ?? 10) . ',' . ($field['settings']['decimal'] ?? 2) . ')';
+                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
             case 'float':
+                $field['type'] = 'FLOAT';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` float([#size])[#default][#null][#comment]";
+                break;
+
+            case 'double':
+                $field['type'] = 'DOUBLE';
+                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
+                break;
+
+            // Booleano
+            case 'boolean':
+                $field['type'] = 'TINYINT(1)';
+                $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
+                break;
+
+            // Strings
+            case 'char':
+            case 'md5':
+                $field['type'] = 'CHAR(' . ($field['size'] ?? 1) . ')';
+                $field['default'] = is_null($field['default']) ? '' : " DEFAULT '{$field['default']}'";
+                break;
+
+            case 'varchar':
+            case 'email':
+            case 'password':
+                $field['type'] = 'VARCHAR(' . ($field['size'] ?? 255) . ')';
+                $field['default'] = is_null($field['default']) ? '' : " DEFAULT '{$field['default']}'";
                 break;
 
             case 'text':
-            case 'json':
+                $field['type'] = 'TEXT';
                 $field['default'] = '';
-                $prepare = "`[#name]` text[#null][#comment]";
                 break;
 
-            case 'string':
-            case 'email':
-            case 'md5':
-            case 'mx5':
-                $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
-                $prepare = "`[#name]` varchar([#size])[#default][#null][#comment]";
+            case 'blob':
+                $field['type'] = 'BLOB';
+                $field['default'] = '';
+                break;
+
+            // Data e hora
+            case 'date':
+            case 'time':
+            case 'datetime':
+            case 'timestamp':
+                $field['type'] = match ($field['type']) {
+                    'date' => 'DATE',
+                    'time' => 'TIME',
+                    'datetime' => 'DATETIME',
+                    'timestamp' => 'TIMESTAMP',
+                };
+                $field['default'] = is_null($field['default']) ? '' : ($field['default'] === 'CURRENT_TIMESTAMP' ? ' DEFAULT CURRENT_TIMESTAMP' : " DEFAULT '{$field['default']}'");
+                break;
+
+            // JSON
+            case 'json':
+                $field['type'] = 'JSON';
+                $field['default'] = '';
                 break;
 
             default:
-                throw new Exception("Type [$field[type]] not suported");
+                throw new Exception("Type [{$field['type']}] not supported");
         }
 
-        return prepare($prepare, $field);
+        return prepare("`[#name]` [#type][#default][#null][#comment]", $field);
     }
 }
