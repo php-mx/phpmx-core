@@ -28,7 +28,7 @@ if (!function_exists('dbugpre')) {
 if (!function_exists('dd')) {
 
     /** Realiza o var_dump de variaveis finalizando o sistema */
-    function dd(mixed ...$params): never
+    function dd(mixed ...$params): void
     {
         dbug(...$params);
         die;
@@ -38,7 +38,7 @@ if (!function_exists('dd')) {
 if (!function_exists('ddpre')) {
 
     /** Realiza o var_dump de variaveis dentro de uma tag HTML pre finalizando o sistema */
-    function ddpre(mixed ...$params): never
+    function ddpre(mixed ...$params): void
     {
         dbugpre(...$params);
         die;

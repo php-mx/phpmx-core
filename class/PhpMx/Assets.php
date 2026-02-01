@@ -8,14 +8,14 @@ use Exception;
 abstract class Assets
 {
     /** Envia um arquivo do projeto como resposta da requisição */
-    static function send(Response $response, ...$assetArgs): never
+    static function send(Response $response, ...$assetArgs): void
     {
         self::load(...func_get_args());
         $response->send();
     }
 
     /** Realiza o download de um arquivo do projeto como resposta da requisição */
-    static function download(Response $response, ...$assetArgs): never
+    static function download(Response $response, ...$assetArgs): void
     {
         self::load(...func_get_args());
         $response->download(true);

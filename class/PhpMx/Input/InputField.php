@@ -38,7 +38,7 @@ class InputField
     }
 
     /** Lança uma Exception em nome do campo */
-    function send($message, bool|int $status = false, array $prepare = []): never
+    function send($message, bool|int $status = false, array $prepare = []): void
     {
         if ($status === true) $status = STS_OK;
         if ($status === false || !is_httpStatus($status)) $status = STS_BAD_REQUEST;

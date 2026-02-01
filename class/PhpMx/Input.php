@@ -117,7 +117,7 @@ class Input
     }
 
     /** Lança uma Exception em nome do input */
-    function send($message, bool|int $status = false): never
+    function send($message, bool|int $status = false): void
     {
         if ($status === true) $status = STS_OK;
         if ($status === false || !is_httpStatus($status)) $status = STS_BAD_REQUEST;
