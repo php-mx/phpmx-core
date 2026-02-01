@@ -228,7 +228,7 @@ class Postgresql extends BaseConnection
             'bigint' => 'BIGINT',
 
             // Ponto fixo e flutuante
-            'decimal' => 'DECIMAL(' . ($field['size'] ?? 10) . ',' . ($field['settings']['decimal'] ?? 2) . ')',
+            'decimal' => 'DECIMAL',
             'float' => 'REAL',
             'double' => 'DOUBLE PRECISION',
 

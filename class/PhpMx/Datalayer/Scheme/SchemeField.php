@@ -88,16 +88,8 @@ class SchemeField
     /** Define o tamanho máximo do campo */
     function size(int $size): static
     {
-        $this->onlyType('size', ['char', 'varchar', 'decimal']);
+        $this->onlyType('size', ['char', 'varchar']);
         $this->map['size'] = max(0, intval($size));
-        return $this;
-    }
-
-    /** Determina quantas casas decimais o campo deve ter */
-    function decimal(int $decimal): static
-    {
-        $this->onlyType('decimal', ['decimal', 'float', 'double']);
-        $this->map['settings']['decimal'] = max(0, intval($decimal));
         return $this;
     }
 
@@ -120,7 +112,7 @@ class SchemeField
     /** Determina a forma de arredondamento do campo [-1:baixo, 0:automático, 1:cima] */
     function round(int $round): static
     {
-        $this->onlyType('round', ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'decimal', 'float', 'double']);
+        $this->onlyType('round', ['tinyint', 'smallint', 'mediumint', 'int', 'bigint']);
         $this->map['settings']['round'] = max(-1, min(1, intval($round)));
         return $this;
     }
@@ -200,7 +192,7 @@ class SchemeField
         if (!is_null($map['default']))
             $map['default'] = floatval($map['default']);
 
-        $map['settings']['decimal'] = $map['settings']['decimal'] ?? 2;
+        // $map['settings']['decimal'] = $map['settings']['decimal'] ?? 2;
 
         return $map;
     }

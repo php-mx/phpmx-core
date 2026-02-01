@@ -191,7 +191,7 @@ class Mysql extends BaseConnection
 
             // Ponto fixo e flutuante
             case 'decimal':
-                $field['type'] = 'DECIMAL(' . ($field['size'] ?? 10) . ',' . ($field['settings']['decimal'] ?? 2) . ')';
+                $field['type'] = 'DECIMAL';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
