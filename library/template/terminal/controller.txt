@@ -2,9 +2,7 @@
 
 namespace [#namespace];
 
-use PhpMx\Context;
-
-class [#class] extends Context
+class [#class]
 {
     function __invoke()
     {

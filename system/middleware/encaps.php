@@ -1,9 +1,9 @@
 <?php
 
-use PhpMx\Context;
 use PhpMx\Log;
+use PhpMx\Response;
 
-return new class extends Context {
+return new class {
 
     function __invoke(Closure $next)
     {
@@ -13,7 +13,7 @@ return new class extends Context {
             $this->encapsException($e);
         }
 
-        $this->response->send();
+        Response::send();
     }
 
     function encapsResponse($response): void
@@ -24,7 +24,7 @@ return new class extends Context {
         if (is_json($response))
             $response = json_decode($response, true);
 
-        $status = $this->response->getStatus() ?? STS_OK;
+        $status = Response::getStatus() ?? STS_OK;
 
         $response = [
             'info' => [
@@ -36,11 +36,11 @@ return new class extends Context {
             'data' => $response
         ];
 
-        $this->response->status($status);
+        Response::status($status);
 
         if (env('DEV')) $response['log'] = Log::getArray();
 
-        $this->response->content($response);
+        Response::content($response);
     }
 
     function encapsException(Throwable $e): void
@@ -52,7 +52,7 @@ return new class extends Context {
             $status = !is_class($e, Error::class) ? STS_BAD_REQUEST : STS_INTERNAL_SERVER_ERROR;
 
         if ($status == STS_REDIRECT) {
-            $this->response->header('location', $message);
+            Response::header('location', $message);
         } else {
             if (empty($message))
                 $message = env("STM_$status");
@@ -73,23 +73,23 @@ return new class extends Context {
                 'data' => null
             ];
 
-            $this->response->header('Mx-Error-Message', $response['info']['message']);
-            $this->response->header('Mx-Error-Status', $response['info']['status']);
+            Response::header('Mx-Error-Message', $response['info']['message']);
+            Response::header('Mx-Error-Status', $response['info']['status']);
 
             if (env('DEV') && is_httpStatusError($status)) {
                 $response['info']['file'] = $e->getFile();
                 $response['info']['line'] = $e->getLine();
-                $this->response->header('Mx-Error-File', $response['info']['file']);
-                $this->response->header('Mx-Error-Line', $response['info']['line']);
+                Response::header('Mx-Error-File', $response['info']['file']);
+                Response::header('Mx-Error-Line', $response['info']['line']);
             }
 
-            $this->response->cache(false);
+            Response::cache(false);
 
             if (env('DEV')) $response['log'] = Log::getArray();
 
-            $this->response->content($response);
+            Response::content($response);
         }
 
-        $this->response->status($status);
+        Response::status($status);
     }
 };

@@ -36,7 +36,7 @@ $interceptor = new class {
             Terminal::echo("[#$color$D:#method] [#$color:#call]", $route);
             Terminal::echo(" [#$color$D:response] [#]", $route['response']);
             if (!empty($route['middlewares']))
-                Terminal::echo("  middlewares: [#]", $route['middlewares']);
+                Terminal::echo(" [#$color$D:middlewares] [#]", $route['middlewares']);
             Terminal::echo(" [#$color$D:registred] [#]", $route['registred_in']);
             if ($route['replaced_in'])
                 Terminal::echo(" [#$color$D:replaced] [#]", $route['replaced_in']);

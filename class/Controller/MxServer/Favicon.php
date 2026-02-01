@@ -3,20 +3,20 @@
 namespace Controller\MxServer;
 
 use PhpMx\Assets;
-use PhpMx\Context;
 use PhpMx\File;
 use PhpMx\Path;
+use PhpMx\Response;
 
-class Favicon extends Context
+class Favicon
 {
     function __invoke()
     {
         $file = path('library/assets/favicon.ico');
 
         if (!File::check($file)) {
-            $this->response->cache(false);
+            Response::cache(false);
             $file = Path::seekForFile('library/assets/favicon.ico');
         }
-        Assets::send($this->response, $file);
+        Assets::send($file);
     }
 }

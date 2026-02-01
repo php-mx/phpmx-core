@@ -2,14 +2,14 @@
 
 namespace Controller\MxServer;
 
-use PhpMx\Context;
+use PhpMx\Response;
 
-class Robots extends Context
+class Robots
 {
     function __invoke()
     {
-        $this->response->type('text');
-        $this->response->content("User-agent: *\nDisallow: /");
-        $this->response->send();
+        Response::type('text');
+        Response::content("User-agent: *\nDisallow: /");
+        Response::send();
     }
 }

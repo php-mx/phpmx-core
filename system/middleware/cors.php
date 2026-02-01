@@ -1,32 +1,33 @@
 <?php
 
-use PhpMx\Context;
+use PhpMx\Request;
+use PhpMx\Response;
 
-return new class extends Context {
+return new class {
 
     function __invoke(Closure $next)
     {
-        $this->response->header('Mx-Cors', 'true');
+        Response::header('Mx-Cors', 'true');
 
-        $this->response->header('Access-Control-Allow-Origin', '*');
-        $this->response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $this->response->header('Access-Control-Allow-Headers', 'X-Requested-With');
+        Response::header('Access-Control-Allow-Origin', '*');
+        Response::header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        Response::header('Access-Control-Allow-Headers', 'X-Requested-With');
 
-        if ($this->request->server('HTTP_ORIGIN')) {
-            $this->response->header('Access-Control-Allow-Origin', $this->request->server('HTTP_ORIGIN'));
-            $this->response->header('Access-Control-Allow-Credentials', 'true');
-            $this->response->header('Access-Control-Max-Age', 86400);
+        if (Request::server('HTTP_ORIGIN')) {
+            Response::header('Access-Control-Allow-Origin', Request::server('HTTP_ORIGIN'));
+            Response::header('Access-Control-Allow-Credentials', 'true');
+            Response::header('Access-Control-Max-Age', 86400);
         }
 
-        if ($this->request->type('OPTIONS')) {
-            if ($this->request->server('HTTP_ACCESS_CONTROL_REQUEST_METHOD'))
-                $this->response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        if (Request::type('OPTIONS')) {
+            if (Request::server('HTTP_ACCESS_CONTROL_REQUEST_METHOD'))
+                Response::header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
-            if ($this->request->server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS'))
-                $this->response->header('Access-Control-Allow-Headers', $this->request->server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS'));
+            if (Request::server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS'))
+                Response::header('Access-Control-Allow-Headers', Request::server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS'));
 
-            $this->response->status(STS_OK);
-            $this->response->send();
+            Response::status(STS_OK);
+            Response::send();
         }
 
         return $next();

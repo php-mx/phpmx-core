@@ -3,108 +3,108 @@
 namespace PhpMx;
 
 /** Classe para acesso aos dados da requisição HTTP atual. */
-class Request
+abstract class Request
 {
-    protected ?array $SERVER = null;
-    protected ?string $TYPE = null;
-    protected ?array $HEADER = null;
-    protected ?bool $SSL = null;
-    protected ?string $HOST = null;
-    protected ?array $PATH = null;
-    protected ?array $QUERY = null;
-    protected ?array $BODY = null;
-    protected array $ROUTE = [];
-    protected ?array $FILE = null;
+    protected static ?array $SERVER = null;
+    protected static ?string $TYPE = null;
+    protected static ?array $HEADER = null;
+    protected static ?bool $SSL = null;
+    protected static ?string $HOST = null;
+    protected static ?array $PATH = null;
+    protected static ?array $QUERY = null;
+    protected static ?array $BODY = null;
+    protected static array $ROUTE = [];
+    protected static ?array $FILE = null;
 
     /** Retorna um ou todos os parametros server da requisição atual */
-    function server(): mixed
+    static function server(): mixed
     {
-        $this->SERVER = $this->SERVER ?? $this->current_server();
+        self::$SERVER = self::$SERVER ?? self::current_server();
 
-        if (func_num_args()) return $this->SERVER[func_get_arg(0)] ?? null;
+        if (func_num_args()) return self::$SERVER[func_get_arg(0)] ?? null;
 
-        return $this->SERVER;
+        return self::$SERVER;
     }
 
     /** Retorna/Compara o tipo da requisição atual (GET, POST, PUT, DELETE, OPTIONS,) */
-    function type(): string|bool
+    static function type(): string|bool
     {
-        $this->TYPE = $this->TYPE ?? $this->current_type();
+        self::$TYPE = self::$TYPE ?? self::current_type();
 
-        if (func_num_args()) return $this->TYPE == strtoupper(func_get_arg(0));
+        if (func_num_args()) return self::$TYPE == strtoupper(func_get_arg(0));
 
-        return $this->TYPE;
+        return self::$TYPE;
     }
 
     /** Retorna um ou todos os parametros header da requisição atual */
-    function header(): mixed
+    static function header(): mixed
     {
-        $this->HEADER = $this->HEADER ?? $this->current_header();
+        self::$HEADER = self::$HEADER ?? self::current_header();
 
-        if (func_num_args()) return $this->HEADER[func_get_arg(0)] ?? null;
+        if (func_num_args()) return self::$HEADER[func_get_arg(0)] ?? null;
 
-        return $this->HEADER;
+        return self::$HEADER;
     }
 
     /** Retorna/Compara o status de utilização SSL da requisição atual */
-    function ssl(): bool
+    static function ssl(): bool
     {
-        $this->SSL = $this->SSL ?? $this->current_ssl();
+        self::$SSL = self::$SSL ?? self::current_ssl();
 
-        if (func_num_args()) return $this->SSL == func_get_arg(0);
+        if (func_num_args()) return self::$SSL == func_get_arg(0);
 
-        return $this->SSL;
+        return self::$SSL;
     }
 
     /** Retorna o host da requisição atual */
-    function host(): string
+    static function host(): string
     {
-        $this->HOST = $this->HOST ?? $this->current_host();
-        return $this->HOST;
+        self::$HOST = self::$HOST ?? self::current_host();
+        return self::$HOST;
     }
 
     /** Retorna ou o todos os caminhos da URI da requisição atual */
-    function path(): array|string
+    static function path(): array|string
     {
-        $this->PATH = $this->PATH ?? $this->current_path();
+        self::$PATH = self::$PATH ?? self::current_path();
 
-        if (func_num_args()) return $this->PATH[func_get_arg(0)] ?? null;
+        if (func_num_args()) return self::$PATH[func_get_arg(0)] ?? null;
 
-        return $this->PATH;
+        return self::$PATH;
     }
 
     /** Retorna ou o todos os parametros passados via query na requisição atual */
-    function query(): mixed
+    static function query(): mixed
     {
-        $this->QUERY = $this->QUERY ?? $this->current_query();
+        self::$QUERY = self::$QUERY ?? self::current_query();
 
-        if (func_num_args() == 1) return $this->QUERY[func_get_arg(0)] ?? null;
+        if (func_num_args() == 1) return self::$QUERY[func_get_arg(0)] ?? null;
 
-        return $this->QUERY;
+        return self::$QUERY;
     }
 
     /** Retorna um ou todos os dados enviados no corpo da requisição atual */
-    function body(): mixed
+    static function body(): mixed
     {
-        $this->BODY = $this->BODY ?? $this->current_body();
+        self::$BODY = self::$BODY ?? self::current_body();
 
-        if (func_num_args()) return $this->BODY[func_get_arg(0)] ?? null;
+        if (func_num_args()) return self::$BODY[func_get_arg(0)] ?? null;
 
-        return $this->BODY;
+        return self::$BODY;
     }
 
     /** Retorna um ou todos os dados enviados via rota para a requisição atual */
-    function route(): mixed
+    static function route(): mixed
     {
-        if (func_num_args()) return $this->ROUTE[func_get_arg(0)] ?? null;
+        if (func_num_args()) return self::$ROUTE[func_get_arg(0)] ?? null;
 
-        return $this->ROUTE;
+        return self::$ROUTE;
     }
 
     /** Retorna um ou todos os capturados pela requisição atual via route, query, body ou file */
-    function data(): mixed
+    static function data(): mixed
     {
-        $data = [...$this->route(), ...$this->query(), ...$this->body(), ...$this->file()];
+        $data = [...self::route(), ...self::query(), ...self::body(), ...self::file()];
 
         if (func_num_args()) return $data[func_get_arg(0)] ?? null;
 
@@ -112,11 +112,11 @@ class Request
     }
 
     /** Retorna um o todos os arquivos enviados na requisição atual */
-    function file(): array
+    static function file(): array
     {
-        $this->FILE = $this->FILE ?? $this->current_file();
+        self::$FILE = self::$FILE ?? self::current_file();
 
-        $return = $this->FILE;
+        $return = self::$FILE;
 
         if (func_num_args()) $return = $return[func_get_arg(0)] ?? [];
 
@@ -126,62 +126,62 @@ class Request
     #==| SET |==#
 
     /** Define o valor de um parametro header da requisição atual */
-    function set_header(string|int $name, mixed $value): void
+    static function set_header(string|int $name, mixed $value): void
     {
-        $this->HEADER = $this->HEADER ?? $this->current_header();
-        $this->HEADER[$name] = $value;
+        self::$HEADER = self::$HEADER ?? self::current_header();
+        self::$HEADER[$name] = $value;
     }
 
     /** Define o valor de um parametro query da requisição atual */
-    function set_query(string|int $name, mixed $value): void
+    static function set_query(string|int $name, mixed $value): void
     {
-        $this->QUERY = $this->QUERY ?? $this->current_query();
-        $this->QUERY[$name] = $value;
+        self::$QUERY = self::$QUERY ?? self::current_query();
+        self::$QUERY[$name] = $value;
     }
 
     /** Define o valor de um parametro do corpo da requisição atual */
-    function set_body(string|int $name, mixed $value): void
+    static function set_body(string|int $name, mixed $value): void
     {
-        $this->BODY = $this->BODY ?? $this->current_query();
-        $this->BODY[$name] = $value;
+        self::$BODY = self::$BODY ?? self::current_body();
+        self::$BODY[$name] = $value;
     }
 
     /** Define o valor de um parametro de rota da requisição atual */
-    function set_route(string|int $name, mixed $value): void
+    static function set_route(string|int $name, mixed $value): void
     {
-        $this->ROUTE[$name] = $value;
+        self::$ROUTE[$name] = $value;
     }
 
     #==| LOAD |==#
 
-    protected function current_server(): array
+    protected static function current_server(): array
     {
         return $_SERVER;
     }
 
-    protected function current_header(): array
+    protected static function current_header(): array
     {
         return IS_TERMINAL ? [] : getallheaders();
     }
 
-    protected function current_type(): string
+    protected static function current_type(): string
     {
         if (IS_TERMINAL) return 'TERMINAL';
 
-        return $this->server('REQUEST_METHOD') ?? 'UNDEFINED';
+        return self::server('REQUEST_METHOD') ?? 'UNDEFINED';
     }
 
-    protected function current_ssl(): bool
+    protected static function current_ssl(): bool
     {
         if (IS_TERMINAL)
             return env('FORCE_SSL');
 
-        return env('FORCE_SSL') || strtolower($this->server('HTTPS') ?? '') == 'on';
+        return env('FORCE_SSL') || strtolower(self::server('HTTPS') ?? '') == 'on';
     }
 
-    protected function current_host(): string
+    protected static function current_host(): string
     {
-        if ($this->server('HTTP_HOST')) return $this->server('HTTP_HOST');
+        if (self::server('HTTP_HOST')) return self::server('HTTP_HOST');
 
         $parse = parse_url(env('TERMINAL_URL') ?? 'http://localhost:8888');
 
@@ -193,9 +193,9 @@ class Request
         return $host;
     }
 
-    protected function current_path(): array
+    protected static function current_path(): array
     {
-        $path = urldecode($this->server('REQUEST_URI') ?? '');
+        $path = urldecode(self::server('REQUEST_URI') ?? '');
         $path = explode('?', $path);
         $path = array_shift($path);
         $path = trim($path, '/');
@@ -205,9 +205,9 @@ class Request
         return $path ?? [];
     }
 
-    protected function current_query(): array
+    protected static function current_query(): array
     {
-        $query = $this->server('REQUEST_URI') ?? '';
+        $query = self::server('REQUEST_URI') ?? '';
 
         $query = parse_url($query)['query'] ?? '';
 
@@ -218,7 +218,7 @@ class Request
         return array_map(fn($var) => str_get_var($var), $query);
     }
 
-    protected function current_body(): array
+    protected static function current_body(): array
     {
         $data = [];
 
@@ -226,9 +226,9 @@ class Request
 
         if (is_json($inputData)) {
             $data = json_decode($inputData, true);
-        } elseif ($this->type('POST')) {
+        } elseif (self::type('POST')) {
             $data = $_POST;
-        } else if ($this->type('GET') || $this->type('PUT') || $this->type('DELETE')) {
+        } else if (self::type('GET') || self::type('PUT') || self::type('DELETE')) {
             parse_str($inputData, $data);
         }
 
@@ -237,7 +237,7 @@ class Request
         return $data;
     }
 
-    protected function current_file(): array
+    protected static function current_file(): array
     {
         if (IS_TERMINAL) return [];
 

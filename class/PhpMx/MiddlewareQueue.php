@@ -10,7 +10,7 @@ class MiddlewareQueue
 {
     protected array $QUEUE = [];
 
-    function __construct(protected Request $request, protected Response $response) {}
+    function __construct() {}
 
     /** Executa uma fila de middlewares retornando a action */
     function __invoke(array $queue, Closure $action)
@@ -53,11 +53,6 @@ class MiddlewareQueue
 
             if (!is_object($action))
                 throw new Exception("Middleware [$middleware] not is object");
-
-            if (is_extend($action, Context::class)) {
-                $action->request = $this->request;
-                $action->response = $this->response;
-            }
 
             if (!is_callable($action))
                 throw new Exception("Middleware [$middleware] cannot be called");

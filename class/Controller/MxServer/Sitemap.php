@@ -2,14 +2,14 @@
 
 namespace Controller\MxServer;
 
-use PhpMx\Context;
+use PhpMx\Response;
 
-class Sitemap extends Context
+class Sitemap
 {
     function __invoke()
     {
-        $this->response->type('xml');
-        $this->response->content('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
-        $this->response->send();
+        Response::type('xml');
+        Response::content('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
+        Response::send();
     }
 }
