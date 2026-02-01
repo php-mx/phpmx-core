@@ -157,12 +157,15 @@ return new class {
                     case 'double':
                         if (isset($fieldMap['settings']['min'])) $settings['min'] = $fieldMap['settings']['min'];
                         if (isset($fieldMap['settings']['max'])) $settings['max'] = $fieldMap['settings']['max'];
-                        if (isset($fieldMap['settings']['round'])) $settings['round'] = $fieldMap['settings']['round'];
-                        if (isset($fieldMap['settings']['decimal'])) $settings['decimal'] = $fieldMap['settings']['decimal'];
+                        if (isset($fieldMap['settings']['precision'])) $settings['precision'] = $fieldMap['settings']['precision'];
                         break;
 
                     case 'char':
                     case 'varchar':
+                    case 'email':
+                    case 'md5':
+                    case 'password':
+                        $settings['size'] = $fieldMap['size'];
                         if (isset($fieldMap['settings']['crop'])) $settings['crop'] = $fieldMap['settings']['crop'];
                         break;
 

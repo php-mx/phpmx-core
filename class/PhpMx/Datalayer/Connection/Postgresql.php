@@ -194,7 +194,7 @@ class Postgresql extends BaseConnection
                 $query[] = prepare('ALTER TABLE "[#table]" ALTER COLUMN "[#fieldName]" SET DEFAULT [#default];', [
                     'table' => $tableName,
                     'fieldName' => $fieldName,
-                    'default' => $this->formatDefault($fieldData['default'])
+                    'default' => $this->formatDefault($fieldData['default'], $fieldData['type'])
                 ]);
             }
 
@@ -217,36 +217,30 @@ class Postgresql extends BaseConnection
     }
 
     /** Retorna somente o tipo de dado PostgreSQL correspondente ao campo */
-    protected static function schemeTemplateFieldTypeOnly(array $field): string
+    protected function schemeTemplateFieldTypeOnly(array $field): string
     {
         return match ($field['type']) {
-            // Inteiros
             'tinyint' => 'SMALLINT',
             'smallint' => 'SMALLINT',
             'mediumint' => 'INTEGER',
             'int', 'idx' => 'INTEGER',
             'bigint' => 'BIGINT',
 
-            // Ponto fixo e flutuante
-            'decimal' => 'DECIMAL',
+            'decimal' => 'DECIMAL' . (isset($field['settings']['precision']) ? '(' . ($field['size'] ?? 10) . ',' . $field['settings']['precision'] . ')' : ''),
             'float' => 'REAL',
             'double' => 'DOUBLE PRECISION',
 
-            // Booleano
             'boolean' => 'BOOLEAN',
 
-            // Strings
             'char', 'md5' => 'CHAR(' . ($field['size'] ?? 1) . ')',
             'varchar', 'email', 'password' => 'VARCHAR(' . ($field['size'] ?? 255) . ')',
             'text' => 'TEXT',
             'blob' => 'BYTEA',
 
-            // Data e hora
             'date' => 'DATE',
             'time' => 'TIME',
             'datetime', 'timestamp' => 'TIMESTAMP',
 
-            // JSON
             'json' => 'JSONB',
 
             default => throw new Exception("Type [{$field['type']}] not supported")
@@ -276,18 +270,17 @@ class Postgresql extends BaseConnection
     }
 
     /** Retorna o template do campo para composição de querys */
-    protected static function schemeTemplateField(string $fieldName, array $field): string
+    protected function schemeTemplateField(string $fieldName, array $field): string
     {
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
 
-        $pgType = self::schemeTemplateFieldTypeOnly($field);
+        $pgType = $this->schemeTemplateFieldTypeOnly($field);
 
-        // text e blob não aceita DEFAULT no PostgreSQL
         if (in_array($field['type'], ['text', 'blob', 'json'])) {
             $field['default'] = '';
         } else {
-            $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . self::formatDefault($field['default']);
+            $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $this->formatDefault($field['default'], $field['type']);
         }
 
         $field['type'] = $pgType;
@@ -296,11 +289,11 @@ class Postgresql extends BaseConnection
     }
 
     /** Formata o valor default corretamente para PostgreSQL */
-    protected static function formatDefault(mixed $value): string
+    protected function formatDefault(mixed $value, ?string $type = null): string
     {
         if (is_null($value)) return 'NULL';
-        if (is_bool($value)) return $value ? 'TRUE' : 'FALSE';
         if ($value === 'CURRENT_TIMESTAMP') return 'CURRENT_TIMESTAMP';
+        if ($type === 'boolean') return $value ? 'TRUE' : 'FALSE';
         if (is_numeric($value)) return $value;
         return "'" . str_replace("'", "''", $value) . "'";
     }

@@ -20,7 +20,7 @@ class SchemeMap
         'default' => null,
         'comment' => '',
         'size' => null,
-        'null' => false,
+        'null' => true,
         'settings' => []
     ];
 

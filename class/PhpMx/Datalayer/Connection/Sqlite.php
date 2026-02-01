@@ -206,13 +206,12 @@ class Sqlite extends BaseConnection
     }
 
     /** Retorna o template do campo para composição de querys */
-    protected static function schemeTemplateField(string $fieldName, array $field): string
+    protected function schemeTemplateField(string $fieldName, array $field): string
     {
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
 
         switch ($field['type']) {
-            // Inteiros → INTEGER
             case 'tinyint':
             case 'smallint':
             case 'mediumint':
@@ -224,7 +223,6 @@ class Sqlite extends BaseConnection
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
-            // Ponto fixo e flutuante → REAL
             case 'decimal':
             case 'float':
             case 'double':
@@ -232,7 +230,6 @@ class Sqlite extends BaseConnection
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
-            // Strings e temporais
             case 'char':
             case 'varchar':
             case 'email':
@@ -246,14 +243,12 @@ class Sqlite extends BaseConnection
                 $field['default'] = is_null($field['default']) ? '' : ($field['default'] === 'CURRENT_TIMESTAMP' ? ' DEFAULT CURRENT_TIMESTAMP' : " DEFAULT '{$field['default']}'");
                 break;
 
-            // Strings → TEXT
             case 'text':
             case 'json':
                 $field['type'] = 'TEXT';
                 $field['default'] = '';
                 break;
 
-            // Binário → BLOB
             case 'blob':
                 $field['type'] = 'BLOB';
                 $field['default'] = '';

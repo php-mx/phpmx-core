@@ -155,14 +155,13 @@ class Mysql extends BaseConnection
     }
 
     /** Retorna o template do campo para composição de querys */
-    protected static function schemeTemplateField(string $fieldName, array $field): string
+    protected function schemeTemplateField(string $fieldName, array $field): string
     {
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
         $field['comment'] = isset($field['comment']) && $field['comment'] !== '' ? " COMMENT '{$field['comment']}'" : '';
 
         switch ($field['type']) {
-            // Inteiros
             case 'tinyint':
                 $field['type'] = 'TINYINT';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
@@ -189,9 +188,10 @@ class Mysql extends BaseConnection
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
-            // Ponto fixo e flutuante
             case 'decimal':
-                $field['type'] = 'DECIMAL';
+                $field['type'] = isset($field['settings']['precision'])
+                    ? 'DECIMAL(' . ($field['size'] ?? 10) . ',' . $field['settings']['precision'] . ')'
+                    : 'DECIMAL';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
@@ -205,13 +205,11 @@ class Mysql extends BaseConnection
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
-            // Booleano
             case 'boolean':
                 $field['type'] = 'TINYINT(1)';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
                 break;
 
-            // Strings
             case 'char':
             case 'md5':
                 $field['type'] = 'CHAR(' . ($field['size'] ?? 1) . ')';
@@ -235,7 +233,6 @@ class Mysql extends BaseConnection
                 $field['default'] = '';
                 break;
 
-            // Data e hora
             case 'date':
             case 'time':
             case 'datetime':
@@ -249,7 +246,6 @@ class Mysql extends BaseConnection
                 $field['default'] = is_null($field['default']) ? '' : ($field['default'] === 'CURRENT_TIMESTAMP' ? ' DEFAULT CURRENT_TIMESTAMP' : " DEFAULT '{$field['default']}'");
                 break;
 
-            // JSON
             case 'json':
                 $field['type'] = 'JSON';
                 $field['default'] = '';

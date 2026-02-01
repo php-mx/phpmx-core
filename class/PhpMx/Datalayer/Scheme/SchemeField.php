@@ -67,6 +67,14 @@ class SchemeField
         return $this;
     }
 
+    /** Determina a precisão de casas decimais do campo */
+    function precision(int $precision): static
+    {
+        $this->onlyType('precision', ['decimal']);
+        $this->map['settings']['precision'] = max(0, intval($precision));
+        return $this;
+    }
+
     /** Define se o campo deve ser indexado */
     function index(bool $index, bool $unique = false): static
     {
@@ -187,12 +195,15 @@ class SchemeField
         return $map;
     }
 
-    private function __mapNumeric(array $map): array
+    protected function __mapNumeric(array $map): array
     {
+        if ($map['type'] === 'decimal') {
+            $map['settings']['precision'] = $map['settings']['precision'] ?? 2;
+            $map['size'] = max($map['size'] ?? 10, $map['settings']['precision'] + 1);
+        }
+
         if (!is_null($map['default']))
             $map['default'] = floatval($map['default']);
-
-        // $map['settings']['decimal'] = $map['settings']['decimal'] ?? 2;
 
         return $map;
     }
@@ -305,7 +316,6 @@ class SchemeField
     protected function __mapPassword(array $map): array
     {
         $map['size'] = 255;
-        $map['null'] = false;
         $map['default'] = null;
 
         return $map;

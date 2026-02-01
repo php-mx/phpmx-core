@@ -4,14 +4,12 @@ namespace PhpMx\Datalayer\Driver\Field;
 
 use Exception;
 
-/** Armazena string de email */
-class FEmail extends FString
+class FEmail extends FVarchar
 {
-    /** Define um novo valor para o campo */
     function set($value): static
     {
-        if (is_stringable($value)) {
-            $value = strtolower($value);
+        if (!is_null($value)) {
+            $value = strtolower(strval($value));
             $value = remove_accents($value);
             $value = filter_var($value, FILTER_SANITIZE_EMAIL);
         }
@@ -19,7 +17,6 @@ class FEmail extends FString
         return parent::set($value);
     }
 
-    /** Verifica se o campo pode ser insetido no banco de dados */
     protected function validade(mixed $value): void
     {
         parent::validade($value);

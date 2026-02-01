@@ -4,10 +4,8 @@ namespace PhpMx\Datalayer\Driver\Field;
 
 use PhpMx\Datalayer\Driver\Field;
 
-/** Armazena um md5 */
 class FMd5 extends Field
 {
-    /** Define um novo valor para o campo */
     function set($value): static
     {
         if (!is_null($value))
@@ -16,7 +14,6 @@ class FMd5 extends Field
         return parent::set($value);
     }
 
-    /** Verifica se  baum valor bate com o valor do campo */
     function compare($value): bool
     {
         if (!is_null($value))

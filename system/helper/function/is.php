@@ -171,6 +171,16 @@ if (!function_exists('is_md5')) {
     }
 }
 
+if (!function_exists('is_password')) {
+
+    /** Verifica se uma hash de password */
+    function is_password(string $value): bool
+    {
+        return password_needs_rehash($value, PASSWORD_BCRYPT) === false
+            && strlen($value) === 60;
+    }
+}
+
 if (!function_exists('is_mx5')) {
 
     /** Verifica se uma variavel é um mx5 */

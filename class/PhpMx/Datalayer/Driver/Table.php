@@ -142,13 +142,13 @@ abstract class Table
     }
 
     /** Retorna um registro novo */
-    final function getNew(...$args)
+    final function getNew()
     {
         return $this->arrayToRecord(['id' => 0]);
     }
 
     /** Retorna um registro nulo */
-    final function getNull(...$args)
+    final function getNull()
     {
         return $this->arrayToRecord(['id' => null]);
     }
@@ -207,7 +207,7 @@ abstract class Table
                 throw new Error('Impossible to create query with provided parameters');
                 break;
         }
-        $query->dbName($this->DATALAYER)->table($this->TABLE);
+        $query->dbName($this->DATALAYER)->table($this->TABLE)->whereNull('_deleted', true);
 
         return $query;
     }
