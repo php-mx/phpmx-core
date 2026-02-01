@@ -46,9 +46,9 @@ class Captcha
         imagecolorallocate($image, $bg['r'], $bg['g'], $bg['b']);
         $color = imagecolorallocate($image, $fg['r'], $fg['g'], $fg['b']);
 
-        $fontFile = Path::seekForFile('library/font/arial.ttf');
+        $fontFile = Path::seekForFile('library/font/catcha.ttf');
 
-        for ($i = 1; $i <= 7; $i++) {
+        for ($i = 1; $i < 7; $i++) {
             imagettftext(
                 $image,
                 18,
