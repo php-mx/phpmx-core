@@ -5,6 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Lista todas as funções de helper registradas no sistema */
 return new class {
 
     protected $used = [];
