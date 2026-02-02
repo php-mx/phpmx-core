@@ -38,9 +38,11 @@ return new class {
 
         File::create($file, $content, true);
 
-        Terminal::echo('Certificate [#blueB:.crt] created successfully.', $cifName);
+        Terminal::echo("Certificate [#cyan:#] created successfully", [$cifName]);
+        Terminal::echo(" [#blue:#]", [$file]);
+        Terminal::echo();
         Terminal::echo('To use the new file in your project, add the line below to your environment variables');
-        Terminal::echo('');
-        Terminal::echo('    [#cyanB:CIF = ][#cyanB:#]', $cifName);
+        Terminal::echo();
+        Terminal::echo(' [#greenB:CIF = ][#greenB:#]', $cifName);
     }
 };

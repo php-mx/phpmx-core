@@ -7,6 +7,6 @@ return new class {
 
     function __invoke()
     {
-        Terminal::echo('Command [#green:#] running', '[#command]');
+        Terminal::echo('Command [#cyan:#] running', '[#command]');
     }
 };
