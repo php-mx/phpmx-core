@@ -33,7 +33,6 @@
             "system/helper/constant/request_is.php",
             "system/helper/function/cache.php",
             "system/helper/function/changes.php",
-            "system/helper/function/color.php",
             "system/helper/function/dbug.php",
             "system/helper/function/env.php",
             "system/helper/function/is.php",
