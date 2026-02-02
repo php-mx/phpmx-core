@@ -1,6 +1,6 @@
 {
     "name": "phpmx/core",
-    "description": "Framework PHP leve e eficiente para desenvolvimento rápido de APIs modernas com foco em manutenção simples.",
+    "description": "Framework php focado em produtividade e facilidade de manutenção",
     "license": "MIT",
     "version": "3.0",
     "keywords": [
@@ -13,7 +13,6 @@
         "router",
         "orm"
     ],
-    "homepage": "https://github.com/phpmx/core",
     "authors": [
         {
             "name": "André Ricardo",
@@ -25,27 +24,18 @@
         "ext-mbstring": "*",
         "ext-fileinfo": "*"
     },
-    "suggest": {
-        "ext-gd": "Required for image manipulation and Captcha generation.",
-        "ext-exif": "Required for identifying file types and correcting JPEG orientation.",
-        "ext-pdo_mysql": "Required if you intend to use MySQL or MariaDB connections.",
-        "ext-pdo_sqlite": "Required if you intend to use SQLite connections.",
-        "ext-pdo_pgsql": "Required if you intend to use PostgreSQL connections."
-    },
     "autoload": {
         "psr-4": {
             "": "class/"
         },
         "files": [
             "system/helper/constant/char_normalizer.php",
-            "system/helper/constant/http_status.php",
             "system/helper/constant/request_is.php",
             "system/helper/function/cache.php",
             "system/helper/function/changes.php",
             "system/helper/function/color.php",
             "system/helper/function/dbug.php",
             "system/helper/function/env.php",
-            "system/helper/function/idkey.php",
             "system/helper/function/is.php",
             "system/helper/function/mx5.php",
             "system/helper/function/num.php",
