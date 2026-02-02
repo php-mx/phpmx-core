@@ -4,6 +4,7 @@ use PhpMx\Datalayer;
 use PhpMx\Json;
 use PhpMx\Terminal;
 
+/** Exporta o mapeamento interno do banco para um arquivo JSON */
 return new class {
 
     function __invoke($dbName = 'main')

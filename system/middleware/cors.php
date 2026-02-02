@@ -3,6 +3,7 @@
 use PhpMx\Request;
 use PhpMx\Response;
 
+/** Configura as permissões de CORS */
 return new class {
 
     function __invoke(Closure $next)

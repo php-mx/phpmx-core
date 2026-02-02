@@ -5,6 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Gera um novo arquivo de Controller com namespace e estrutura baseados no caminho informado */
 return new class {
 
     function __invoke($controller)

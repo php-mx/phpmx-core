@@ -1,8 +1,8 @@
 <?php
 
 use PhpMx\Datalayer\MigrationTerminalTrait;
-use PhpMx\Terminal;
 
+/** Executa todas as migrações pendentes para atualizar o esquema do banco de dados até a versão mais recente */
 return new class {
 
     use MigrationTerminalTrait;

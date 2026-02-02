@@ -4,6 +4,7 @@
 /composer.lock
 
 /library/cache
+/library/temp
 /library/certificate/*
 !/library/certificate/base.crt
 

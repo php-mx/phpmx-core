@@ -5,6 +5,7 @@ namespace PhpMx;
 use Closure;
 use Exception;
 
+/** Lista as rotas registradas no projeto */
 $interceptor = new class {
 
     public bool $intercepting = false;
@@ -28,18 +29,16 @@ $interceptor = new class {
 
         foreach ($routes as $n => $route) {
 
-            if ($n > 0) Terminal::echo();
-
             $color = ['GET' => 'green', 'POST' => 'blue', 'PUT' => 'magenta', 'DELETE' => 'red'][$route['method']];
             $D = 'D';
 
-            Terminal::echo("[#$color$D:#method] [#$color:#call]", $route);
-            Terminal::echo(" [#$color$D:response] [#]", $route['response']);
+            Terminal::echo(" - [#$color$D:#method] [#$color:#call]", $route);
+            Terminal::echo("    [#$color$D:response] [#]", $route['response']);
             if (!empty($route['middlewares']))
-                Terminal::echo(" [#$color$D:middlewares] [#]", $route['middlewares']);
-            Terminal::echo(" [#$color$D:registred] [#]", $route['registred_in']);
+                Terminal::echo("    [#$color$D:middlewares] [#]", $route['middlewares']);
+            Terminal::echo("    [#$color$D:registred] [#whiteD:#]", $route['registred_in']);
             if ($route['replaced_in'])
-                Terminal::echo(" [#$color$D:replaced] [#]", $route['replaced_in']);
+                Terminal::echo("    [#$color$D:replaced] [#whiteD:#]", $route['replaced_in']);
         }
     }
 

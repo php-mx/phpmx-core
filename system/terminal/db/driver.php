@@ -7,6 +7,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Instala os drivers e classes de Model baseados no mapeamento do banco de dados */
 return new class {
 
     protected string $dbName = '';

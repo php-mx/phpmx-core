@@ -2,6 +2,7 @@
 
 use PhpMx\Terminal;
 
+/** Orgulhosamente exibe a logo do PhpMx */
 return new class {
 
     function __invoke()

@@ -4,6 +4,7 @@ use PhpMx\Env;
 use PhpMx\File;
 use PhpMx\Terminal;
 
+/** Inicia o servidor embutido do PHP para rodar o projeto localmente */
 return new class {
 
     function __invoke($port = null)

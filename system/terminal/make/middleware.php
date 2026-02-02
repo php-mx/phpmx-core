@@ -5,6 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Cria um novo arquivo de middleware no diretório do sistema com base em um template padrão */
 return new class {
 
     function __invoke($middleware)

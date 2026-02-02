@@ -3,6 +3,9 @@
 /** Sucesso (HTTP 200) */
 define('STS_OK', 200);
 
+/** Criado (HTTP 201) */
+define('STS_CREATED', 201);
+
 /** Sem conteúdo (HTTP 204) */
 define('STS_NOT_CONTENT', 204);
 

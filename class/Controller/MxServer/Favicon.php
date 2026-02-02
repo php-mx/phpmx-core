@@ -9,6 +9,7 @@ use PhpMx\Response;
 
 class Favicon
 {
+    /** Gerencia a entrega do ícone do site buscando primeiro no projeto local e depois no framework */
     function __invoke()
     {
         $file = path('library/assets/favicon.ico');

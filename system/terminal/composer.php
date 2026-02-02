@@ -4,6 +4,7 @@ use PhpMx\Dir;
 use PhpMx\Json;
 use PhpMx\Terminal;
 
+/** Atualiza o autoload do composer mapeando automaticamente as classes e arquivos de helper do sistema */
 return new class {
 
     function __invoke($forceDev = 0)

@@ -4,6 +4,7 @@ use PhpMx\Dir;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Lista as bibliotecas registradas no projeto */
 return new class {
 
     protected $used = [];

@@ -5,6 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Cria um novo arquivo de migração com timestamp único para controle de versão do banco de dados */
 return new class {
 
     function __invoke(string $migrationName, string $dbName = 'main')

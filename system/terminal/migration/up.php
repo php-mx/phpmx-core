@@ -1,8 +1,8 @@
 <?php
 
 use PhpMx\Datalayer\MigrationTerminalTrait;
-use PhpMx\Terminal;
 
+/** Executa a próxima migração pendente no banco de dados para avançar uma versão */
 return new class {
 
     use MigrationTerminalTrait;

@@ -4,6 +4,7 @@ use PhpMx\File;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Copia um arquivo do vendor para o projeto local permitindo a customização do código original */
 return new class {
 
     function __invoke($file)

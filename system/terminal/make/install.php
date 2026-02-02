@@ -5,6 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Gera o arquivo de instalação para configurar o ambiente do projeto pela primeira vez */
 return new class {
 
     function __invoke()

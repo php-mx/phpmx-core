@@ -5,6 +5,7 @@ use PhpMx\Datalayer\Query;
 use PhpMx\Json;
 use PhpMx\Terminal;
 
+/** Importa um banco de dados apra um arquivo JSON */
 return new class {
 
     function __invoke($dbName = 'main', $tables = '*')

@@ -3,6 +3,7 @@
 use PhpMx\Log;
 use PhpMx\Response;
 
+/** Padroniza a saída da API, encapsulando respostas e exceções em um formato JSON estruturado. */
 return new class {
 
     function __invoke(Closure $next)

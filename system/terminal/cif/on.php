@@ -3,6 +3,7 @@
 use PhpMx\Cif;
 use PhpMx\Terminal;
 
+/** Criptografa uma string ou um conjunto de argumentos */
 return new class {
 
     function __invoke($content)

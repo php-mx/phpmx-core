@@ -5,6 +5,7 @@ use PhpMx\Path;
 use PhpMx\Terminal;
 use PhpMx\TerminalInstall;
 
+/** Executa os scripts de instalação de pacotes externos e atualiza o autoload do composer */
 return new class {
 
     function __invoke()

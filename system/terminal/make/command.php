@@ -5,6 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
+/** Cria um novo arquivo de comando para o terminal no diretório do sistema */
 return new class {
 
     function __invoke(string $command)

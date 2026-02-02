@@ -4,6 +4,7 @@ use PhpMx\Cif;
 use PhpMx\File;
 use PhpMx\Terminal;
 
+/** Gera um novo arquivo de certificado para o motor Cif */
 return new class {
 
     function __invoke($cifName)

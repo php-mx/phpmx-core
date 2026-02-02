@@ -6,6 +6,7 @@ use PhpMx\Response;
 
 class Sitemap
 {
+    /** Gera a estrutura inicial do mapa do site para indexação em motores de busca */
     function __invoke()
     {
         Response::type('xml');
