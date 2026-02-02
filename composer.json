@@ -1,13 +1,37 @@
 {
     "name": "phpmx/core",
-    "description": "Núcleo leve para criação de aplicações modernas com PHP, orientado à manutenção e performance.",
+    "description": "Framework PHP leve e eficiente para desenvolvimento rápido de APIs modernas com foco em manutenção simples.",
     "license": "MIT",
+    "version": "3.0",
+    "keywords": [
+        "framework",
+        "php",
+        "api",
+        "rest",
+        "lightweight",
+        "phpmx",
+        "router",
+        "orm"
+    ],
+    "homepage": "https://github.com/phpmx/core",
     "authors": [
         {
             "name": "André Ricardo",
             "email": "contatoadmx@gmail.com"
         }
     ],
+    "require": {
+        "php": "^8.1",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*"
+    },
+    "suggest": {
+        "ext-gd": "Required for image manipulation and Captcha generation.",
+        "ext-exif": "Required for identifying file types and correcting JPEG orientation.",
+        "ext-pdo_mysql": "Required if you intend to use MySQL or MariaDB connections.",
+        "ext-pdo_sqlite": "Required if you intend to use SQLite connections.",
+        "ext-pdo_pgsql": "Required if you intend to use PostgreSQL connections."
+    },
     "autoload": {
         "psr-4": {
             "": "class/"
@@ -37,18 +61,6 @@
             "system/helper/script/path.php",
             "system/helper/script/timezone.php"
         ]
-    },
-    "require": {
-        "php": "^8.1",
-        "ext-mbstring": "*",
-        "ext-fileinfo": "*"
-    },
-    "suggest": {
-        "ext-gd": "Required for image manipulation and Captcha generation.",
-        "ext-exif": "Required for identifying file types and correcting JPEG orientation.",
-        "ext-pdo_mysql": "Required if you intend to use MySQL or MariaDB connections.",
-        "ext-pdo_sqlite": "Required if you intend to use SQLite connections.",
-        "ext-pdo_pgsql": "Required if you intend to use PostgreSQL connections."
     },
     "bin": [
         "mx"
