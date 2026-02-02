@@ -1,29 +1,14 @@
 {
     "name": "phpmx/core",
-    "description": "Framework php focado em produtividade e facilidade de manutenção",
+    "description": "Núcleo para aplicações modernas em PHP",
     "license": "MIT",
-    "version": "3.0",
-    "keywords": [
-        "framework",
-        "php",
-        "api",
-        "rest",
-        "lightweight",
-        "phpmx",
-        "router",
-        "orm"
-    ],
+    "version": "3",
     "authors": [
         {
             "name": "André Ricardo",
             "email": "contatoadmx@gmail.com"
         }
     ],
-    "require": {
-        "php": "^8.1",
-        "ext-mbstring": "*",
-        "ext-fileinfo": "*"
-    },
     "autoload": {
         "psr-4": {
             "": "class/"
@@ -50,6 +35,11 @@
             "system/helper/script/path.php",
             "system/helper/script/timezone.php"
         ]
+    },
+    "require": {
+        "php": "^8.1",
+        "ext-mbstring": "*",
+        "ext-fileinfo": "*"
     },
     "bin": [
         "mx"

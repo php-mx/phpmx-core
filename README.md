@@ -1,6 +1,6 @@
-# phpmx/core
+# PHPMX CORE
 
-Framework php focado em produtividade e facilidade de manutenção.
+Núcleo para aplicações modernas em PHP
 
 ```bash
 composer require phpmx/core
