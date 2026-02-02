@@ -30,7 +30,8 @@ return new class {
 
             foreach ($visibleConstants as $const) {
                 Terminal::echo();
-                Terminal::echo('[#cyan:#ref] [#whiteD:#description][#yellowD:#status]', $const);
+                Terminal::echo(' [#cyan:#ref] [#description]', $const);
+                Terminal::echo('  [#blueD:#file] [#yellowD:#replaced]', $const);
             }
         }
     }
@@ -56,13 +57,13 @@ return new class {
 
             foreach ($matches as $match) {
                 $ref = $match[2];
-                $this->used[$ref] = $this->used[$ref] ?? $origin;
+                $this->used[$ref] = $this->used[$ref] ?? $file;
 
                 $constants[$ref] = [
                     'ref' => $ref,
                     'description' => trim($match[1] ?? ''),
-                    'file' => ($this->used[$ref] == $origin) ? $file : '',
-                    'status' => ($this->used[$ref] == $origin) ? '' : 'replaced in ' . $this->used[$ref]
+                    'file' => $file,
+                    'replaced' => $this->used[$ref] == $file ? '' : $this->used[$ref]
                 ];
             }
         }

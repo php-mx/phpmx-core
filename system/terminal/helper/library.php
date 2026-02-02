@@ -20,7 +20,8 @@ return new class {
 
             foreach ($this->getFilesIn($path, $origin) as $file) {
                 Terminal::echo();
-                Terminal::echo('[#cyan:#ref] [#blueD:#file][#yellowD:#status]', $file);
+                Terminal::echo(' [#cyan:#ref]', $file);
+                Terminal::echo('  [#blueD:#file] [#yellowD:#replaced]', $file);
             }
         }
     }
@@ -42,21 +43,13 @@ return new class {
         $files = [];
         foreach (Dir::seekForFile($path, true) as $ref) {
             $file = path($path, $ref);
-            $this->used[$ref] = $this->used[$ref] ?? $origin;
+            $this->used[$ref] = $this->used[$ref] ?? $file;
 
-            if ($this->used[$ref] == $origin) {
-                $files[$ref] = [
-                    'ref' => $ref,
-                    'file' => $file,
-                    'status' => ''
-                ];
-            } else {
-                $files[$ref] = [
-                    'ref' => $ref,
-                    'file' => '',
-                    'status' => 'replaced in ' . $this->used[$ref]
-                ];
-            }
+            $files[$ref] = [
+                'ref' => $ref,
+                'file' => $file,
+                'replaced' => $this->used[$ref] == $file ? '' : $this->used[$ref]
+            ];
         }
         ksort($files);
         return $files;

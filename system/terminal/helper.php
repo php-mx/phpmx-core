@@ -24,12 +24,12 @@ return new class {
 
                     if ($nCommand > 0) Terminal::echo();
 
-                    Terminal::echo('[#cyan:#terminal] [#whiteD:#description] [#yellowD:#status]', $cmd);
+                    Terminal::echo(' [#cyan:#terminal] [#description]', $cmd);
 
-                    Terminal::echo(' [#blueD:#file]', $cmd);
+                    Terminal::echo('  [#blueD:#file] [#yellowD:#replaced]', $cmd);
 
                     foreach ($cmd['variations'] as $variation)
-                        Terminal::echo('  php [#whiteB:mx] [#whiteB:#][#whiteD:#]', [$cmd['terminal'], $variation]);
+                        Terminal::echo('   php mx [#][#]', [$cmd['terminal'], $variation]);
                 }
             };
         }
@@ -61,7 +61,7 @@ return new class {
             $description = $match ? $this->getDocBefore($content, $match[0][1]) : '';
 
             $variations = [''];
-            $this->used[$terminal] = $this->used[$terminal] ?? $origin;
+            $this->used[$terminal] = $this->used[$terminal] ?? $file;
 
             try {
                 $command = Import::return($file);
@@ -83,7 +83,7 @@ return new class {
                 'description' => $description,
                 'file' => $file,
                 'variations' => $variations,
-                'status' => $this->used[$terminal] == $origin ? '' : 'replaced in ' . $this->used[$terminal]
+                'replaced' => $this->used[$terminal] == $file ? '' : $this->used[$terminal]
             ];
         }
         ksort($commands);

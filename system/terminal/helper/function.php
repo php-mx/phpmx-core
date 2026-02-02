@@ -29,7 +29,8 @@ return new class {
 
             foreach ($visibleFunctions as $func) {
                 Terminal::echo();
-                Terminal::echo('[#cyan:#ref] [#whiteD:#description][#yellowD:#status]', $func);
+                Terminal::echo(' [#cyan:#ref] [#description]', $func);
+                Terminal::echo('  [#blueD:#file] [#yellowD:#replaced]', $func);
             }
         }
     }
@@ -61,13 +62,13 @@ return new class {
 
                 $description = $this->getDocBefore($content, $pos);
 
-                $this->used[$funcName] = $this->used[$funcName] ?? $origin;
+                $this->used[$funcName] = $this->used[$funcName] ?? $file;
 
                 $functions[$funcName] = [
                     'ref' => $funcName,
                     'description' => $description,
-                    'file' => ($this->used[$funcName] == $origin) ? $file : '',
-                    'status' => ($this->used[$funcName] == $origin) ? '' : 'replaced in ' . $this->used[$funcName]
+                    'file' => $file,
+                    'replaced' => $this->used[$funcName] == $file ? '' : $this->used[$funcName]
                 ];
             }
         }
