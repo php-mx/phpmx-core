@@ -1,12 +1,10 @@
-/.env
 /.conf
-/vendor
 /composer.lock
 
+# MX CORE
+
+/.env
+/vendor
 /library/cache
-/library/temp
 /library/certificate/*
 !/library/certificate/base.crt
-
-/system/datalayer
-/library/sqlite

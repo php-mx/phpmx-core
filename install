@@ -16,11 +16,11 @@ return new class extends TerminalInstall {
 
         self::promote('system/helper/script/path.php');
 
-        self::blockFile('.env', 'MX', [
+        self::blockFile('.env', 'MX CORE', [
             'DEV = true',
         ]);
 
-        self::blockFile('.gitignore', 'MX', [
+        self::blockFile('.gitignore', 'MX CORE', [
             '/.env',
             '/vendor',
             '/library/cache',
