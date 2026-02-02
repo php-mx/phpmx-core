@@ -20,14 +20,16 @@ return new class {
             Terminal::echo('[#greenB:#]', $origin);
 
             foreach ($this->getCommandsIn($path, $origin) as $nCommand => $cmd) {
-
                 if (is_null($command) || str_starts_with($cmd['terminal'], $command)) {
-                    Terminal::echo(' - [#cyan:#terminal] [#whiteD:#description][#yellowD:#status]', $cmd);
 
-                    Terminal::echo('   [#blueD:#file]', $cmd);
+                    if ($nCommand > 0) Terminal::echo();
+
+                    Terminal::echo('[#cyan:#terminal] [#whiteD:#description] [#yellowD:#status]', $cmd);
+
+                    Terminal::echo(' [#blueD:#file]', $cmd);
 
                     foreach ($cmd['variations'] as $variation)
-                        Terminal::echo('      php [#whiteB:mx] [#whiteB:#][#whiteD:#]', [$cmd['terminal'], $variation]);
+                        Terminal::echo('  php [#whiteB:mx] [#whiteB:#][#whiteD:#]', [$cmd['terminal'], $variation]);
                 }
             };
         }

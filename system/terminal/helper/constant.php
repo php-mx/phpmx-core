@@ -28,8 +28,10 @@ return new class {
 
             Terminal::echo('[#greenB:#]', $origin);
 
-            foreach ($visibleConstants as $const)
-                Terminal::echo(' - [#cyan:#ref] [#whiteD:#description][#yellowD:#status]', $const);
+            foreach ($visibleConstants as $const) {
+                Terminal::echo();
+                Terminal::echo('[#cyan:#ref] [#whiteD:#description][#yellowD:#status]', $const);
+            }
         }
     }
 

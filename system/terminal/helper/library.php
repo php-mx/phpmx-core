@@ -18,8 +18,10 @@ return new class {
 
             Terminal::echo('[#greenB:#]', $origin);
 
-            foreach ($this->getFilesIn($path, $origin) as $file)
-                Terminal::echo(' - [#cyan:#ref] [#blueD:#file][#yellowD:#status]', $file);
+            foreach ($this->getFilesIn($path, $origin) as $file) {
+                Terminal::echo();
+                Terminal::echo('[#cyan:#ref] [#blueD:#file][#yellowD:#status]', $file);
+            }
         }
     }
 

@@ -28,7 +28,8 @@ return new class {
             Terminal::echo('[#greenB:#]', $origin);
 
             foreach ($visibleFunctions as $func) {
-                Terminal::echo(' - [#cyan:#ref] [#whiteD:#description][#yellowD:#status]', $func);
+                Terminal::echo();
+                Terminal::echo('[#cyan:#ref] [#whiteD:#description][#yellowD:#status]', $func);
             }
         }
     }
