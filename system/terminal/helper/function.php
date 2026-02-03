@@ -2,8 +2,6 @@
 
 use PhpMx\Dir;
 use PhpMx\Import;
-use PhpMx\Path;
-use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista todas as funções de helper registradas no sistema */
@@ -16,8 +14,7 @@ return new class {
         $this->handle(
             'system/helper/function',
             $filter,
-            fn($item) => Terminal::echoln(' - [#c:p,#ref] [#description]', $item),
-            'ref'
+            ' - [#c:p,#ref] [#description]'
         );
     }
 

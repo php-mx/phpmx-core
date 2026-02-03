@@ -2,7 +2,6 @@
 
 use PhpMx\Dir;
 use PhpMx\Import;
-use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista todas as constantes helper registradas no sistema */
@@ -15,7 +14,7 @@ return new class {
         $this->handle(
             'system/helper/constant',
             $filter,
-            fn($item) => Terminal::echoln(' - [#c:p,#ref] [#description]', $item)
+            ' - [#c:p,#ref] [#description]'
         );
     }
 

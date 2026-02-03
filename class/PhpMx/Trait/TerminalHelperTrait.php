@@ -11,11 +11,13 @@ trait TerminalHelperTrait
 {
     protected $key = [];
 
-    protected function handle(string $scan, ?string $filter, Closure|string $echo = 'ref', Closure|string $replaced = 'ref')
+    protected function handle(string $scan, ?string $filter, null|Closure|string $echo = null, null|Closure|string $replaced = null)
     {
-        $replaced = $replaced ?? $echo;
-        $echo = is_closure($echo) ? $echo : fn($item) => Terminal::echoln(" - [#c:p,#$echo]", $item);
-        $replaced = is_closure($replaced) ? $replaced : fn($item) => Terminal::echoln(" - [#c:pd,#$replaced] [#c:wd,replaced]", $item);
+        $echo = $echo ?? ' - [#c:p,#ref] [#description]';
+        $replaced = $replaced ?? ' - [#c:pd,#ref] [#c:wd,replaced]';
+
+        $echo = is_closure($echo) ? $echo : fn($item) => Terminal::echoln($echo, $item);
+        $replaced = is_closure($replaced) ? $replaced : fn($item) => Terminal::echoln($replaced, $item);
 
         $originsLn = -1;
         $paths = Path::seekForDirs($scan);
@@ -31,6 +33,7 @@ trait TerminalHelperTrait
                     $item['replaced'] = false;
                     $this->key[$item['ref']] = $item;
                 }
+                $item['description'] = $item['description'] ?? '';
                 $items[$p] = $item;
             }
             usort($items, fn($a, $b) => $a['ref'] <=> $b['ref']);
