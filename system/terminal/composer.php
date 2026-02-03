@@ -9,6 +9,8 @@ return new class {
 
     function __invoke($forceDev = 0)
     {
+        Terminal::echoln('Updating [#c:s,composer.json]');
+
         $composer = Json::import('composer');
 
         $composer['autoload'] = $composer['autoload'] ?? [];
@@ -27,24 +29,27 @@ return new class {
 
         $files = [...$files, ...self::seekForFile($autoImport)];
 
+        foreach ($files as $file)
+            if (!in_array($file, $composer['autoload']['files']))
+                Terminal::echoln("[#c:p,$file]");
+
         $composer['autoload']['files'] = $files;
 
         Json::export('composer', $composer, false);
 
-        Terminal::echo('File [#blue:composer.json] updated');
 
         $forceDev || env('DEV') ? self::inDev() : self::inProd();
     }
 
     protected static function inDev()
     {
-        Terminal::echo('run [#green:composer dump-autoload]');
+        Terminal::echoln('Running [#c:s,composer dump-autoload]');
         echo shell_exec("composer dump-autoload");
     }
 
     protected static function inProd()
     {
-        Terminal::echo('run [#green:composer dump-autoload --no-dev --optimize]');
+        Terminal::echoln('Running [#c:s,composer dump-autoload --no-dev --optimize]');
         echo shell_exec("composer dump-autoload --no-dev --optimize");
     }
 

@@ -7,14 +7,14 @@ return new class {
 
     function __invoke()
     {
-        Terminal::echo('[#blue:   @@@  @@@@@@   @@@@@@@  ][#cyan:   @@@@    @@@@@  ]');
-        Terminal::echo('[#blue:  @@@@@@@%@@@@@@@@%@@@@@@ ][#cyan:    @@@@   @@@@   ]');
-        Terminal::echo('[#blue:  @@@@     @@@@@     @@@@ ][#cyan:     @@@@@@@@@    ]');
-        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:      @@@@@@      ]');
-        Terminal::echo('[#blue:  @@@@     @@@@      %@@@ ][#cyan:       @@@@@      ]');
-        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:      @@@@@@@     ]');
-        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:     @@@@  @@@@   ]');
-        Terminal::echo('[#blue:  @@@@     @@@@      @@@@ ][#cyan:   @@@@     @@@@  ]');
-        Terminal::echo('[#blue: @@@@@     @@@@      @@@@@][#cyan:  @@@@       @@@@ ]');
+        Terminal::echoln('[#c:p,   @@@  @@@@@@   @@@@@@@     @@@@    @@@@@  ]');
+        Terminal::echoln('[#c:p,  @@@@@@@@@@@@@@@@@@@@@@@     @@@@   @@@@   ]');
+        Terminal::echoln('[#c:p,  @@@@     @@@@@     @@@@      @@@@@@@@@    ]');
+        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@       @@@@@@      ]');
+        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@        @@@@@      ]');
+        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@       @@@@@@@     ]');
+        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@      @@@@  @@@@   ]');
+        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@    @@@@     @@@@  ]');
+        Terminal::echoln('[#c:p, @@@@@     @@@@      @@@@@  @@@@       @@@@ ]');
     }
 };

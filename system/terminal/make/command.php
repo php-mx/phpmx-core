@@ -26,7 +26,8 @@ return new class {
 
         File::create($file, $template);
 
-        Terminal::echo("Command [#cyan:#] created successfully", [$command]);
-        Terminal::echo(" [#blue:#]", [$file]);
+        Terminal::echoln("File [#c:p,#] created successfully", $file);
+        Terminal::echoln();
+        Terminal::echoln("   [#c:s,php mx] [#c:s,#]", [$command]);
     }
 };

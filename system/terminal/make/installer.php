@@ -18,7 +18,6 @@ return new class {
 
         File::create('install', $template);
 
-        Terminal::echo("Installer [#cyan:install] created successfully");
-        Terminal::echo(" [#blue:install]");
+        Terminal::echoln("File [#c:install] created successfully");
     }
 };

@@ -3,7 +3,7 @@
 use PhpMx\Log;
 use PhpMx\Path;
 use PhpMx\Terminal;
-use PhpMx\TerminalInstall;
+use PhpMx\Trait\TerminalInstallTrait;
 
 /** Executa os scripts de instalação de pacotes externos e atualiza o autoload do composer */
 return new class {
@@ -12,7 +12,7 @@ return new class {
     {
         foreach (array_reverse(Path::seekForFiles('install')) as $installFile) {
 
-            $origin = $this->getOrigim($installFile);
+            $origin = $this->getOrigin($installFile);
 
             if ($origin != 'current-project') {
                 Log::add('mx', "Install [$origin]", function () use ($installFile, $origin) {
@@ -20,10 +20,10 @@ return new class {
                     $script = require $installFile;
                     ob_end_clean();
 
-                    if (is_extend($script, TerminalInstall::class)) {
-                        Terminal::echo("[#greenB:Install] [#whiteB:$origin]");
+                    if (is_trait($script, TerminalInstallTrait::class)) {
+                        Terminal::echoln("Installing [#c:p,$origin]");
                         $script();
-                        Terminal::echo();
+                        Terminal::echoln();
                     }
                 });
             }
@@ -32,7 +32,7 @@ return new class {
         Terminal::run('composer 1');
     }
 
-    protected function getOrigim($path)
+    protected function getOrigin($path)
     {
         if ($path === 'install') return 'current-project';
 

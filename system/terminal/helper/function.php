@@ -4,50 +4,24 @@ use PhpMx\Dir;
 use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
+use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista todas as funções de helper registradas no sistema */
 return new class {
 
-    protected $used = [];
+    use TerminalHelperTrait;
 
     function __invoke($filter = null)
     {
-        foreach (Path::seekForDirs('system/helper/function') as $n => $path) {
-            $origin = $this->getOrigim($path);
-
-            $functions = $this->extractFunctionsFromPath($path, $origin);
-
-            $visibleFunctions = array_filter($functions, function ($func) use ($filter) {
-                return is_null($filter) || str_starts_with($func['ref'], $filter);
-            });
-
-            if (empty($visibleFunctions)) continue;
-
-            if ($n > 0) Terminal::echo();
-
-            Terminal::echo('[#greenB:#]', $origin);
-
-            foreach ($visibleFunctions as $func) {
-                Terminal::echo();
-                Terminal::echo(' [#cyan:#ref] [#description]', $func);
-                Terminal::echo('  [#blueD:#file] [#yellowD:#replaced]', $func);
-            }
-        }
+        $this->handle(
+            'system/helper/function',
+            $filter,
+            fn($item) => Terminal::echoln(' - [#c:p,#ref] [#description]', $item),
+            'ref'
+        );
     }
 
-    protected function getOrigim($path)
-    {
-        if ($path === 'system/helper/function') return 'current-project';
-
-        if (str_starts_with($path, 'vendor/')) {
-            $parts = explode('/', $path);
-            return ($parts[1] ?? 'unknown') . '-' . ($parts[2] ?? 'unknown');
-        }
-
-        return 'unknown';
-    }
-
-    protected function extractFunctionsFromPath($path, $origin): array
+    protected function scan($path): array
     {
         $functions = [];
         foreach (Dir::seekForFile($path, true) as $item) {
@@ -62,17 +36,12 @@ return new class {
 
                 $description = $this->getDocBefore($content, $pos);
 
-                $this->used[$funcName] = $this->used[$funcName] ?? $file;
-
-                $functions[$funcName] = [
+                $functions[] = [
                     'ref' => $funcName,
-                    'description' => $description,
-                    'file' => $file,
-                    'replaced' => $this->used[$funcName] == $file ? '' : $this->used[$funcName]
+                    'description' => $description
                 ];
             }
         }
-        ksort($functions);
         return $functions;
     }
 

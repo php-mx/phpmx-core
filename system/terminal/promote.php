@@ -17,9 +17,10 @@ return new class {
         $promoted = path($file);
 
         if (File::check($promoted) || $promoted == $current)
-            throw new Exception("File [$promoted] already exists in [CURRENT PROJECT]");
+            throw new Exception("File [$promoted] already exists in [current-project]");
 
         File::copy($current, $promoted);
-        Terminal::echo('File [#blue:#] promoted to [#cyan:#]', [$current, $promoted]);
+
+        Terminal::echoln('File [#c:p,#] promoted to [#c:s,#]', [$current, $promoted]);
     }
 };

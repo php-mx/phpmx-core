@@ -2,52 +2,28 @@
 
 use PhpMx\Dir;
 use PhpMx\Import;
-use PhpMx\Path;
 use PhpMx\Terminal;
+use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista e detalha todos os comandos disponíveis no terminal identificando parâmetros e origens */
 return new class {
 
-    protected $used = [];
+    use TerminalHelperTrait;
 
-    function __invoke($command = null)
+    function __invoke($filter = null)
     {
-        foreach (Path::seekForDirs('system/terminal') as $nPath => $path) {
-            $origin = $this->getOrigim($path);
-
-            if ($nPath > 0) Terminal::echo();
-
-            Terminal::echo('[#greenB:#]', $origin);
-
-            foreach ($this->getCommandsIn($path, $origin) as $nCommand => $cmd) {
-                if (is_null($command) || str_starts_with($cmd['terminal'], $command)) {
-
-                    if ($nCommand > 0) Terminal::echo();
-
-                    Terminal::echo(' [#cyan:#terminal] [#description]', $cmd);
-
-                    Terminal::echo('  [#blueD:#file] [#yellowD:#replaced]', $cmd);
-
-                    foreach ($cmd['variations'] as $variation)
-                        Terminal::echo('   php mx [#][#]', [$cmd['terminal'], $variation]);
-                }
-            };
-        }
+        $this->handle(
+            'system/terminal',
+            $filter,
+            function ($item) {
+                Terminal::echoln(' - [#c:p,#ref] [#description]', $item);
+                foreach ($item['variations'] as $variation)
+                    Terminal::echoln('    [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
+            }
+        );
     }
 
-    protected function getOrigim($path)
-    {
-        if ($path === 'system/terminal') return 'current-project';
-
-        if (str_starts_with($path, 'vendor/')) {
-            $parts = explode('/', $path);
-            return ($parts[1] ?? 'unknown') . '-' . ($parts[2] ?? 'unknown');
-        }
-
-        return 'unknown';
-    }
-
-    protected function getCommandsIn($path, $origin)
+    protected function scan($path)
     {
         $commands = [];
         foreach (Dir::seekForFile($path, true) as $ref) {
@@ -61,7 +37,6 @@ return new class {
             $description = $match ? $this->getDocBefore($content, $match[0][1]) : '';
 
             $variations = [''];
-            $this->used[$terminal] = $this->used[$terminal] ?? $file;
 
             try {
                 $command = Import::return($file);
@@ -79,18 +54,14 @@ return new class {
             }
 
             $commands[$terminal] = [
-                'terminal' => $terminal,
+                'ref' => $terminal,
                 'description' => $description,
-                'file' => $file,
                 'variations' => $variations,
-                'replaced' => $this->used[$terminal] == $file ? '' : $this->used[$terminal]
             ];
         }
-        ksort($commands);
         return $commands;
     }
 
-    /** Extrai o DocBlock permitindo espaços e declarações de variáveis entre o comentário e a classe */
     protected function getDocBefore(string $code, int $pos): string
     {
         $before = substr($code, 0, $pos);

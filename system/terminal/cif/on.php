@@ -10,6 +10,6 @@ return new class {
     {
         $content = implode(' ', func_get_args());
 
-        Terminal::echo(Cif::on($content));
+        Terminal::echoln(Cif::on($content));
     }
 };

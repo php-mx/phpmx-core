@@ -14,6 +14,8 @@ abstract class Terminal
     /** Executa uma linha de comando */
     final static function run(...$commandLine)
     {
+        self::loadColors();
+
         if (count($commandLine) == 1)
             $commandLine = explode(' ', array_shift($commandLine));
 
@@ -73,10 +75,10 @@ abstract class Terminal
                 $trace = $e->getTrace();
                 $type = $e::class;
 
-                self::echo('[#redB:#] [#red:#]', [$type, $message]);
-                self::echo('[#]:[#whiteB:#]', [$file, $line]);
+                self::echoln('[#c:e,#] [#c:e,#]', [$type, $message]);
+                self::echoln(' [#]:[#]', [$file, $line]);
                 foreach ($trace as $pos => $traceLine)
-                    self::echo(' [#][#]:[#whiteB:#]', [str_repeat(' ', $pos), $traceLine['file'], $traceLine['line']]);
+                    self::echoln(' [#]:[#]', [$traceLine['file'], $traceLine['line']]);
 
                 Log::exception($e);
                 return false;
@@ -91,65 +93,208 @@ abstract class Terminal
         return $result;
     }
 
+    /** Exibe uma linha de texto no terminal com quebra de linha */
+    static function echoln(string $text = '', string|array $prepare = []): void
+    {
+        self::echo("$text\n", $prepare);
+    }
+
     /** Exibe uma linha de texto no terminal */
-    static function echo(string $line = '', string|array $prepare = []): void
+    static function echo(string $text = '', string|array $prepare = [])
     {
         self::loadColors();
         $prepare = is_array($prepare) ? $prepare : [$prepare];
-        echo prepare("$line\n", [...self::$colors, ...$prepare]);
+        echo prepare($text, [...self::$colors, ...$prepare]);
+    }
+
+    /** Solicita confirmação y/n do usuário */
+    static function confirm(string $line = '', string|array $prepare = [], $default = null): bool
+    {
+        $input = '';
+
+        while ($input != 'y' && $input != 'n') {
+            self::echo("$line [#c:dd,(][#c:#styleY,#textY][#c:dd,/][#c:#styleN,#textN][#c:dd,):] ", [
+                'styleY' => $default === true ? 'sub' : 's',
+                'styleN' => $default === false ? 'eub' : 'e',
+                'textY' => $default === true ? 'Y' : 'y',
+                'textN' => $default === false ? 'N' : 'n',
+                ...$prepare,
+            ]);
+
+            $input = strtolower(trim(fgets(STDIN)));
+
+            usleep(250000);
+
+            if ($input === '' && $default !== null) return $default;
+        }
+
+        return $input == 'y';
+    }
+
+    /** Solicita entrada de texto do usuário */
+    static function input(string $label = '', string|array $prepare = [], string $default = '', bool $required = false): string
+    {
+        while (true) {
+            $prompt = $label;
+
+            if (!is_blank($default))
+                $prompt .= " [#c:dd,(][#c:pd,#inputDefault][#c:dd,)]";
+
+            $prompt .= "[#c:dd,:] ";
+
+            self::echo($prompt, ['inputDefault' => $default, ...$prepare]);
+
+            $input = trim(fgets(STDIN));
+
+            usleep(250000);
+
+            if (is_blank($input) && !is_blank($default))
+                return $default;
+
+            if (is_blank($input) && $required)
+                continue;
+
+            return $input;
+        }
+    }
+
+    /** Solicita entrada de senha (texto oculto) */
+    static function password(string $label = '', string|array $prepare = [], bool $required = false): string
+    {
+        while (true) {
+            self::echo($label . "[#c:dd,:] ", $prepare);
+
+            if (PHP_OS_FAMILY === 'Windows') {
+                $command = 'powershell -Command "$password = Read-Host -AsSecureString; [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))"';
+                $password = rtrim(shell_exec($command));
+            } else {
+                shell_exec('stty -echo');
+                $password = trim(fgets(STDIN));
+                shell_exec('stty echo');
+                self::echoln();
+            }
+
+            usleep(250000);
+
+            if (is_blank($password) && $required)
+                continue;
+
+            return $password;
+        }
+    }
+
+    /** Barra de progresso */
+    static function progress(int $current, int $total, string $label = '', string $color = 'p')
+    {
+        $percent = ($current / $total);
+        $barWidth = 33;
+        $done = (int)($percent * $barWidth);
+        $left = $barWidth - $done;
+
+        $bar = str_repeat("█", $done) . str_repeat("░", $left);
+        $p = ' ' . round($percent * 100);
+
+        self::echo("\r[#] [#c:$color,#] [#]/[#][#]%", [
+            $label,
+            $bar,
+            $current,
+            $total,
+            $p
+        ]);
+
+        if ($current === $total) self::echo("\n");
+    }
+
+    /** Seleção via setas do teclado */
+    static function select(string $label, array $options, string|array $prepare = [], $default = null, string $color = 'p'): string
+    {
+        $keys = array_keys($options);
+        $current = ($default !== null && isset($options[$default])) ? array_search($default, $keys) : 0;
+        $count = count($keys);
+
+        self::echo("\033[?25l");
+        $sttyMode = (PHP_OS_FAMILY !== 'Windows') ? shell_exec('stty -g') : null;
+        if ($sttyMode) shell_exec('stty -icanon -echo');
+
+        while (true) {
+            self::echoln($label, $prepare);
+            foreach ($keys as $index => $key) {
+                $style = ($index === $current) ? " [#c:$color,>] [#c:$color,#]" : "   [#c:dd,#]";
+                self::echoln($style, [$options[$key]]);
+            }
+
+            $key = self::readKeyPress();
+
+            if ($key === "\033[A" || $key === 'UP') $current = ($current - 1 < 0) ? $count - 1 : $current - 1;
+            elseif ($key === "\033[B" || $key === 'DOWN') $current = ($current + 1 >= $count) ? 0 : $current + 1;
+            elseif ($key === "\n" || $key === "\r" || $key === 'ENTER') break;
+
+            self::echo("\033[" . ($count + 1) . "A");
+        }
+
+        if ($sttyMode) shell_exec("stty $sttyMode");
+        self::echo("\033[?25h\r\033[J");
+
+        return $keys[$current];
+    }
+
+    /** Exibe uma tabela a partir de uma matriz */
+    static function table(array $data, bool $hasHeader = true, string $color = 'p')
+    {
+        if (empty($data)) return;
+
+        $widths = [];
+        foreach ($data as $row)
+            foreach (array_values($row) as $i => $value)
+                $widths[$i] = max($widths[$i] ?? 0, mb_strlen("$value"));
+
+        $separator = "+-" . implode("-+-", array_map(fn($w) => str_repeat("-", $w), $widths)) . "-+";
+        $colorTag = "[#c:{$color}d,#]";
+
+        self::echoln($colorTag, [$separator]);
+
+        foreach ($data as $index => $row) {
+            $line = "[#c:{$color}d,|] ";
+            $values = array_values($row);
+
+            foreach ($values as $i => $v) {
+                $space = $widths[$i] - mb_strlen($v);
+                $v = $index === 0 && $hasHeader ? "[#c:{$color},$v]" : "$v";
+                $line .= $v . str_repeat(" ", $space) . " [#c:{$color}d,|] ";
+            }
+
+            self::echoln($line);
+
+            if ($index === 0 && $hasHeader)
+                self::echoln($colorTag, [$separator]);
+        }
+
+        self::echoln($colorTag, [$separator]);
     }
 
     private static function loadColors()
     {
-        if (is_null(self::$colors)) {
-            self::$colors = [
-                'red' => fn($text) => "\033[0;31m$text\033[0m",
-                'redB' => fn($text) => "\033[1;31m$text\033[0m",
-                'redU' => fn($text) => "\033[4;31m$text\033[0m",
-                'redI' => fn($text) => "\033[3;31m$text\033[0m",
-                'redD' => fn($text) => "\033[2;31m$text\033[0m",
+        if (is_null(self::$colors))
+            if (self::checkANSI()) {
+                self::$colors = [
+                    'c' => function ($style, $text = '') {
+                        $codes = [];
+                        $colors = ['p' => 36, 'd' => 0, 's' => 32, 'e' => 31, 'w' => 33];
+                        $modifiers = ['b' => 1,  'i' => 3, 'u' => 4, 's' => 9, 'd' => 2];
 
-                'green' => fn($text) => "\033[0;32m$text\033[0m",
-                'greenB' => fn($text) => "\033[1;32m$text\033[0m",
-                'greenU' => fn($text) => "\033[4;32m$text\033[0m",
-                'greenI' => fn($text) => "\033[3;32m$text\033[0m",
-                'greenD' => fn($text) => "\033[2;32m$text\033[0m",
+                        $chars = str_split($style);
+                        $codes[] = $colors[array_shift($chars)] ?? 0;
 
-                'yellow' => fn($text) => "\033[0;33m$text\033[0m",
-                'yellowB' => fn($text) => "\033[1;33m$text\033[0m",
-                'yellowU' => fn($text) => "\033[4;33m$text\033[0m",
-                'yellowI' => fn($text) => "\033[3;33m$text\033[0m",
-                'yellowD' => fn($text) => "\033[2;33m$text\033[0m",
+                        foreach ($chars as $c)
+                            if (isset($modifiers[$c]))
+                                $codes[] = $modifiers[$c];
 
-                'blue' => fn($text) => "\033[0;34m$text\033[0m",
-                'blueB' => fn($text) => "\033[1;34m$text\033[0m",
-                'blueU' => fn($text) => "\033[4;34m$text\033[0m",
-                'blueI' => fn($text) => "\033[3;34m$text\033[0m",
-                'blueD' => fn($text) => "\033[2;34m$text\033[0m",
-
-                'magenta' => fn($text) => "\033[0;35m$text\033[0m",
-                'magentaB' => fn($text) => "\033[1;35m$text\033[0m",
-                'magentaU' => fn($text) => "\033[4;35m$text\033[0m",
-                'magentaI' => fn($text) => "\033[3;35m$text\033[0m",
-                'magentaD' => fn($text) => "\033[2;35m$text\033[0m",
-
-                'cyan' => fn($text) => "\033[0;36m$text\033[0m",
-                'cyanB' => fn($text) => "\033[1;36m$text\033[0m",
-                'cyanU' => fn($text) => "\033[4;36m$text\033[0m",
-                'cyanI' => fn($text) => "\033[3;36m$text\033[0m",
-                'cyanD' => fn($text) => "\033[2;36m$text\033[0m",
-
-                'white' => fn($text) => "\033[0;37m$text\033[0m",
-                'whiteB' => fn($text) => "\033[1;37m$text\033[0m",
-                'whiteU' => fn($text) => "\033[4;37m$text\033[0m",
-                'whiteI' => fn($text) => "\033[3;37m$text\033[0m",
-                'whiteD' => fn($text) => "\033[2;37m$text\033[0m",
-            ];
-
-            if (!self::checkANSI())
-                foreach (array_keys(self::$colors) as $color)
-                    self::$colors[$color] = fn($text) => $text;
-        }
+                        return "\033[" . implode(';', $codes) . "m$text\033[0m";
+                    },
+                ];
+            } else {
+                self::$colors = ['c' => fn($style, $text = '') => $text];
+            }
     }
 
     private static function checkANSI(): bool
@@ -162,5 +307,27 @@ abstract class Terminal
         }
 
         return false;
+    }
+
+    private static function readKeyPress(): string
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $cmd = 'powershell -Command "$k = $host.UI.RawUI.ReadKey(\'NoEcho,IncludeKeyDown\'); echo $k.VirtualKeyCode; if ($k.Character -eq 3 -or $k.VirtualKeyCode -eq 27) { exit 3 }"';
+            exec($cmd, $out, $res);
+            if ($res === 3) self::exitGracefully();
+
+            $code = (int)($out[0] ?? 0);
+            return ($code === 38) ? 'UP' : (($code === 40) ? 'DOWN' : (($code === 13) ? 'ENTER' : ''));
+        }
+        $char = fread(STDIN, 3);
+        if ($char === "\x03" || $char === "\x1b") self::exitGracefully();
+        return $char;
+    }
+
+    private static function exitGracefully()
+    {
+        self::echo("\033[?25h\033[0m\n");
+        if (PHP_OS_FAMILY !== 'Windows') shell_exec('stty sane');
+        die;
     }
 }

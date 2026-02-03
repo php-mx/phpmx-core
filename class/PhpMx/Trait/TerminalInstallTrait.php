@@ -1,18 +1,23 @@
 <?php
 
-namespace PhpMx;
+namespace PhpMx\Trait;
+
+use PhpMx\Dir;
+use PhpMx\File;
+use PhpMx\Import;
+use PhpMx\Terminal;
 
 /** Dedicada a scripts de instalação de pacotes. */
-abstract class TerminalInstall
+trait TerminalInstallTrait
 {
     /** Promove um arquivo para o projeto atual */
     protected function promote(string $pathFile)
     {
         if (!File::check($pathFile)) {
             Terminal::run("promote $pathFile");
-            Terminal::echo("[#green:promote] $pathFile");
+            Terminal::echoln("[#c:s,promote] $pathFile");
         } else {
-            Terminal::echo("[#green:promote] $pathFile [#whiteD:ignored]");
+            Terminal::echoln("[#c:sd,promote] [#c:dd,$pathFile]");
         }
     }
 
@@ -21,9 +26,9 @@ abstract class TerminalInstall
     {
         if (!Dir::check($pathDir)) {
             Dir::create("$pathDir");
-            Terminal::echo("[#yellow:create] $pathDir");
+            Terminal::echoln("[#c:s,create] $pathDir");
         } else {
-            Terminal::echo("[#yellow:create] $pathDir [#whiteD:ignored]");
+            Terminal::echoln("[#c:sd,create] [#c:dd,$pathDir]");
         }
     }
 
@@ -32,9 +37,9 @@ abstract class TerminalInstall
     {
         if (!File::check($pathFile)) {
             File::create($pathFile, implode("\n", $contentLines));
-            Terminal::echo("[#yellow:create] $pathFile");
+            Terminal::echoln("[#c:s,create] $pathFile");
         } else {
-            Terminal::echo("[#yellow:create] [#] [#whiteD:ignored]", $pathFile);
+            Terminal::echoln("[#c:sd,create] [#c:dd,$pathFile]");
         }
     }
 
@@ -48,9 +53,9 @@ abstract class TerminalInstall
             $fileContent .=  implode("\n", $contentLines);
             $fileContent .=  "\n";
             File::create($pathFile, $fileContent, true);
-            Terminal::echo("[#blue:block] $blockName $pathFile");
+            Terminal::echoln("[#c:s,block] [#c:p,$blockName] $pathFile");
         } else {
-            Terminal::echo("[#blue:block] $blockName $pathFile [#whiteD:ignored]");
+            Terminal::echoln("[#c:sd,block] [#c:pd,$blockName] [#c:dd,$pathFile]");
         }
     }
 }
