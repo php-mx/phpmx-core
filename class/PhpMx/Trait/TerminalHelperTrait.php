@@ -16,8 +16,8 @@ trait TerminalHelperTrait
         $echo = $echo ?? ' - [#c:p,#ref] [#description]';
         $replaced = $replaced ?? ' - [#c:pd,#ref] [#c:wd,replaced]';
 
-        $echo = is_closure($echo) ? $echo : fn($item) => Terminal::echoln($echo, $item);
-        $replaced = is_closure($replaced) ? $replaced : fn($item) => Terminal::echoln($replaced, $item);
+        $echo = is_closure($echo) ? $echo : fn($item) => Terminal::echol($echo, $item);
+        $replaced = is_closure($replaced) ? $replaced : fn($item) => Terminal::echol($replaced, $item);
 
         $originsLn = -1;
         $paths = Path::seekForDirs($scan);
@@ -48,8 +48,8 @@ trait TerminalHelperTrait
                 $items = array_filter($items, fn($item) => is_null($filter) || str_starts_with(strtolower($item['filter']), strtolower($filter)));
 
             if (count($items)) {
-                if (++$originsLn) Terminal::echoln();
-                Terminal::echoln('[#c:sb,#]', $origin);
+                if (++$originsLn) Terminal::echol();
+                Terminal::echol('[#c:sb,#]', $origin);
                 foreach ($items as $item) {
                     !$item['replaced'] ? $echo($item) : $replaced($item);
                 }

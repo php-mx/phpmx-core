@@ -9,7 +9,7 @@ return new class {
 
     function __invoke($forceDev = 0)
     {
-        Terminal::echoln('Updating [#c:s,composer.json]');
+        Terminal::echol('Updating [#c:s,composer.json]');
 
         $composer = Json::import('composer');
 
@@ -31,7 +31,7 @@ return new class {
 
         foreach ($files as $file)
             if (!in_array($file, $composer['autoload']['files']))
-                Terminal::echoln("[#c:p,$file]");
+                Terminal::echol("[#c:p,$file]");
 
         $composer['autoload']['files'] = $files;
 
@@ -43,13 +43,13 @@ return new class {
 
     protected static function inDev()
     {
-        Terminal::echoln('Running [#c:s,composer dump-autoload]');
+        Terminal::echol('Running [#c:s,composer dump-autoload]');
         echo shell_exec("composer dump-autoload");
     }
 
     protected static function inProd()
     {
-        Terminal::echoln('Running [#c:s,composer dump-autoload --no-dev --optimize]');
+        Terminal::echol('Running [#c:s,composer dump-autoload --no-dev --optimize]');
         echo shell_exec("composer dump-autoload --no-dev --optimize");
     }
 

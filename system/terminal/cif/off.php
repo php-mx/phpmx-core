@@ -8,6 +8,6 @@ return new class {
 
     function __invoke($cif)
     {
-        Terminal::echoln(Cif::off($cif));
+        Terminal::echol(Cif::off($cif));
     }
 };

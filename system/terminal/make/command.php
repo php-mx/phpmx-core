@@ -26,8 +26,8 @@ return new class {
 
         File::create($file, $template);
 
-        Terminal::echoln("File [#c:p,#] created successfully", $file);
-        Terminal::echoln();
-        Terminal::echoln("   [#c:s,php mx] [#c:s,#]", [$command]);
+        Terminal::echol("File [#c:p,#] created successfully", $file);
+        Terminal::echol();
+        Terminal::echol("   [#c:s,php mx] [#c:s,#]", [$command]);
     }
 };

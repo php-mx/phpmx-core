@@ -21,6 +21,6 @@ return new class {
 
         File::copy($current, $promoted);
 
-        Terminal::echoln('File [#c:p,#] promoted to [#c:s,#]', [$current, $promoted]);
+        Terminal::echol('File [#c:p,#] promoted to [#c:s,#]', [$current, $promoted]);
     }
 };

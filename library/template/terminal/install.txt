@@ -10,6 +10,6 @@ return new class {
     function __invoke()
     {
         // Install code here
-        Terminal::echoln('installing');
+        Terminal::echol('installing');
     }
 };

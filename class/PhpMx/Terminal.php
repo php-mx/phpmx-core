@@ -75,10 +75,10 @@ abstract class Terminal
                 $trace = $e->getTrace();
                 $type = $e::class;
 
-                self::echoln('[#c:e,#] [#c:e,#]', [$type, $message]);
-                self::echoln(' [#]:[#]', [$file, $line]);
+                self::echol('[#c:e,#] [#c:e,#]', [$type, $message]);
+                self::echol(' [#]:[#]', [$file, $line]);
                 foreach ($trace as $pos => $traceLine)
-                    self::echoln(' [#]:[#]', [$traceLine['file'], $traceLine['line']]);
+                    self::echol(' [#]:[#]', [$traceLine['file'], $traceLine['line']]);
 
                 Log::exception($e);
                 return false;
@@ -94,7 +94,7 @@ abstract class Terminal
     }
 
     /** Exibe uma linha de texto no terminal com quebra de linha */
-    static function echoln(string $text = '', string|array $prepare = []): void
+    static function echol(string $text = '', string|array $prepare = []): void
     {
         self::echo("$text\n", $prepare);
     }
@@ -171,7 +171,7 @@ abstract class Terminal
                 shell_exec('stty -echo');
                 $password = trim(fgets(STDIN));
                 shell_exec('stty echo');
-                self::echoln();
+                self::echol();
             }
 
             usleep(250000);
@@ -217,10 +217,10 @@ abstract class Terminal
         if ($sttyMode) shell_exec('stty -icanon -echo');
 
         while (true) {
-            self::echoln($label, $prepare);
+            self::echol($label, $prepare);
             foreach ($keys as $index => $key) {
                 $style = ($index === $current) ? " [#c:$color,>] [#c:$color,#]" : "   [#c:dd,#]";
-                self::echoln($style, [$options[$key]]);
+                self::echol($style, [$options[$key]]);
             }
 
             $key = self::readKeyPress();
@@ -251,7 +251,7 @@ abstract class Terminal
         $separator = "+-" . implode("-+-", array_map(fn($w) => str_repeat("-", $w), $widths)) . "-+";
         $colorTag = "[#c:{$color}d,#]";
 
-        self::echoln($colorTag, [$separator]);
+        self::echol($colorTag, [$separator]);
 
         foreach ($data as $index => $row) {
             $line = "[#c:{$color}d,|] ";
@@ -263,13 +263,13 @@ abstract class Terminal
                 $line .= $v . str_repeat(" ", $space) . " [#c:{$color}d,|] ";
             }
 
-            self::echoln($line);
+            self::echol($line);
 
             if ($index === 0 && $hasHeader)
-                self::echoln($colorTag, [$separator]);
+                self::echol($colorTag, [$separator]);
         }
 
-        self::echoln($colorTag, [$separator]);
+        self::echol($colorTag, [$separator]);
     }
 
     private static function loadColors()

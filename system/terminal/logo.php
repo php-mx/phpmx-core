@@ -7,14 +7,14 @@ return new class {
 
     function __invoke()
     {
-        Terminal::echoln('[#c:p,   @@@  @@@@@@   @@@@@@@     @@@@    @@@@@  ]');
-        Terminal::echoln('[#c:p,  @@@@@@@@@@@@@@@@@@@@@@@     @@@@   @@@@   ]');
-        Terminal::echoln('[#c:p,  @@@@     @@@@@     @@@@      @@@@@@@@@    ]');
-        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@       @@@@@@      ]');
-        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@        @@@@@      ]');
-        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@       @@@@@@@     ]');
-        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@      @@@@  @@@@   ]');
-        Terminal::echoln('[#c:p,  @@@@     @@@@      @@@@    @@@@     @@@@  ]');
-        Terminal::echoln('[#c:p, @@@@@     @@@@      @@@@@  @@@@       @@@@ ]');
+        Terminal::echol('[#c:p,   @@@  @@@@@@   @@@@@@@     @@@@    @@@@@  ]');
+        Terminal::echol('[#c:p,  @@@@@@@@@@@@@@@@@@@@@@@     @@@@   @@@@   ]');
+        Terminal::echol('[#c:p,  @@@@     @@@@@     @@@@      @@@@@@@@@    ]');
+        Terminal::echol('[#c:p,  @@@@     @@@@      @@@@       @@@@@@      ]');
+        Terminal::echol('[#c:p,  @@@@     @@@@      @@@@        @@@@@      ]');
+        Terminal::echol('[#c:p,  @@@@     @@@@      @@@@       @@@@@@@     ]');
+        Terminal::echol('[#c:p,  @@@@     @@@@      @@@@      @@@@  @@@@   ]');
+        Terminal::echol('[#c:p,  @@@@     @@@@      @@@@    @@@@     @@@@  ]');
+        Terminal::echol('[#c:p, @@@@@     @@@@      @@@@@  @@@@       @@@@ ]');
     }
 };

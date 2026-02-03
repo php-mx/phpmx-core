@@ -16,9 +16,9 @@ return new class {
             'system/terminal',
             $filter,
             function ($item) {
-                Terminal::echoln(' - [#c:p,#ref] [#description]', $item);
+                Terminal::echol(' - [#c:p,#ref] [#description]', $item);
                 foreach ($item['variations'] as $variation)
-                    Terminal::echoln('    [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
+                    Terminal::echol('    [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
             }
         );
     }

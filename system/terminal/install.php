@@ -21,9 +21,9 @@ return new class {
                     ob_end_clean();
 
                     if (is_trait($script, TerminalInstallTrait::class)) {
-                        Terminal::echoln("Installing [#c:p,$origin]");
+                        Terminal::echol("Installing [#c:p,$origin]");
                         $script();
-                        Terminal::echoln();
+                        Terminal::echol();
                     }
                 });
             }

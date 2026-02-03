@@ -18,6 +18,6 @@ return new class {
 
         File::create('install', $template);
 
-        Terminal::echoln("File [#c:install] created successfully");
+        Terminal::echol("File [#c:install] created successfully");
     }
 };

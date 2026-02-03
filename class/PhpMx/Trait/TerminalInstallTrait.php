@@ -15,9 +15,9 @@ trait TerminalInstallTrait
     {
         if (!File::check($pathFile)) {
             Terminal::run("promote $pathFile");
-            Terminal::echoln("[#c:s,promote] $pathFile");
+            Terminal::echol("[#c:s,promote] $pathFile");
         } else {
-            Terminal::echoln("[#c:sd,promote] [#c:dd,$pathFile]");
+            Terminal::echol("[#c:sd,promote] [#c:dd,$pathFile]");
         }
     }
 
@@ -26,9 +26,9 @@ trait TerminalInstallTrait
     {
         if (!Dir::check($pathDir)) {
             Dir::create("$pathDir");
-            Terminal::echoln("[#c:s,create] $pathDir");
+            Terminal::echol("[#c:s,create] $pathDir");
         } else {
-            Terminal::echoln("[#c:sd,create] [#c:dd,$pathDir]");
+            Terminal::echol("[#c:sd,create] [#c:dd,$pathDir]");
         }
     }
 
@@ -37,9 +37,9 @@ trait TerminalInstallTrait
     {
         if (!File::check($pathFile)) {
             File::create($pathFile, implode("\n", $contentLines));
-            Terminal::echoln("[#c:s,create] $pathFile");
+            Terminal::echol("[#c:s,create] $pathFile");
         } else {
-            Terminal::echoln("[#c:sd,create] [#c:dd,$pathFile]");
+            Terminal::echol("[#c:sd,create] [#c:dd,$pathFile]");
         }
     }
 
@@ -53,9 +53,9 @@ trait TerminalInstallTrait
             $fileContent .=  implode("\n", $contentLines);
             $fileContent .=  "\n";
             File::create($pathFile, $fileContent, true);
-            Terminal::echoln("[#c:s,block] [#c:p,$blockName] $pathFile");
+            Terminal::echol("[#c:s,block] [#c:p,$blockName] $pathFile");
         } else {
-            Terminal::echoln("[#c:sd,block] [#c:pd,$blockName] [#c:dd,$pathFile]");
+            Terminal::echol("[#c:sd,block] [#c:pd,$blockName] [#c:dd,$pathFile]");
         }
     }
 }
