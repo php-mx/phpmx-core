@@ -108,65 +108,79 @@ abstract class Terminal
     }
 
     /** Solicita confirmação y/n do usuário */
-    static function confirm(string $line = '', string|array $prepare = [], $default = null): bool
+    static function confirm(string|array $label = '', $default = null): bool
     {
         $input = '';
+        $label = is_array($label) ? $label : [$label];
+        self::echol();
 
         while ($input != 'y' && $input != 'n') {
-            self::echo("$line [#c:dd,(][#c:#styleY,#textY][#c:dd,/][#c:#styleN,#textN][#c:dd,):] ", [
+            self::echo("\e[1A\e[K");
+
+            self::echo(...$label);
+            self::echo(" [#c:dd,(][#c:#styleY,#textY][#c:dd,/][#c:#styleN,#textN][#c:dd,):] ", [
                 'styleY' => $default === true ? 'sub' : 's',
                 'styleN' => $default === false ? 'eub' : 'e',
                 'textY' => $default === true ? 'Y' : 'y',
-                'textN' => $default === false ? 'N' : 'n',
-                ...$prepare,
+                'textN' => $default === false ? 'N' : 'n'
             ]);
 
             $input = strtolower(trim(fgets(STDIN)));
 
-            usleep(250000);
-
-            if ($input === '' && $default !== null) return $default;
+            if ($input === '' && $default !== null)
+                $input = $default;
         }
+
+        usleep(250000);
 
         return $input == 'y';
     }
 
     /** Solicita entrada de texto do usuário */
-    static function input(string $label = '', string|array $prepare = [], string $default = '', bool $required = false): string
+    static function input(string|array $label = '', string $default = '', bool $required = true): string
     {
+        $label = is_array($label) ? $label : [$label];
+        self::echol();
+
         while (true) {
-            $prompt = $label;
+            self::echo("\e[1A\e[K");
 
-            if (!is_blank($default))
-                $prompt .= " [#c:dd,(][#c:pd,#inputDefault][#c:dd,)]";
+            self::echo(...$label);
 
-            $prompt .= "[#c:dd,:] ";
+            $prompt = is_blank($default) ? "[#c:dd,:] " : " [#c:dd,(][#c:pd,$default][#c:dd,):] ";
 
-            self::echo($prompt, ['inputDefault' => $default, ...$prepare]);
+            self::echo($prompt);
 
             $input = trim(fgets(STDIN));
+
+            if (is_blank($input) && $required && is_blank($default))
+                continue;
 
             usleep(250000);
 
             if (is_blank($input) && !is_blank($default))
                 return $default;
 
-            if (is_blank($input) && $required)
-                continue;
-
             return $input;
         }
     }
 
     /** Solicita entrada de senha (texto oculto) */
-    static function password(string $label = '', string|array $prepare = [], bool $required = false): string
+    static function password(string|array $label = '', ?string $expected = null, bool $required = true): string
     {
+        $label = is_array($label) ? $label : [$label];
+        self::echol();
+
         while (true) {
-            self::echo($label . "[#c:dd,:] ", $prepare);
+            self::echo("\e[1A\e[K");
+            self::echo(...$label);
+            self::echo("[#c:dd,:] ");
 
             if (PHP_OS_FAMILY === 'Windows') {
                 $command = 'powershell -Command "$password = Read-Host -AsSecureString; [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))"';
-                $password = rtrim(shell_exec($command));
+                $password = shell_exec($command);
+                if ($password === null) die(self::echol());
+                $password = rtrim($password, "\r\n");
             } else {
                 shell_exec('stty -echo');
                 $password = trim(fgets(STDIN));
@@ -174,13 +188,73 @@ abstract class Terminal
                 self::echol();
             }
 
-            usleep(250000);
-
             if (is_blank($password) && $required)
                 continue;
 
+            if (!is_null($expected) && $password !== $expected)
+                continue;
+
+            usleep(250000);
+
             return $password;
         }
+    }
+
+    /** Solicita uma escolha de uma lista numerada */
+    static function select(string|array $label = '', array $options, $default = null, bool $required = true): mixed
+    {
+        if (empty($options)) return null;
+
+        $label = is_array($label) ? $label : [$label];
+        self::echol(...$label);
+
+        $col = [];
+        $size = [];
+        $n = 0;
+
+        foreach (array_values($options) as $key => $option) {
+            $col[$n] = $col[$n] ?? [];
+            $size[$n] = $size[$n] ?? 0;
+            $isDefault = $key == $default;
+            $key++;
+            $key = $key < 10 && count($options) > 10 ? " $key" : "$key";
+            $content = $isDefault ? "[#c:p,$key)] $option*" : "[#c:p,$key)] $option";
+            $size[$n] = max($size[$n], strlen("$option$key") + 10);
+            $col[$n][] = $content;
+            if (count($col[$n]) >= 10) $n++;
+        }
+
+        for ($i = 0; $i < 10; $i++) {
+            $rowContent = "";
+            foreach ($col as $columnIndex => $columnItems)
+                if (isset($columnItems[$i])) {
+                    $content = $columnItems[$i];
+                    $padding = $size[$columnIndex] + 3;
+                    $rowContent .= str_pad($content, $padding, " ");
+                }
+            if (!empty(trim($rowContent))) self::echol($rowContent);
+        }
+
+        self::echol();
+
+        $return = null;
+        while (is_null($return)) {
+            self::echo("\e[1A\e[K");
+            self::echo("[#c:dd,#][#c:dd,#] ", ['(1-', count($options) . '):']);
+            $input = trim(fgets(STDIN));
+            if ($input === '' && ($default !== null || !$required)) {
+                $return = $default;
+            } else {
+                $choiceIndex = intval($input) - 1;
+                $optionsKeys = array_keys($options);
+                if (isset($optionsKeys[$choiceIndex]))
+                    $return = $optionsKeys[$choiceIndex];
+            }
+        }
+
+        usleep(250000);
+
+        return $return;
     }
 
     /** Barra de progresso */
@@ -203,65 +277,6 @@ abstract class Terminal
         ]);
 
         if ($current === $total) self::echo("\n");
-    }
-
-    /** Solicita uma escolha de uma lista numerada */
-    static function select(array $options, $default = null, bool $required = false): mixed
-    {
-        if (empty($options)) return null;
-
-        $col = [];
-        $size = [];
-        $n = 0;
-
-        foreach (array_values($options) as $key => $option) {
-            $col[$n] = $col[$n] ?? [];
-            $size[$n] = $size[$n] ?? 0;
-
-            $key++;
-            if ($key < 10 && count($options) > 10) $key =  " $key";
-
-            $content = "[#c:p,$key)] $option";
-
-            $size[$n] = max($size[$n], strlen($content));
-            $col[$n][] = $content;
-
-            if (count($col[$n]) >= 10) $n++;
-        }
-
-        $line = [];
-
-        for ($i = 0; $i < 10; $i++) {
-            $rowContent = "";
-            foreach ($col as $columnIndex => $columnItems)
-                if (isset($columnItems[$i])) {
-                    $content = $columnItems[$i];
-                    $padding = $size[$columnIndex] + 3;
-
-                    $rowContent .= str_pad($content, $padding, " ");
-                }
-            if (!empty(trim($rowContent)))
-                $line[] = $rowContent;
-        }
-
-        foreach ($line as $l)
-            self::echol($l);
-
-        self::echol();
-
-        while (true) {
-            self::echo("[#c:s,#][#c:s,#] ", ['(1-', count($options) . '):']);
-            $input = trim(fgets(STDIN));
-            usleep(250000);
-
-            if ($input === '' && ($default !== null || !$required))
-                return $default;
-
-            $choiceIndex = intval($input) - 1;
-            $optionsKeys = array_keys($options);
-            if (isset($optionsKeys[$choiceIndex]))
-                return $optionsKeys[$choiceIndex];
-        }
     }
 
     /** Exibe uma tabela a partir de uma matriz */
