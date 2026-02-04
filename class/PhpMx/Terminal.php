@@ -215,7 +215,7 @@ abstract class Terminal
         foreach (array_values($options) as $key => $option) {
             $col[$n] = $col[$n] ?? [];
             $size[$n] = $size[$n] ?? 0;
-            $isDefault = $key == $default;
+            $isDefault = $key === $default;
             $key++;
             $key = $key < 10 && count($options) > 10 ? " $key" : "$key";
             $content = $isDefault ? "[#c:p,$key)] $option*" : "[#c:p,$key)] $option";
