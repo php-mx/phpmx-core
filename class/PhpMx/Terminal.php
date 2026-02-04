@@ -201,7 +201,7 @@ abstract class Terminal
     }
 
     /** Solicita uma escolha de uma lista numerada */
-    static function select(string|array $label = '', array $options, $default = null, bool $required = true): mixed
+    static function select(string|array $label = '', array $options = [], $default = null, bool $required = true): mixed
     {
         if (empty($options)) return null;
 
