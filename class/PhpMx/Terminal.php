@@ -205,37 +205,63 @@ abstract class Terminal
         if ($current === $total) self::echo("\n");
     }
 
-    /** Seleção via setas do teclado */
-    static function select(string $label, array $options, string|array $prepare = [], $default = null, string $color = 'p'): string
+    /** Solicita uma escolha de uma lista numerada */
+    static function select(array $options, $default = null, bool $required = false): mixed
     {
-        $keys = array_keys($options);
-        $current = ($default !== null && isset($options[$default])) ? array_search($default, $keys) : 0;
-        $count = count($keys);
+        if (empty($options)) return null;
 
-        self::echo("\033[?25l");
-        $sttyMode = (PHP_OS_FAMILY !== 'Windows') ? shell_exec('stty -g') : null;
-        if ($sttyMode) shell_exec('stty -icanon -echo');
+        $col = [];
+        $size = [];
+        $n = 0;
 
-        while (true) {
-            self::echol($label, $prepare);
-            foreach ($keys as $index => $key) {
-                $style = ($index === $current) ? " [#c:$color,>] [#c:$color,#]" : "   [#c:dd,#]";
-                self::echol($style, [$options[$key]]);
-            }
+        foreach (array_values($options) as $key => $option) {
+            $col[$n] = $col[$n] ?? [];
+            $size[$n] = $size[$n] ?? 0;
 
-            $key = self::readKeyPress();
+            $key++;
+            if ($key < 10 && count($options) > 10) $key =  " $key";
 
-            if ($key === "\033[A" || $key === 'UP') $current = ($current - 1 < 0) ? $count - 1 : $current - 1;
-            elseif ($key === "\033[B" || $key === 'DOWN') $current = ($current + 1 >= $count) ? 0 : $current + 1;
-            elseif ($key === "\n" || $key === "\r" || $key === 'ENTER') break;
+            $content = "[#c:p,$key)] $option";
 
-            self::echo("\033[" . ($count + 1) . "A");
+            $size[$n] = max($size[$n], strlen($content));
+            $col[$n][] = $content;
+
+            if (count($col[$n]) >= 10) $n++;
         }
 
-        if ($sttyMode) shell_exec("stty $sttyMode");
-        self::echo("\033[?25h\r\033[J");
+        $line = [];
 
-        return $keys[$current];
+        for ($i = 0; $i < 10; $i++) {
+            $rowContent = "";
+            foreach ($col as $columnIndex => $columnItems)
+                if (isset($columnItems[$i])) {
+                    $content = $columnItems[$i];
+                    $padding = $size[$columnIndex] + 3;
+
+                    $rowContent .= str_pad($content, $padding, " ");
+                }
+            if (!empty(trim($rowContent)))
+                $line[] = $rowContent;
+        }
+
+        foreach ($line as $l)
+            self::echol($l);
+
+        self::echol();
+
+        while (true) {
+            self::echo("[#c:s,#][#c:s,#] ", ['(1-', count($options) . '):']);
+            $input = trim(fgets(STDIN));
+            usleep(250000);
+
+            if ($input === '' && ($default !== null || !$required))
+                return $default;
+
+            $choiceIndex = intval($input) - 1;
+            $optionsKeys = array_keys($options);
+            if (isset($optionsKeys[$choiceIndex]))
+                return $optionsKeys[$choiceIndex];
+        }
     }
 
     /** Exibe uma tabela a partir de uma matriz */
@@ -307,27 +333,5 @@ abstract class Terminal
         }
 
         return false;
-    }
-
-    private static function readKeyPress(): string
-    {
-        if (PHP_OS_FAMILY === 'Windows') {
-            $cmd = 'powershell -Command "$k = $host.UI.RawUI.ReadKey(\'NoEcho,IncludeKeyDown\'); echo $k.VirtualKeyCode; if ($k.Character -eq 3 -or $k.VirtualKeyCode -eq 27) { exit 3 }"';
-            exec($cmd, $out, $res);
-            if ($res === 3) self::exitGracefully();
-
-            $code = (int)($out[0] ?? 0);
-            return ($code === 38) ? 'UP' : (($code === 40) ? 'DOWN' : (($code === 13) ? 'ENTER' : ''));
-        }
-        $char = fread(STDIN, 3);
-        if ($char === "\x03" || $char === "\x1b") self::exitGracefully();
-        return $char;
-    }
-
-    private static function exitGracefully()
-    {
-        self::echo("\033[?25h\033[0m\n");
-        if (PHP_OS_FAMILY !== 'Windows') shell_exec('stty sane');
-        die;
     }
 }
