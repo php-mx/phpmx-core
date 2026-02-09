@@ -12,8 +12,7 @@ class Captcha
     /** Gera um desafio de captcha alfanumérico com imagem em base64 e chave criptografada */
     function __invoke($color = '000', $background = 'fff')
     {
-        if (!extension_loaded('gd'))
-            throw new Exception("Extension [gd] is required to use Captcha.", STS_INTERNAL_SERVER_ERROR);
+        phpex('gd');
 
         $fg = $color;
         $bg = $background;

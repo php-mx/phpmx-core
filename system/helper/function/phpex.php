@@ -3,7 +3,7 @@
 if (!function_exists('phpex')) {
 
     /** Verifica se uma extensão do PHP está ativa */
-    function phpex(string $extension, bool $throw = false): bool
+    function phpex(string $extension, bool $throw = true): bool
     {
         $loaded = extension_loaded($extension);
 

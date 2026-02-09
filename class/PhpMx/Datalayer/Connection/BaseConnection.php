@@ -44,8 +44,7 @@ abstract class BaseConnection
 
     final function __construct(string $dbName, protected array $data = [])
     {
-        if (!extension_loaded($this->pdoDriver))
-            throw new Exception("Extension [{$this->pdoDriver}] is required.");
+        phpex($this->pdoDriver);
 
         $this->dbName = $dbName;
         $this->load();
