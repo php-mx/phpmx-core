@@ -26,6 +26,7 @@
             "system/helper/function/mx5.php",
             "system/helper/function/num.php",
             "system/helper/function/path.php",
+            "system/helper/function/phpex.php",
             "system/helper/function/prepare.php",
             "system/helper/function/redirect.php",
             "system/helper/function/remove_accents.php",
