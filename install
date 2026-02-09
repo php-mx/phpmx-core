@@ -35,6 +35,9 @@ return new class {
             '/vendor',
             '/library/cache',
             '/library/certificate',
+            '/class/Model/Db*/Driver',
+            '/library/sqlite',
+            '/system/datalayer/*/scheme',
         ]);
 
         self::createFile('.conf', [
