@@ -58,7 +58,7 @@ abstract class BaseQuery
     /** Executa a query */
     function run(?string $dbName = null): mixed
     {
-        return Datalayer::get($this->dbName ?? $dbName ?? 'default')->executeQuery($this);
+        return Datalayer::get($this->dbName ?? $dbName ?? 'main')->executeQuery($this);
     }
 
     /** Define o banco de dados que deve receber a query */
