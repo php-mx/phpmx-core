@@ -18,14 +18,8 @@ return new class {
     protected function scan($path)
     {
         $files = [];
-        foreach (Dir::seekForFile($path, true) as $ref) {
-            $file = path($path, $ref);
-
-            $files[] = [
-                'ref' => $ref,
-                'file' => $file
-            ];
-        }
+        foreach (Dir::seekForFile($path, true) as $ref)
+            $files[] = ['ref' => $ref];
         return $files;
     }
 };

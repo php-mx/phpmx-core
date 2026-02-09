@@ -1,7 +1,7 @@
 <?php
 
+use PhpMx\Autodoc;
 use PhpMx\Dir;
-use PhpMx\Import;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista todas as constantes helper registradas no sistema */
@@ -11,30 +11,19 @@ return new class {
 
     function __invoke($filter = null)
     {
-        $this->handle(
-            'system/helper/constant',
-            $filter,
-            ' - [#c:p,#ref] [#description]'
-        );
+        $this->handle('system/helper/constant', $filter);
     }
 
-    protected function scan($path)
+    protected function scan($path): array
     {
-        $constants = [];
-        foreach (Dir::seekForFile($path, true) as $item) {
-            $file = path($path, $item);
-            $content = Import::content($file);
-
-            preg_match_all('/(?:\/\*\*\s*(.*?)\s*\*\/\s*\n\s*)?define\(\s*[\'"](\w+)[\'"]/s', $content, $matches, PREG_SET_ORDER);
-
-            foreach ($matches as $match) {
-                $ref = $match[2];
-                $constants[] = [
-                    'ref' => $ref,
-                    'description' => trim($match[1] ?? '')
+        $functions = [];
+        foreach (Dir::seekForFile($path, true) as $item)
+            foreach (Autodoc::getDocSchemeHelperFileConstants(path($path, $item)) as $scheme)
+                $functions[] = [
+                    'ref' => $scheme['ref'],
+                    'description' => str_replace("\n", ' ', $scheme['doc']['description'] ?? '')
                 ];
-            }
-        }
-        return $constants;
+
+        return $functions;
     }
 };
