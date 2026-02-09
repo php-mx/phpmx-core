@@ -58,7 +58,7 @@ class DImage
 
         $object->name = implode('-', [
             'color',
-            self::colorHex(implode(',', $object->color)),
+            colorHex(implode(',', $object->color)),
             ...$object->size
         ]);
 

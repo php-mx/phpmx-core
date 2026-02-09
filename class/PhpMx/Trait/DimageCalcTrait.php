@@ -91,7 +91,7 @@ trait DimageCalcTrait
     protected static function normalizeColor(string|array $color): array
     {
         if (!is_array($color)) {
-            $color = self::colorRGB($color);
+            $color = colorRGB($color);
             $color = explode(',', $color);
             $color = [
                 $color[0],
@@ -120,48 +120,5 @@ trait DimageCalcTrait
         $size = array_map(fn($v) => max($v, 0), $size);
 
         return $size;
-    }
-
-    /** Converte uma cor no formato RGB (string separada por vírgulas) para Hexadecimal */
-    protected static function colorHex(string $color): string
-    {
-        if (strpos($color, ',') === false) {
-            return str_replace('#', '', $color);
-        }
-
-        $color = explode(',', $color);
-        $r = array_shift($color) ?? '225';
-        $g = array_shift($color) ?? '225';
-        $b = array_shift($color) ?? '225';
-
-        return str_pad(dechex($r), 2, 0) . str_pad(dechex($g), 2, 0) . str_pad(dechex($b), 2, 0);
-    }
-
-    /** Converte uma cor Hexadecimal para o formato RGB (string separada por vírgulas) */
-    protected static function colorRGB(string $color): string
-    {
-        if (count(explode(',', $color)) == 3) {
-            return $color;
-        }
-
-        $color = str_replace('#', '', $color);
-        $c = ['R' => '', 'G' => '', 'B' => ''];
-        if (strlen($color) == 6) {
-            list($c['R'], $c['G'], $c['B']) = str_split($color, 2);
-        } elseif (strlen($color) == 3) {
-            list($c['R'], $c['G'], $c['B']) = str_split($color, 1);
-            foreach ($c as $var => $value) {
-                $c[$var] = str_repeat($value, 2);
-            }
-        } elseif (strlen($color) == 1) {
-            foreach ($c as $var => $value) {
-                $c[$var] = str_repeat($color, 2);
-            }
-        }
-        foreach ($c as $var => $value) {
-            $c[$var] = hexdec($value);
-        }
-
-        return implode(',', $c);
     }
 }
