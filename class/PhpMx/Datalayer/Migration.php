@@ -33,7 +33,7 @@ abstract class Migration
     function &table(string $table, ?string $comment = null): SchemeTable
     {
         $returnTable = $this->scheme->table($table, $comment)->fields([
-            $this->fTimestamp('=_created', 'moment of record creation')->default(true)->index(true),
+            $this->fTimestamp('=_created', 'moment of record creation')->default(true)->null(false)->index(true),
             $this->fTimestamp('=_updated', 'moment of last record update')->default(null)->index(true),
             $this->fTimestamp('=_deleted', 'moment of record deletion')->default(null)->index(true),
         ]);
