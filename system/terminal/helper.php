@@ -16,9 +16,12 @@ return new class {
             'system/terminal',
             $filter,
             function ($item) {
-                Terminal::echol(' - [#c:p,#ref] [#description]', $item);
+                Terminal::echol();
+                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file]', $item);
+                if (!empty($item['description']))
+                    Terminal::echol('     [#description]', $item);
                 foreach ($item['variations'] as $variation)
-                    Terminal::echol('      [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
+                    Terminal::echol('       [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
             }
         );
     }
@@ -44,6 +47,7 @@ return new class {
                 'ref' => $scheme['ref'],
                 'description' => str_replace("\n", ' ', $scheme['doc']['description'] ?? ''),
                 'variations' => $variations,
+                'file' => $scheme['file'],
             ];
         }
 

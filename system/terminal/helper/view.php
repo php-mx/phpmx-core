@@ -2,6 +2,7 @@
 
 use PhpMx\Dir;
 use PhpMx\File;
+use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista e detalha todas as views disponíveis no projeto */
@@ -14,7 +15,15 @@ return new class {
         $this->handle(
             'system/view',
             $filter,
-            ' - [#c:p,#ref] [#c:dd,#description]'
+            function ($item) {
+
+                $imports = $item['imports'];
+                $imports = array_map(fn($i) => "[#c:sd," . path($item['path'], $item['ref']) . ".$i]", $imports);
+                $imports = implode(' ', $imports);
+
+                Terminal::echol();
+                Terminal::echol(" - [#c:p,#ref] $imports", $item);
+            }
         );
     }
 
@@ -34,6 +43,7 @@ return new class {
                 'ref' => $namespace,
                 'imports' => ['php' => null, 'html' => null],
                 'direct' => true,
+                'path' => path($viewPath, $path),
             ];
 
             if (!$scheme[$namespace]['direct']) {
@@ -56,7 +66,6 @@ return new class {
                     'direct' => false,
                 ];
 
-
                 if (!$scheme[$namespace]['direct'])
                     $scheme[$namespace]['imports'][$fileEx] = true;
             }
@@ -66,10 +75,6 @@ return new class {
             $item['imports'] = array_filter($item['imports']);
             $item['imports'] = array_keys($item['imports']);
             unset($item['direct']);
-        }
-
-        foreach ($scheme as &$file) {
-            $file['description'] = "[" . implode(', ', $file['imports']) . "]";
         }
 
         return $scheme;

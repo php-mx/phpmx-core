@@ -18,7 +18,7 @@ return new class {
         $time = str_pad($time, 14, '0');
         $time = $time . str_pad(random_int(0, 999), 3, '0', STR_PAD_LEFT);
 
-        $migrationName = $migrationName ? strToSnakeCase("$time $migrationName") : $time;
+        $migrationName = strToSnakeCase("$time $migrationName");
 
         $file = path('system/datalayer', $migrationDbName, 'migration', $migrationName);
         $file = File::setEx($file, 'php');

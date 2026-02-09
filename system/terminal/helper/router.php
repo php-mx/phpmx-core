@@ -26,9 +26,11 @@ return new class {
 
                     $response = '';
 
-                    if ($schemeRoute['response']['type'] == 'status')
-                        $response = $schemeRoute['response']['code'];
-                    elseif ($schemeRoute['response']['type'] == 'controller') {
+                    if ($schemeRoute['response']['type'] == 'status') {
+                        $responseStauts = $schemeRoute['response']['code'];
+                        $color = is_httpStatusError($responseStauts) ? 'ed' : 'wd';
+                        $response = "[#c:$color,$responseStauts]";
+                    } elseif ($schemeRoute['response']['type'] == 'controller') {
                         if ($schemeRoute['response']['callable']) {
                             $responseFile = $schemeRoute['response']['file'];
                             $responseMethod = $schemeRoute['response']['method'];
@@ -47,6 +49,7 @@ return new class {
 
                     $currentRoute = [
                         'order' =>  $template,
+                        'type' => $schemeRoute['response']['type'],
                         'template' => '/' . trim($template, '/'),
                         'response' => $response,
                         'middlewares' => empty($schemeRoute['middlewares']) ? '' : '[' . implode(', ', $schemeRoute['middlewares']) . '] ',
@@ -86,13 +89,13 @@ return new class {
                 if (empty($routes)) continue;
                 $routes = $this->organize($routes);
 
-                Terminal::echol();
-
                 foreach (array_reverse($routes) as $route) {
+                    Terminal::echol();
                     if (!$route['replaced']) {
                         $response = $route['response'];
-                        Terminal::echol(" - [#c:d,$curentMethod][#c:dd,:][#c:p,#template] [#description]", $route);
-                        Terminal::echol("     [#c:dd,response][#c:dd,:] [#middlewares]$response", $route);
+                        Terminal::echol(" - [#c:dd,$curentMethod][#c:dd,:][#c:p,#template] $response", $route);
+                        if ($route['type'] != 'status' && !empty($route['description']))
+                            Terminal::echol("     [#description]", $route);
                     } else {
                         Terminal::echol(" - [#c:dd,$curentMethod][#c:sd,:][#c:pd,#template] [#c:wd,replaced]", $route);
                     }

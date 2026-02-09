@@ -12,14 +12,24 @@ return new class {
 
     function __invoke($filter = null)
     {
-        $this->handle('library', $filter);
+        $this->handle(
+            'library',
+            $filter,
+            function ($item) {
+                Terminal::echol();
+                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file]', $item);
+            }
+        );
     }
 
     protected function scan($path)
     {
         $files = [];
         foreach (Dir::seekForFile($path, true) as $ref)
-            $files[] = ['ref' => $ref];
+            $files[] = [
+                'ref' => $ref,
+                'file' => path($path, $ref)
+            ];
         return $files;
     }
 };
