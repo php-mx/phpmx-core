@@ -2,9 +2,12 @@
 
 namespace PhpMx;
 
+use ReflectionMethod;
+
 /** Classe utilitária para mapear e documentar projetos. */
 abstract class Autodoc
 {
+    /** Carrega esquema de documentação das constantes de um arquivo */
     static function getDocSchemeHelperFileConstants(string $file): array
     {
         $content = Import::content($file);
@@ -31,6 +34,7 @@ abstract class Autodoc
         return $scheme;
     }
 
+    /** Carrega esquema de documentação das funções de um arquivo */
     static function getDocSchemeHelperFileFunctions(string $file): array
     {
         $content = Import::content($file);
@@ -57,6 +61,7 @@ abstract class Autodoc
         return $scheme;
     }
 
+    /** Carrega esquema de documentação das variaveis de ambiente padrão de um arquivo */
     static function getDocSchemeHelperFileEnvironments(string $file): array
     {
         $content = Import::content($file);
@@ -83,6 +88,7 @@ abstract class Autodoc
         return $scheme;
     }
 
+    /** Carrega esquema de documentação de um arquivo de comando */
     static function getDocSchemeFileCommand(string $file): array
     {
         $content = Import::content($file);
@@ -131,6 +137,7 @@ abstract class Autodoc
         ];
     }
 
+    /** Carrega esquema de documentação de um arquivo de middleware */
     static function getDocSchemeFileMiddleware(string $file): array
     {
         $content = Import::content($file);
@@ -152,12 +159,65 @@ abstract class Autodoc
         $ref = str_replace(['/', '\\'], '.', $ref);
 
         return [
-            'ref'    => $ref,
-            'doc'    => $parsed,
+            'ref' => $ref,
+            'doc' => $parsed,
             'origin' => self::getOriginPath($file),
-            'file'   => $file,
-            'line'   => $line
+            'file' => $file,
+            'line' => $line
         ];
+    }
+
+    /** Carrega esquema de documentação das rotas definidas em uma arquivo */
+    static function getDocSchemeFileRoutes(string $file): array
+    {
+        $scheme = [];
+
+        Import::only($file);
+
+        /** @var Router|mixed $interceptorRouter */
+        $interceptorRouter = new class extends Router {
+            function captureRoutes()
+            {
+                $routes = self::$ROUTE;
+                self::$ROUTE = ['GET' => [], 'POST' => [], 'PUT' => [], 'DELETE' => []];
+                return $routes;
+            }
+        };
+
+        foreach ($interceptorRouter->captureRoutes() as $method => $templates)
+            foreach ($templates as $data) {
+                $response = self::formatRouteResponse($data[1]);
+                $scheme[] = [
+                    'ref' => $data[0],
+                    'method' => $method,
+                    'response' => $response,
+                    'params' => $data[2] ?? [],
+                    'middlewares' => $data[3] ?? [],
+                    'origin' => self::getOriginPath($file),
+                    'file' => $file,
+                    'line' => null
+                ];
+            }
+
+        return $scheme;
+    }
+
+    /** Carrega esquema de documentação de um arquivo de classe */
+    static function getDocSchemeFileClass(string $file): array
+    {
+        return [];
+    }
+
+    /** Carrega esquema de documentação de um arquivo de trait */
+    static function getDocSchemeFileTrait(string $file): array
+    {
+        return [];
+    }
+
+    /** Carrega esquema de documentação de um arquivo de interface */
+    static function getDocSchemeFileInterface(string $file): array
+    {
+        return [];
     }
 
     static function getOriginPath($path): string
@@ -270,5 +330,45 @@ abstract class Autodoc
         $description = trim(implode("\n", $descriptionLines));
         if ($description !== '') $result['description'] = $description;
         return $result;
+    }
+
+    protected static function formatRouteResponse($response): array
+    {
+        if (is_int($response)) {
+            return [
+                'type' => 'status',
+                'code' => $response,
+                'description' => env("STM_$response") ?? 'HTTP Status ' . $response,
+            ];
+        }
+
+        $parts = is_array($response) ? $response : [$response];
+        $controller = array_shift($parts);
+        $method = array_shift($parts) ?? '__invoke';
+
+        $info = [
+            'type' => 'controller',
+            'class' => $controller,
+            'method' => $method,
+            'callable' => false,
+            'file' => null,
+            'line' => null,
+            'description' => '',
+        ];
+
+        if (class_exists($controller)) {
+            if (method_exists($controller, $method)) {
+                $refMethod = new ReflectionMethod($controller, $method);
+                $info['file'] = path($refMethod->getFileName());
+                $info['line'] = $refMethod->getStartLine();
+                $info['description'] = self::parseDoc($refMethod->getDocComment())['description'] ?? '';
+                $info['callable'] = true;
+            } else {
+                $reflection = new \ReflectionClass($controller);
+                $info['file'] = path($reflection->getFileName());
+            }
+        }
+
+        return $info;
     }
 }

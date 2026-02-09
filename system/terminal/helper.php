@@ -18,7 +18,7 @@ return new class {
             function ($item) {
                 Terminal::echol(' - [#c:p,#ref] [#description]', $item);
                 foreach ($item['variations'] as $variation)
-                    Terminal::echol(' [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
+                    Terminal::echol('      [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
             }
         );
     }
