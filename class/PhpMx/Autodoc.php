@@ -98,7 +98,9 @@ abstract class Autodoc
 
         $line = substr_count(substr($content, 0, $posNewClass), "\n") + 1;
 
-        $ref = substr($file, 0, -4);
+        $ref = explode('system/terminal/', $file);
+        $ref = array_pop($ref);
+        $ref = substr($ref, 0, -4);
         $ref = str_replace(['/', '\\'], '.', $ref);
 
         $params = [];
@@ -144,7 +146,9 @@ abstract class Autodoc
 
         $line = substr_count(substr($content, 0, $posNewClass), "\n") + 1;
 
-        $ref = substr($file, 0, -4);
+        $ref = explode('system/middleware/', $file);
+        $ref = array_pop($ref);
+        $ref = substr($ref, 0, -4);
         $ref = str_replace(['/', '\\'], '.', $ref);
 
         return [
