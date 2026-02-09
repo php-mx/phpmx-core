@@ -7,7 +7,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-/** Gera automaticamente a infraestrutura de classes (Drivers, Tables e Records) com base no mapeamento do banco de dados */
+/** Gera infraestrutura de classes de Model e Drivers baseados no mapeamento do banco de dados */
 return new class {
 
     protected string $dbName = '';
@@ -130,8 +130,7 @@ return new class {
 
                 if (!is_null($fieldMap['default'])) {
                     if (is_string($fieldMap['default'])) {
-                        $value = $fieldMap['default'];
-                        $value = "'$value'";
+                        $value = "'{$fieldMap['default']}'";
                     } else if (is_numeric($fieldMap['default'])) {
                         $value = $fieldMap['default'];
                     } else if (is_bool($fieldMap['default'])) {
@@ -142,46 +141,46 @@ return new class {
                 $settings = [];
 
                 switch ($fieldMap['type']) {
+                    case 'tinyint':
+                    case 'smallint':
+                    case 'mediumint':
                     case 'int':
-                        if ($fieldMap['size']) $settings['size'] = $fieldMap['size'];
+                    case 'bigint':
                         if (isset($fieldMap['settings']['min'])) $settings['min'] = $fieldMap['settings']['min'];
                         if (isset($fieldMap['settings']['max'])) $settings['max'] = $fieldMap['settings']['max'];
                         if (isset($fieldMap['settings']['round'])) $settings['round'] = $fieldMap['settings']['round'];
                         break;
 
+                    case 'decimal':
                     case 'float':
-                        if ($fieldMap['size']) $settings['size'] = $fieldMap['size'];
+                    case 'double':
                         if (isset($fieldMap['settings']['min'])) $settings['min'] = $fieldMap['settings']['min'];
                         if (isset($fieldMap['settings']['max'])) $settings['max'] = $fieldMap['settings']['max'];
-                        if (isset($fieldMap['settings']['round'])) $settings['round'] = $fieldMap['settings']['round'];
-                        if (isset($fieldMap['settings']['decimal'])) $settings['decimal'] = $fieldMap['settings']['decimal'];
+                        if (isset($fieldMap['settings']['precision'])) $settings['precision'] = $fieldMap['settings']['precision'];
                         break;
 
+                    case 'char':
+                    case 'varchar':
                     case 'email':
-                    case 'string':
-                    case 'text':
-                        if ($fieldMap['size']) $settings['size'] = $fieldMap['size'];
+                    case 'md5':
+                    case 'password':
+                        $settings['size'] = $fieldMap['size'];
                         if (isset($fieldMap['settings']['crop'])) $settings['crop'] = $fieldMap['settings']['crop'];
                         break;
+
                     case 'idx':
                         $settings['datalayer'] = $fieldMap['settings']['datalayer'];
                         $settings['table'] = $fieldMap['settings']['table'];
                         break;
-                    case 'time':
-                        $settings['datalayer'] = $fieldMap['settings']['datalayer'];
-                        $settings['table'] = $fieldMap['settings']['table'];
-                        break;
-                    default:
-                        $settings = [];
                 }
 
                 $fieldMap['phpType'] = match ($fieldMap['type']) {
+                    'tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'idx' => 'int',
+                    'decimal', 'float', 'double' => 'float',
                     'boolean' => 'bool',
-                    'email', 'md5', 'md5', 'string', 'text' => 'string',
-                    'float' => 'float',
-                    'idx', 'int' => 'int',
-                    'time' => 'int|string',
-                    default => 'mixed'
+                    'char', 'varchar', 'email', 'md5', 'password', 'text', 'date', 'time', 'datetime', 'timestamp' => 'string',
+                    'json' => 'array',
+                    'blob' => 'string',
                 };
 
                 $data = [
