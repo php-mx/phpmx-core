@@ -4,13 +4,12 @@ namespace PhpMx\Datalayer\Driver\Field;
 
 use PhpMx\Datalayer\Driver\Field;
 
-class FText extends Field
+class FDate extends Field
 {
     function set($value): static
     {
-        if (!is_null($value))
-            $value = strval($value);
-
+        if ($value === false) $value = null;
+        if (is_int($value)) $value = date('Y-m-d', $value);
         return parent::set($value);
     }
 }

@@ -5,13 +5,20 @@ namespace PhpMx\Datalayer\Driver\Field;
 use PhpMx\Datalayer\Driver\Field;
 use PhpMx\Datalayer\Driver\Record;
 
-/** Armazena um ID de referencia para uma tabela */
 class FIdx extends Field
 {
     /** @var Record */
     protected $RECORD = false;
 
-    /** Define um novo valor para o campo */
+    private function _table()
+    {
+        $datalayer = $this->SETTINGS['datalayer'];
+        $table = $this->SETTINGS['table'];
+        $driverClass = 'Model\\' . strToPascalCase("db $datalayer") . '\\' . strToPascalCase("db $datalayer");
+        $tableMethod = strToCamelCase($table);
+        return $driverClass::${$tableMethod};
+    }
+
     function set($value): static
     {
         if (is_numeric($value)) {
@@ -20,26 +27,13 @@ class FIdx extends Field
                 $value = null;
             }
         } else if (is_bool($value)) {
-            if ($value) {
-                $datalayer = $this->SETTINGS['datalayer'];
-                $table = $this->SETTINGS['table'];
-
-                $driverClass = 'Model\\' . strToPascalCase("db $datalayer") . '\\' . strToPascalCase("db $datalayer");
-                $tableMethod = strToCamelCase($table);
-                $value = $driverClass::${$tableMethod}->active()->id();
-            } else {
-                $value = null;
-            }
+            $value = $value ? $this->_table()->active()->id() : null;
         } else {
             $datalayer = $this->SETTINGS['datalayer'];
             $table = $this->SETTINGS['table'];
             $driverNamespace = 'Model\\' . strToPascalCase("db $datalayer");
             $driverRecordClass = "$driverNamespace\Driver\\" . strToPascalCase("driver record $table");
-            if (is_extend($value, $driverRecordClass)) {
-                $value = $value->id();
-            } else {
-                $value = null;
-            }
+            $value = is_extend($value, $driverRecordClass) ? $value->id() : null;
         }
 
         $this->RECORD = false;
@@ -50,17 +44,11 @@ class FIdx extends Field
     /** Retorna o registro referenciado pelo objeto */
     function _record(): Record
     {
-        if (!$this->_checkLoad()) {
-            $datalayer = $this->SETTINGS['datalayer'];
-            $table = $this->SETTINGS['table'];
-            $driverClass = 'Model\\' . strToPascalCase("db $datalayer") . '\\' . strToPascalCase("db $datalayer");
-            $tableMethod = strToCamelCase($table);
-            $this->RECORD = $driverClass::${$tableMethod}->getOne($this->get());
-        }
+        if (!$this->_checkLoad())
+            $this->RECORD = $this->_table()->getOne($this->get());
 
         return $this->RECORD;
     }
-
 
     /** Salva o registro no banco de dados */
     function _save()
@@ -80,12 +68,7 @@ class FIdx extends Field
     function idKey(): ?string
     {
         if (!$this->_checkInDb()) return null;
-
-        $datalayer = $this->SETTINGS['datalayer'];
-        $table = $this->SETTINGS['table'];
-        $driverClass = 'Model\\' . strToPascalCase("db $datalayer") . '\\' . strToPascalCase("db $datalayer");
-        $tableMethod = strToCamelCase($table);
-        return $driverClass::${$tableMethod}->idToIdkey($this->get());
+        return $this->_table()->idToIdkey($this->get());
     }
 
     /** Verifica se o objeto referenciado pelo IDX foi carregado */
@@ -103,7 +86,7 @@ class FIdx extends Field
     /** Verifica se o registro existe no banco de dados */
     function _checkInDb()
     {
-        return $this->_checkSave() ? $this->_record()->_checkInDb() : false;
+        return !is_null($this->get()) && $this->get() > 0;
     }
 
     function __get($name)

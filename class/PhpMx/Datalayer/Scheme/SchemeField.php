@@ -4,7 +4,6 @@ namespace PhpMx\Datalayer\Scheme;
 
 use Exception;
 use PhpMx\Datalayer;
-use PhpMx\Mx5;
 
 /** Representa um campo da tabela no esquema de banco de dados, permitindo configuração detalhada. */
 class SchemeField
@@ -32,6 +31,12 @@ class SchemeField
         $this->map['settings'] = $map['settings'] ?? $realMap['settings'];
     }
 
+    protected function onlyType(string $name, array $allowTypes = [], array $denyType = []): void
+    {
+        if ((!empty($allowTypes) && !in_array($this->map['type'], $allowTypes)) || in_array($this->map['type'], $denyType))
+            throw new Exception(prepare("Unsupported [$name] to fields [[#]]", $this->map['type']));
+    }
+
     /** Marca/Desmarca o campo para a remoção */
     function drop(bool $drop = true): static
     {
@@ -46,116 +51,101 @@ class SchemeField
         return $this;
     }
 
-    /** Define o valor padrão do campo (fBoolean,  fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fJson, fString, fText, fTime) */
+    /** Define o valor padrão do campo */
     function default(mixed $default): static
     {
-        if (!$this->isType('boolean',  'email', 'float', 'md5', 'mx5', 'idx', 'int', 'json', 'string', 'text', 'time'))
-            throw new Exception(prepare("Unsoported [detault] to fields [[#]]", $this->map['type']));
-
+        $this->onlyType('default', denyType: ['password', 'text', 'blob', 'json']);
         $this->map['default'] = $default;
         if (is_null($default)) $this->null(true);
         return $this;
     }
 
-    /** Define o tamanho maximo (fFloat, fInt, fString) */
-    function size(int $size): static
-    {
-        if (!$this->isType('float', 'int', 'string'))
-            throw new Exception(prepare("Unsoported [size] to fields [[#]]", $this->map['type']));
-
-        $this->map['size'] = max(0, intval($size));
-        return $this;
-    }
-
-    /** Define se o campo aceita valores nulos (fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fString, fTime) */
+    /** Define se o campo aceita valores nulos */
     function null(bool $null): static
     {
-        if (!$this->isType('email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
-            throw new Exception(prepare("Unsoported [null] to fields [[#]]", $this->map['type']));
-
         $this->map['null'] = boolval($null);
         return $this;
     }
 
-    /** Define se o campo deve ser indexado (fBoolean, fEmail, fFloat, fMd5, fMx5, fIdx, fInt, fString, fTime) */
-    function index(bool $index, bool $unique = false): static
+    /** Determina a precisão de casas decimais do campo */
+    function precision(int $precision): static
     {
-        if (!$this->isType('boolean', 'email', 'float', 'md5', 'mx5', 'idx', 'int', 'string', 'time'))
-            throw new Exception(prepare("Unsoported [index] to fields [[#]]", $this->map['type']));
-
-        $this->map['index'] = $index;
-        $this->map['unique'] = $index && $unique;
-
+        $this->onlyType('precision', ['decimal']);
+        $this->map['settings']['precision'] = max(0, intval($precision));
         return $this;
     }
 
-    /** Determina o valor máximo do campo (fInt, fFloat) */
-    function max(int $max): static
+    /** Define se o campo deve ser indexado */
+    function index(bool $index, bool $unique = false): static
     {
-        if (!$this->isType('int', 'float'))
-            throw new Exception(prepare("Unsoported [max] to fields [[#]]", $this->map['type']));
-
-        return $this->settings('min', num_positive($max));
+        $this->onlyType('index', denyType: ['text', 'blob']);
+        $this->map['index'] = $index;
+        $this->map['unique'] = $index && $unique;
+        return $this;
     }
 
-    /** Determina o valor minimo do campo (fInt, fFloat) */
-    function min(int $min): static
+    /** Define se o campo deve ser único */
+    function unique(bool $unique): static
     {
-        if (!$this->isType('int', 'float'))
-            throw new Exception(prepare("Unsoported [min] to fields [[#]]", $this->map['type']));
-
-        return $this->settings('min', num_positive($min));
+        $this->onlyType('unique', denyType: ['text', 'blob']);
+        $this->map['unique'] = boolval($unique);
+        if ($unique) $this->map['index'] = true;
+        return $this;
     }
 
-    /** Determina a forma de arredondamento do campo [-1:baixo,0:automático,1:cima] (fInt, fFloat) */
+    /** Define o tamanho máximo do campo */
+    function size(int $size): static
+    {
+        $this->onlyType('size', ['char', 'varchar']);
+        $this->map['size'] = max(0, intval($size));
+        return $this;
+    }
+
+    /** Determina o valor mínimo do campo */
+    function min(int|float $min): static
+    {
+        $this->onlyType('min', ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'decimal', 'float', 'double']);
+        $this->map['settings']['min'] = $min;
+        return $this;
+    }
+
+    /** Determina o valor máximo do campo */
+    function max(int|float $max): static
+    {
+        $this->onlyType('max', ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'decimal', 'float', 'double']);
+        $this->map['settings']['max'] = $max;
+        return $this;
+    }
+
+    /** Determina a forma de arredondamento do campo [-1:baixo, 0:automático, 1:cima] */
     function round(int $round): static
     {
-        if (!$this->isType('int', 'float'))
-            throw new Exception(prepare("Unsoported [round] to fields [[#]]", $this->map['type']));
-
-        return $this->settings('round', num_interval($round, -1, 1));
+        $this->onlyType('round', ['tinyint', 'smallint', 'mediumint', 'int', 'bigint']);
+        $this->map['settings']['round'] = max(-1, min(1, intval($round)));
+        return $this;
     }
 
-    /** Determina quantas casas decimais o campo deve ter (fFloat) */
-    function decimal(int $decimal): static
-    {
-        if (!$this->isType('float'))
-            throw new Exception(prepare("Unsoported [decimal] to fields [[#]]", $this->map['type']));
-
-        return $this->settings('decimal', num_positive($decimal));
-    }
-
-    /** Determina a conexão referenciada pelo campo (fIdx) */
-    function datalayer(string $datalayer): static
-    {
-        if (!$this->isType('idx'))
-            throw new Exception(prepare("Unsoported [datalayer] to fields [[#]]", $this->map['type']));
-
-        return $this->settings('datalayer', Datalayer::internalName($datalayer));
-    }
-
-    /** Determina a tabela referenciada pelo campo (fIdx) */
-    function table(string $table): static
-    {
-        if (!$this->isType('idx'))
-            throw new Exception(prepare("Unsoported [table] to fields [[#]]", $this->map['type']));
-
-        return $this->settings('table', Datalayer::internalName($table));
-    }
-
-    /** Determina se o campo deve cortar conteúdo com mais caracteres que o permitido (fString) */
+    /** Determina se o campo deve cortar conteúdo com mais caracteres que o permitido */
     function crop(bool $crop): static
     {
-        if (!$this->isType('string'))
-            throw new Exception(prepare("Unsoported [crop] to fields [[#]]", $this->map['type']));
-
-        return $this->settings('crop', $crop);
+        $this->onlyType('crop', ['char', 'varchar']);
+        $this->map['settings']['crop'] = boolval($crop);
+        return $this;
     }
 
-    /** Armazena uma configuração dentro do campo */
-    function settings(string $name, $value): static
+    /** Determina a conexão referenciada pelo campo */
+    function datalayer(string $datalayer): static
     {
-        $this->map['settings'][$name] = $value;
+        $this->onlyType('datalayer', ['idx']);
+        $this->map['settings']['datalayer'] = $datalayer;
+        return $this;
+    }
+
+    /** Determina a tabela referenciada pelo campo */
+    function table(string $table): static
+    {
+        $this->onlyType('table', ['idx']);
+        $this->map['settings']['table'] = $table;
         return $this;
     }
 
@@ -168,145 +158,166 @@ class SchemeField
     /** Retorna o mapa do campo */
     function getMap(): bool|array
     {
-        if ($this->isDroped)
-            return false;
+        if ($this->isDroped) return false;
 
         return match ($this->map['type']) {
+            'tinyint', 'smallint', 'mediumint', 'int', 'bigint' => $this->__mapInteger($this->map),
+            'decimal', 'float', 'double' => $this->__mapNumeric($this->map),
             'boolean' => $this->__mapBoolean($this->map),
-            'email' => $this->__mapEmail($this->map),
-            'float' => $this->__mapFloat($this->map),
-            'md5' => $this->__mapMd5($this->map),
-            'mx5' => $this->__mapMx5($this->map),
-            'idx' => $this->__mapIdx($this->map),
-            'int' => $this->__mapInt($this->map),
+            'char' => $this->__mapChar($this->map),
+            'varchar' => $this->__mapVarchar($this->map),
+            'text', 'blob' => $this->__mapText($this->map),
+            'date', 'time', 'datetime', 'timestamp' => $this->__mapTemporal($this->map),
             'json' => $this->__mapJson($this->map),
-            'string' => $this->__mapString($this->map),
-            'text' => $this->__mapText($this->map),
-            'time' => $this->__mapTime($this->map),
+            'email' => $this->__mapEmail($this->map),
+            'md5' => $this->__mapMd5($this->map),
+            'password' => $this->__mapPassword($this->map),
+            'idx' => $this->__mapIdx($this->map),
             default => throw new Exception("Invalid field type [{$this->map['type']}] in [{$this->name}]")
         };
     }
 
-    /** Retorna o mapa de campos BOOLEAN */
     protected function __mapBoolean(array $map): array
     {
         $map['size'] = 1;
-        $map['null'] = false;
 
-        if (is_bool($map['default']))
-            $map['default'] = intval(boolval($map['default'] ?? 0));
-
-        return $map;
-    }
-
-    /** Retorna o mapa de campos EMAIL */
-    protected function __mapEmail(array $map): array
-    {
-        $map['size'] = 254;
-
-        if (isset($map['default']) && !is_null($map['default']) && !filter_var($map['default'], FILTER_VALIDATE_EMAIL))
-            throw new Exception("Invalid field default value in [$this->name]");
+        if (!is_null($map['default']))
+            $map['default'] = intval(boolval($map['default']));
 
         return $map;
     }
 
-    /** Retorna o mapa de campos FLOAT */
-    protected function __mapFloat(array $map): array
+    private function __mapInteger(array $map): array
     {
-        $map['settings']['size'] = $map['size'] ?? 10;
+        if (!is_null($map['default']))
+            $map['default'] = intval($map['default']);
+
+        return $map;
+    }
+
+    protected function __mapNumeric(array $map): array
+    {
+        if ($map['type'] === 'decimal') {
+            $map['settings']['precision'] = $map['settings']['precision'] ?? 2;
+            $map['size'] = max($map['size'] ?? 10, $map['settings']['precision'] + 1);
+        }
+
+        if (!is_null($map['default']))
+            $map['default'] = floatval($map['default']);
+
+        return $map;
+    }
+
+    protected function __mapChar(array $map): array
+    {
+        $map['size'] = $map['size'] ?? 1;
+
+        if (!is_null($map['default']))
+            $map['default'] = substr(strval($map['default']), 0, $map['size']);
+
+        return $map;
+    }
+
+    protected function __mapVarchar(array $map): array
+    {
+        $map['size'] = $map['size'] ?? 255;
+
+        if (!is_null($map['default']))
+            $map['default'] = substr(strval($map['default']), 0, $map['size']);
+
+        return $map;
+    }
+
+    protected function __mapText(array $map): array
+    {
         $map['size'] = null;
 
-        if (!isset($map['settings']['decimal']))
-            $map['settings']['decimal'] = 2;
+        if (!is_null($map['default']))
+            $map['default'] = strval($map['default']);
 
         return $map;
     }
 
-    /** Retorna o mapa de campos IDX */
+    private function __mapTemporal(array $map): array
+    {
+        $map['size'] = null;
+
+        if (is_string($map['default'])) {
+            $value = strval($map['default']);
+            $valid = match ($map['type']) {
+                'date' => date_create_from_format('Y-m-d', $value) !== false,
+                'time' => date_create_from_format('H:i:s', $value) !== false,
+                'datetime' => date_create_from_format('Y-m-d H:i:s', $value) !== false,
+                'timestamp' => date_create_from_format('Y-m-d H:i:s', $value) !== false,
+            };
+
+            if (!$valid)
+                throw new Exception("Invalid default value for [{$map['type']}] field [{$this->name}]");
+
+            $map['default'] = $value;
+        }
+
+        if (is_bool($map['default'])) {
+
+            if ($map['default'] && !in_array($map['type'], ['datetime', 'timestamp']))
+                throw new Exception("CURRENT_TIMESTAMP is only supported for datetime and timestamp fields [{$this->name}]");
+
+            $map['default'] = $map['default'] ? 'CURRENT_TIMESTAMP' : null;
+        }
+
+        return $map;
+    }
+
+    protected function __mapJson(array $map): array
+    {
+        $map['size'] = null;
+
+        return $map;
+    }
+
     protected function __mapIdx(array $map): array
     {
         $map['size'] = 10;
+        $map['index'] = true;
         $map['settings']['datalayer'] = Datalayer::internalName($map['settings']['datalayer']);
         $map['settings']['table'] = Datalayer::internalName($map['settings']['table']);
 
         return $map;
     }
 
-    /** Retorna o mapa de campos INT */
-    protected function __mapInt(array $map): array
+    protected function __mapEmail(array $map): array
     {
-        $map['settings']['size'] = $map['size'] ?? 10;
-        $map['size'] = null;
+        $map['size'] = 254;
+
+        if (!is_null($map['default'])) {
+            $map['default'] = strtolower(filter_var(strval($map['default']), FILTER_SANITIZE_EMAIL));
+
+            if (!filter_var($map['default'], FILTER_VALIDATE_EMAIL))
+                throw new Exception("Invalid email default value in [{$this->name}]");
+        }
 
         return $map;
     }
 
-    /** Retorna o mapa de campos JSON */
-    protected function __mapJson(array $map): array
-    {
-        $map['size'] = null;
-        $map['null'] = false;
-
-        $map['default'] = $map['default'] ?? [];
-        $map['default'] = is_json($map['default']) ? $map['default'] : json_encode($map['default']);
-
-        return $map;
-    }
-
-    /** Retorna o mapa de campos MD5 */
     protected function __mapMd5(array $map): array
     {
         $map['size'] = 32;
 
-        if (isset($map['default']) && !is_md5($map['default']))
-            $map['default'] = md5($map['default']);
+        if (!is_null($map['default'])) {
+            if (!is_md5($map['default']))
+                $map['default'] = md5(strval($map['default']));
+
+            $map['default'] = strtolower($map['default']);
+        }
 
         return $map;
     }
 
-    /** Retorna o mapa de campos MX5 */
-    protected function __mapMx5(array $map): array
+    protected function __mapPassword(array $map): array
     {
-        $map['size'] = 34;
-
-        if (isset($map['default']) && !Mx5::check($map['default']))
-            $map['default'] = mx5($map['default']);
+        $map['size'] = 255;
+        $map['default'] = null;
 
         return $map;
-    }
-
-    /** Retorna o mapa de campos STRING */
-    protected function __mapString(array $map): array
-    {
-        $map['size'] = $map['size'] ?? 50;
-
-        $map['settings']['crop'] = boolval($map['settings']['crop'] ?? false);
-
-        return $map;
-    }
-
-    /** Retorna o mapa de campos TEXT */
-    protected function __mapText(array $map): array
-    {
-        $map['size'] = null;
-        $map['null'] = false;
-
-        $map['default'] = $map['default'] ?? '';
-
-        return $map;
-    }
-
-    /** Retorna o mapa de campos TIME */
-    protected function __mapTime(array $map): array
-    {
-        $map['size'] = 11;
-
-        return $map;
-    }
-
-    /** Verifica se o campo atual é de um dos tipos informados */
-    protected function isType(...$types): bool
-    {
-        return in_array($this->map['type'], $types);
     }
 }

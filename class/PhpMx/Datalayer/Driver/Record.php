@@ -27,6 +27,12 @@ abstract class Record
 
     function __construct(array $scheme)
     {
+        $this->FIELD = array_merge([
+            '_created' => new \PhpMx\Datalayer\Driver\Field\FTimestamp('_created', false, 'CURRENT_TIMESTAMP', []),
+            '_updated' => new \PhpMx\Datalayer\Driver\Field\FTimestamp('_updated', true, null, []),
+            '_deleted' => new \PhpMx\Datalayer\Driver\Field\FTimestamp('_deleted', true, null, []),
+        ], $this->FIELD);
+
         $this->_arraySet($scheme);
 
         $this->ID = $scheme['id'] ?? null;
@@ -55,20 +61,23 @@ abstract class Record
     }
 
     /** Retorna o momento em que o campo foi criado */
-    final function _created(): int
+    final function _created(): ?string
     {
+        if (!$this->_checkInDb()) return null;
         return $this->FIELD['_created']->get();
     }
 
     /** Retorna o momento da ultima atualização do campo  */
-    final function _updated(): int
+    final function _updated(): ?string
     {
+        if (!$this->_checkInDb()) return null;
         return $this->FIELD['_updated']->get();
     }
 
     /** Retorna o momento da ultima mudança (create ou update) do campo  */
-    final function _changed(): int
+    final function _changed(): ?string
     {
+        if (!$this->_checkInDb()) return null;
         return $this->_updated() ? $this->_updated() : $this->_created();
     }
 
@@ -91,6 +100,14 @@ abstract class Record
             $schemeWraper = !is_callable($schemeWraper) ? fn($record) => $schemeWraper : $schemeWraper;
 
             $scheme[$fieldName] = $schemeWraper($this);
+        }
+
+
+        if (!$this->_checkInDb()) {
+            if (isset($scheme['_changed'])) $scheme['_changed'] = null;
+            if (isset($scheme['_created'])) $scheme['_created'] = null;
+            if (isset($scheme['_updated'])) $scheme['_updated'] = null;
+            if (isset($scheme['_deleted'])) $scheme['_deleted'] = null;
         }
 
         return $scheme;
@@ -309,8 +326,8 @@ abstract class Record
                     if ($value == $this->INITIAL[$name])
                         unset($dif[$name]);
 
-                $dif['_updated'] = time();
-                $this->FIELD['_updated']->set($dif['_updated']);
+                $this->FIELD['_updated']->set(true);
+                $dif['_updated'] = $this->FIELD['_updated']->get();
 
                 foreach ($dif as $name => $value)
                     $this->INITIAL[$name] = $value;
@@ -334,23 +351,28 @@ abstract class Record
     final protected function __runDelete()
     {
         Log::changeScope('driver.delete', "[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+        $this->__runSaveIdx();
         $onDelete = $this->_onDelete() ?? null;
         if ($onDelete ?? true) {
-            Query::delete($this->TABLE)
+            $this->FIELD['_deleted']->set(true);
+
+            $dif = ['_deleted' => $this->FIELD['_deleted']->get()];
+
+            Query::update($this->TABLE)
                 ->where('id', $this->ID)
+                ->values($dif)
                 ->run($this->DATALAYER);
 
-            $oldId = $this->ID;
-            $this->ID = null;
+            $this->INITIAL['_deleted'] = $dif['_deleted'];
 
             $drvierClass = 'Model\\' . strToPascalCase("db $this->DATALAYER") . '\\' . strToPascalCase("db $this->DATALAYER");
             $tableMethod = strToCamelCase($this->TABLE);
-            $drvierClass::${$tableMethod}->__cacheRemove($oldId);
+            $drvierClass::${$tableMethod}->__cacheRemove($this->ID);
 
             if (is_callable($onDelete))
                 $onDelete($this);
         } else {
-            Log::changeScope('driver.delete.aborted', '[#].[#]([#]) aborted in _onDelete', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+            Log::changeScope('driver.delete.aborted', '[#].[#]([#]) aborted in _onDelete', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]);
         }
     }
 

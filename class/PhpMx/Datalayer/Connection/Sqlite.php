@@ -212,43 +212,58 @@ class Sqlite extends BaseConnection
     }
 
     /** Retorna o template do campo para composição de querys */
-    protected static function schemeTemplateField(string $fieldName, array $field): string
+    protected function schemeTemplateField(string $fieldName, array $field): string
     {
-        $prepare = '';
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
 
         switch ($field['type']) {
-            case 'idx':
-            case 'time':
+            case 'tinyint':
+            case 'smallint':
+            case 'mediumint':
             case 'int':
+            case 'idx':
+            case 'bigint':
             case 'boolean':
                 $field['type'] = 'INTEGER';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` [#type][#default][#null]";
                 break;
 
+            case 'decimal':
             case 'float':
+            case 'double':
                 $field['type'] = 'REAL';
                 $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $field['default'];
-                $prepare = "`[#name]` [#type][#default][#null]";
                 break;
 
-            case 'string':
+            case 'char':
+            case 'varchar':
             case 'email':
             case 'md5':
-            case 'mx5':
+            case 'password':
+            case 'date':
+            case 'time':
+            case 'datetime':
+            case 'timestamp':
+                $field['type'] = 'TEXT';
+                $field['default'] = is_null($field['default']) ? '' : ($field['default'] === 'CURRENT_TIMESTAMP' ? ' DEFAULT CURRENT_TIMESTAMP' : " DEFAULT '{$field['default']}'");
+                break;
+
             case 'text':
             case 'json':
-                $field['type'] = 'VARCHAR';
-                $field['default'] = is_null($field['default']) ? '' : " DEFAULT '" . $field['default'] . "'";
-                $prepare = "`[#name]` [#type][#default][#null]";
+                $field['type'] = 'TEXT';
+                $field['default'] = '';
+                break;
+
+            case 'blob':
+                $field['type'] = 'BLOB';
+                $field['default'] = '';
                 break;
 
             default:
-                throw new Exception("Type [$field[type]] not suported");
+                throw new Exception("Type [{$field['type']}] not supported");
         }
 
-        return prepare($prepare, $field);
+        return prepare("`[#name]` [#type][#default][#null]", $field);
     }
 }

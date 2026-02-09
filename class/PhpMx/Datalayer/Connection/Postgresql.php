@@ -196,7 +196,7 @@ class Postgresql extends BaseConnection
                 $query[] = prepare('ALTER TABLE "[#table]" ALTER COLUMN "[#fieldName]" SET DEFAULT [#default];', [
                     'table' => $tableName,
                     'fieldName' => $fieldName,
-                    'default' => $this->formatDefault($fieldData['default'])
+                    'default' => $this->formatDefault($fieldData['default'], $fieldData['type'])
                 ]);
             }
 
@@ -219,14 +219,33 @@ class Postgresql extends BaseConnection
     }
 
     /** Retorna somente o tipo de dado PostgreSQL correspondente ao campo */
-    protected static function schemeTemplateFieldTypeOnly(array $field): string
+    protected function schemeTemplateFieldTypeOnly(array $field): string
     {
         return match ($field['type']) {
-            'int', 'idx', 'time', 'boolean' => "INTEGER",
-            'float' => "REAL",
-            'string', 'email', 'md5', 'mx5' => "VARCHAR({$field['size']})",
-            'text', 'json' => "TEXT",
-            default => throw new Exception("Type [$field[type]] not suported")
+            'tinyint' => 'SMALLINT',
+            'smallint' => 'SMALLINT',
+            'mediumint' => 'INTEGER',
+            'int', 'idx' => 'INTEGER',
+            'bigint' => 'BIGINT',
+
+            'decimal' => 'DECIMAL' . (isset($field['settings']['precision']) ? '(' . ($field['size'] ?? 10) . ',' . $field['settings']['precision'] . ')' : ''),
+            'float' => 'REAL',
+            'double' => 'DOUBLE PRECISION',
+
+            'boolean' => 'BOOLEAN',
+
+            'char', 'md5' => 'CHAR(' . ($field['size'] ?? 1) . ')',
+            'varchar', 'email', 'password' => 'VARCHAR(' . ($field['size'] ?? 255) . ')',
+            'text' => 'TEXT',
+            'blob' => 'BYTEA',
+
+            'date' => 'DATE',
+            'time' => 'TIME',
+            'datetime', 'timestamp' => 'TIMESTAMP',
+
+            'json' => 'JSONB',
+
+            default => throw new Exception("Type [{$field['type']}] not supported")
         };
     }
 
@@ -253,49 +272,30 @@ class Postgresql extends BaseConnection
     }
 
     /** Retorna o template do campo para composição de querys */
-    protected static function schemeTemplateField(string $fieldName, array $field): string
+    protected function schemeTemplateField(string $fieldName, array $field): string
     {
         $field['name'] = $fieldName;
         $field['null'] = $field['null'] ? '' : ' NOT NULL';
 
-        switch ($field['type']) {
-            case 'idx':
-            case 'time':
-            case 'int':
-            case 'boolean':
-                $field['type'] = 'INTEGER';
-                break;
+        $pgType = $this->schemeTemplateFieldTypeOnly($field);
 
-            case 'float':
-                $field['type'] = 'REAL';
-                break;
-
-            case 'text':
-            case 'json':
-                $field['type'] = 'TEXT';
-                break;
-
-            case 'string':
-            case 'email':
-            case 'md5':
-            case 'mx5':
-                $field['type'] = "VARCHAR({$field['size']})";
-                break;
-
-            default:
-                throw new Exception("Type [$field[type]] not suported");
+        if (in_array($field['type'], ['text', 'blob', 'json'])) {
+            $field['default'] = '';
+        } else {
+            $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . $this->formatDefault($field['default'], $field['type']);
         }
 
-        $field['default'] = is_null($field['default']) ? '' : ' DEFAULT ' . self::formatDefault($field['default']);
+        $field['type'] = $pgType;
 
         return prepare('"[#name]" [#type][#default][#null]', $field);
     }
 
     /** Formata o valor default corretamente para PostgreSQL */
-    protected static function formatDefault(mixed $value): string
+    protected function formatDefault(mixed $value, ?string $type = null): string
     {
         if (is_null($value)) return 'NULL';
-        if (is_bool($value)) return $value ? 'TRUE' : 'FALSE';
+        if ($value === 'CURRENT_TIMESTAMP') return 'CURRENT_TIMESTAMP';
+        if ($type === 'boolean') return $value ? 'TRUE' : 'FALSE';
         if (is_numeric($value)) return $value;
         return "'" . str_replace("'", "''", $value) . "'";
     }
