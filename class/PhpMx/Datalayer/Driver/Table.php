@@ -23,6 +23,14 @@ abstract class Table
 
     protected $ACTIVE;
 
+    protected $SHOW_DELETED = false;
+
+    final function showDeleted(?bool $showDeleted): self
+    {
+        $this->SHOW_DELETED = $showDeleted;
+        return $this;
+    }
+
     /** Retorna os esquemas dos registros */
     final function getAll_scheme(array $scheme = [], ...$args): array
     {
@@ -109,6 +117,9 @@ abstract class Table
 
         if ($args[0] === true)
             return $this->active();
+
+        if (is_idKey($args[0]))
+            return $this->getOneKey($args[0]);
 
         if ($this->typeQuery(...$args) == 2 && $this->inCache($args[0]))
             return Log::add('driver.select.ignored', prepare('[#].[#]([#]) has already been loaded', [
@@ -207,7 +218,13 @@ abstract class Table
                 throw new Error('Impossible to create query with provided parameters');
                 break;
         }
-        $query->dbName($this->DATALAYER)->table($this->TABLE)->whereNull('_deleted', true);
+
+        $query->dbName($this->DATALAYER)->table($this->TABLE);
+
+        if (!is_null($this->SHOW_DELETED))
+            $query->whereNull('_deleted', !$this->SHOW_DELETED);
+
+        $this->SHOW_DELETED = false;
 
         return $query;
     }
@@ -247,7 +264,7 @@ abstract class Table
         if (!$id)
             return new $classRecord(['id' => 0]);
 
-        if ($this->__cacheCheck())
+        if ($this->__cacheCheck() && is_null($array['_deleted']))
             return $this->recordCache($array);
 
         return new $classRecord($array);
@@ -276,7 +293,7 @@ abstract class Table
     /** Armazena um objeto de registro em cache */
     function __cacheSet(int $id, Record &$record): void
     {
-        if ($this->__cacheCheck())
+        if ($this->__cacheCheck() && is_null($record->_deleted()))
             $this->CACHE[$id] = $record;
     }
 

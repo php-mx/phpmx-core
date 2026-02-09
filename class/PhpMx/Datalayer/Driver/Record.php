@@ -24,6 +24,7 @@ abstract class Record
     protected string $TABLE;
 
     protected bool $DELETE = false;
+    protected bool $UNDELETE = false;
 
     function __construct(array $scheme)
     {
@@ -79,6 +80,13 @@ abstract class Record
     {
         if (!$this->_checkInDb()) return null;
         return $this->_updated() ? $this->_updated() : $this->_created();
+    }
+
+    /** Retorna o momento em que o campo foi marcado como removido */
+    final function _deleted(): ?string
+    {
+        if (!$this->_checkInDb()) return null;
+        return $this->FIELD['_deleted']->get();
     }
 
     /** Retorna o valor do esquema de um campo do registro */
@@ -250,10 +258,17 @@ abstract class Record
         return $return;
     }
 
-    /** Prepara o registro para ser excluido PERMANENTEMENTE no proximo _save */
+    /** Prepara o registro para ser marcado como excluido no proximo _save */
     final function _delete(bool $delete): static
     {
         $this->DELETE = $delete;
+        return $this;
+    }
+
+    /** Prepara o registro para ser desmarcado como excluido no proximo _save */
+    final function _undelete(bool $undelete): static
+    {
+        $this->UNDELETE = $undelete;
         return $this;
     }
 
@@ -267,6 +282,7 @@ abstract class Record
                 if ($this->_checkSave()) {
                     match (true) {
                         $this->DELETE => $this->__runDelete(),
+                        $this->UNDELETE => $this->__runUndelete(),
                         $this->_checkInDb() => $this->__runUpdate($forceUpdate),
                         default => $this->__runCreate()
                     };
@@ -315,7 +331,7 @@ abstract class Record
     /** Executa o comando parar atualizar o registro */
     final protected function __runUpdate(bool $forceUpdate)
     {
-        Log::changeScope('driver.update', "[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+        Log::changeScope('driver.update', prepare("[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]));
         $this->__runSaveIdx();
         if ($forceUpdate || $this->_checkChange()) {
             $onUpdate = $this->_onUpdate() ?? null;
@@ -350,7 +366,7 @@ abstract class Record
     /** Executa o comando para deletar o registro do banco de dados */
     final protected function __runDelete()
     {
-        Log::changeScope('driver.delete', "[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]);
+        Log::changeScope('driver.delete', prepare("[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]));
         $this->__runSaveIdx();
         $onDelete = $this->_onDelete() ?? null;
         if ($onDelete ?? true) {
@@ -373,6 +389,35 @@ abstract class Record
                 $onDelete($this);
         } else {
             Log::changeScope('driver.delete.aborted', '[#].[#]([#]) aborted in _onDelete', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]);
+        }
+    }
+
+    /** Executa o comando para recuperar o registro do banco de dados */
+    final protected function __runUndelete()
+    {
+        Log::changeScope('driver.undelete', prepare("[#].[#]([#])", [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE), $this->id()]));
+        $this->__runSaveIdx();
+        $onUndelete = $this->_onUndelete() ?? null;
+        if ($onUndelete ?? true) {
+            $this->FIELD['_deleted']->set(null);
+
+            $dif = ['_deleted' => $this->FIELD['_deleted']->get()];
+
+            Query::update($this->TABLE)
+                ->where('id', $this->ID)
+                ->values($dif)
+                ->run($this->DATALAYER);
+
+            $this->INITIAL['_deleted'] = $dif['_deleted'];
+
+            $drvierClass = 'Model\\' . strToPascalCase("db $this->DATALAYER") . '\\' . strToPascalCase("db $this->DATALAYER");
+            $tableMethod = strToCamelCase($this->TABLE);
+            $drvierClass::${$tableMethod}->__cacheSet($this->ID, $this);
+
+            if (is_callable($onUndelete))
+                $onUndelete($this);
+        } else {
+            Log::changeScope('driver.undelete.aborted', '[#].[#]([#]) aborted in _onUndelete', [strToPascalCase("db $this->DATALAYER"), strToCamelCase($this->TABLE)]);
         }
     }
 
@@ -405,4 +450,6 @@ abstract class Record
     protected function _onUpdate() {}
 
     protected function _onDelete() {}
+
+    protected function _onUndelete() {}
 }
