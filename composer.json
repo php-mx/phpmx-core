@@ -38,7 +38,8 @@
             "system/helper/script/error.php",
             "system/helper/script/log.php",
             "system/helper/script/path.php",
-            "system/helper/script/timezone.php"
+            "system/helper/script/timezone.php",
+            "system/helper/script/view.php"
         ]
     },
     "require": {
