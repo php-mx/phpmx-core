@@ -2,10 +2,9 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
-    "composer.json": "composer.lock, .gitignore",
-    "mx": "install, .env, .conf",
+    "composer.json": "composer.lock",
+    "mx": "install",
     "index.php": ".htaccess",
-    "env": ".env, .env.development, .env.production, .conf, .gitignore",
-    "README.md": "LICENSE, CHANGELOG.md, CONTRIBUTING.md, build.xml"
+    "README.md": "LICENSE"
   }
 }

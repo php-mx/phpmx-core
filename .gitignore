@@ -1,17 +1,19 @@
+/.env
 /.conf
+/vendor
+
 /composer.lock
+
 /class/Controller/*
 !/class/Controller/Mx
+
 /class/Model
+
+/library/cache
+
 /library/certificate/*
 !/library/certificate/base.crt
-/system/datalayer
 
-# MX CORE
-
-/.env
-/vendor
-/library/cache
-/library/certificate
 /library/sqlite
-/system/datalayer/*/scheme
+
+/system/datalayer
