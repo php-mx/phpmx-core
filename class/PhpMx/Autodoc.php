@@ -2,67 +2,78 @@
 
 namespace PhpMx;
 
+use Reflection;
+use ReflectionClass;
+use ReflectionFunction;
 use ReflectionMethod;
 
 /** Classe utilitária para mapear e documentar projetos. */
 abstract class Autodoc
 {
-    /** Carrega esquema de documentação das constantes de um arquivo */
-    static function getDocSchemeHelperFileConstants(string $file): array
+    /** Retorna o docScheme das constantes de um arquivo */
+    static function docSchemesConstantFile(string $file): array
     {
         $content = Import::content($file);
-
         preg_match_all('/^\s*define\s*\(\s*[\'"]([\w_]+)[\'"]\s*,/im', $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
-
         $scheme = [];
         foreach ($matches as $match) {
             $ref = $match[1][0];
             $pos = $match[0][1];
-
-            $docBlock = self::getDocBefore($content, $pos);
-            $parsed = $docBlock ? self::parseDoc($docBlock) : [];
-
+            $docBlock = self::docBlockBefore($content, $pos);
             $scheme[] = [
                 'ref' => $ref,
-                'doc' => $parsed,
-                'origin' => self::getOriginPath($file),
+                'origin' => self::originPath($file),
                 'file' => $file,
                 'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+                ...self::parseDocBlock($docBlock, ['description', 'examples'])
             ];
         }
-
         return $scheme;
     }
 
-    /** Carrega esquema de documentação das funções de um arquivo */
-    static function getDocSchemeHelperFileFunctions(string $file): array
+    /** Retorna o docScheme das funções de um arquivo */
+    static function docSchemesFunctionFile(string $file): array
     {
         $content = Import::content($file);
-
         preg_match_all('/^\s*function\s+(\w+)/im', $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
-
         $scheme = [];
         foreach ($matches as $match) {
-            $ref = $match[1][0];
-            $pos = $match[0][1];
+            $functionName = $match[1][0];
 
-            $docBlock = self::getDocBefore($content, $pos);
-            $parsed = $docBlock ? self::parseDoc($docBlock) : [];
+            $reflection = new ReflectionFunction($functionName);
+            $docBlock = self::parseDocBlock($reflection->getDocComment(), ['description', 'params', 'return', 'examples']);
+            $params = [];
+            foreach ($reflection->getParameters() as $p) {
+                $name = $p->getName();
+                $type = $p->hasType() ? (string)$p->getType() : ($docBlock['params'][$name]['type'] ?? 'mixed');
+                $params[$name] = [
+                    'name' => $name,
+                    'type' => $type,
+                    'description' => $docBlock['params'][$name]['description'] ?? '',
+                    'optional' => $p->isOptional(),
+                    'default' => $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null
+                ];
+            }
+            $returnType = $reflection->hasReturnType() ? (string)$reflection->getReturnType() : ($docBlock['return']['type'] ?? 'mixed');
 
             $scheme[] = [
-                'ref' => $ref,
-                'doc' => $parsed,
-                'origin' => self::getOriginPath($file),
-                'file' => $file,
-                'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+                'ref' => $functionName,
+                'description' => $docBlock['description'],
+                'params' => array_values($params),
+                'return' => [
+                    'type' => $returnType,
+                    'description' => $docBlock['return']['description'] ?? ''
+                ],
+                'examples' => $docBlock['examples'],
+                'line' => $reflection->getStartLine(),
+                'file' => $reflection->getFileName()
             ];
         }
-
         return $scheme;
     }
 
-    /** Carrega esquema de documentação das variaveis de ambiente padrão de um arquivo */
-    static function getDocSchemeHelperFileEnvironments(string $file): array
+    /** Retorna o docScheme das variaveis de ambiente em um arquivo */
+    static function docSchemesEnvironmentsFile(string $file): array
     {
         $content = Import::content($file);
 
@@ -72,16 +83,14 @@ abstract class Autodoc
         foreach ($matches as $match) {
             $ref = $match[1][0];
             $pos = $match[0][1];
-
-            $docBlock = self::getDocBefore($content, $pos);
-            $parsed = $docBlock ? self::parseDoc($docBlock) : [];
+            $docBlock = self::docBlockBefore($content, $pos);
 
             $scheme[] = [
                 'ref' => $ref,
-                'doc' => $parsed,
-                'origin' => self::getOriginPath($file),
+                'origin' => self::originPath($file),
                 'file' => $file,
                 'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+                ...self::parseDocBlock($docBlock, ['description'])
             ];
         }
 
@@ -89,7 +98,7 @@ abstract class Autodoc
     }
 
     /** Carrega esquema de documentação de um arquivo de comando */
-    static function getDocSchemeFileCommand(string $file): array
+    static function docSchemeCommandFile(string $file): array
     {
         $content = Import::content($file);
 
@@ -97,12 +106,8 @@ abstract class Autodoc
 
         if (!$match) return [];
 
-        $posNewClass = $match[0][1];
-
-        $docBlock = self::getDocBefore($content, $posNewClass);
-        $parsed = $docBlock ? self::parseDoc($docBlock) : [];
-
-        $line = substr_count(substr($content, 0, $posNewClass), "\n") + 1;
+        $pos = $match[0][1];
+        $docBlock = self::parseDocBlock(self::docBlockBefore($content, $pos), ['description', 'params', 'return', 'examples']);
 
         $ref = explode('system/terminal/', $file);
         $ref = array_pop($ref);
@@ -112,33 +117,37 @@ abstract class Autodoc
         $params = [];
 
         preg_match('/function\s+__invoke\s*\((.*?)\)/s', $content, $invokeMatch);
+
         if (!empty($invokeMatch[1])) {
             $paramsStr = trim($invokeMatch[1]);
             if ($paramsStr !== '') {
                 preg_match_all('/\$(\w+)(?:\s*=\s*([^,]+))?/', $paramsStr, $paramMatches, PREG_SET_ORDER);
                 foreach ($paramMatches as $p) {
                     $name = trim($p[1]);
-                    $optional = !empty($p[2]);
-                    $params[] = [
+                    $params[$name] = [
                         'name' => $name,
-                        'optional' => $optional,
+                        'type' => $docBlock['params'][$name]['type'] ?? 'mixed',
+                        'description' => $docBlock['params'][$name]['description'] ?? '',
+                        'optional' => !empty($p[2]),
+                        'default' => isset($p[2]) ? trim($p[2]) : null
                     ];
                 }
             }
         }
 
+        $docBlock['params'] = array_values($params);
+
         return [
             'ref' => $ref,
-            'doc' => $parsed,
-            'params' => $params,
-            'origin' => self::getOriginPath($file),
+            'origin' => self::originPath($file),
             'file' => $file,
-            'line' => $line,
+            'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+            ...$docBlock
         ];
     }
 
-    /** Carrega esquema de documentação de um arquivo de middleware */
-    static function getDocSchemeFileMiddleware(string $file): array
+    /** Retorna o docScheme de um arquivo de middleware */
+    static function docSchemeMiddlewareFile(string $file): array
     {
         $content = Import::content($file);
 
@@ -146,12 +155,9 @@ abstract class Autodoc
 
         if (!$match) return [];
 
-        $posNewClass = $match[0][1];
+        $pos = $match[0][1];
 
-        $docBlock = self::getDocBefore($content, $posNewClass);
-        $parsed = $docBlock ? self::parseDoc($docBlock) : [];
-
-        $line = substr_count(substr($content, 0, $posNewClass), "\n") + 1;
+        $docBlock = self::docBlockBefore($content, $pos);
 
         $ref = explode('system/middleware/', $file);
         $ref = array_pop($ref);
@@ -160,15 +166,15 @@ abstract class Autodoc
 
         return [
             'ref' => $ref,
-            'doc' => $parsed,
-            'origin' => self::getOriginPath($file),
+            'origin' => self::originPath($file),
             'file' => $file,
-            'line' => $line
+            'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+            ...self::parseDocBlock($docBlock, ['description'])
         ];
     }
 
-    /** Carrega esquema de documentação das rotas definidas em uma arquivo */
-    static function getDocSchemeFileRoutes(string $file): array
+    /** Retorna o docScheme das rotas definidas em um arquivo */
+    static function docSchemeRouteFile(string $file): array
     {
         $scheme = [];
 
@@ -185,43 +191,126 @@ abstract class Autodoc
         };
 
         foreach ($interceptorRouter->captureRoutes() as $method => $templates)
-            foreach ($templates as $data) {
-                $response = self::formatRouteResponse($data[1]);
+            foreach ($templates as $data)
                 $scheme[] = [
                     'ref' => $data[0],
-                    'method' => $method,
-                    'response' => $response,
-                    'params' => $data[2] ?? [],
-                    'middlewares' => $data[3] ?? [],
-                    'origin' => self::getOriginPath($file),
+                    'origin' => self::originPath($file),
                     'file' => $file,
-                    'line' => null
+                    'line' => null,
+                    'middlewares' => $data[3] ?? [],
+                    'method' => $method,
+                    'response' => self::formatRouteResponse($data[1]),
                 ];
-            }
 
         return $scheme;
     }
 
-    /** Carrega esquema de documentação de um arquivo de classe */
-    static function getDocSchemeFileClass(string $file): array
+    /** Retorna o docScheme de um arquivo php class, trait ou interface */
+    static function docSchemeSourceFile(string $file): array
     {
-        return [];
+        $content = Import::content($file);
+
+        preg_match('/namespace\s+([\w\\\\]+);/m', $content, $nsMatch);
+        preg_match('/^\s*(?:abstract\s+|final\s+)?(?:class|trait|interface)\s+(\w+)/im', $content, $nameMatch);
+
+        if (!$nameMatch) return [];
+
+        $namespace = $nsMatch[1] ?? '';
+        $shortName = $nameMatch[1];
+        $className = $namespace ? "$namespace\\$shortName" : $shortName;
+
+        $reflection = new ReflectionClass($className);
+
+        $type = 'class';
+        if ($reflection->isInterface()) $type = 'interface';
+        if ($reflection->isTrait()) $type = 'trait';
+
+        $constants = self::extractConstantsReflection($reflection);
+        $properties = self::extractPropertiesReflection($reflection);
+        $methods = self::extractMethodsReflection($reflection);
+
+        $classDoc = self::parseDocBlock($reflection->getDocComment(), ['description', 'examples', 'methods', 'properties']);
+
+        $extends = $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null;
+        $implements = $reflection->getInterfaceNames();
+        $traits = $reflection->getTraitNames();
+
+        foreach ($classDoc['methods'] as $name => $vMethod) {
+            $exists = false;
+            foreach ($methods as $m) {
+                if ($m['name'] === $name) {
+                    $exists = true;
+                    break;
+                }
+            }
+
+            if (!$exists) {
+                $methods[] = [
+                    'name' => $name,
+                    'visibility' => 'public',
+                    'static' => false,
+                    'final' => false,
+                    'line' => null,
+                    'description' => [$vMethod['description']],
+                    'params' => [
+                        [
+                            'name' => 'args',
+                            'type' => $vMethod['args'],
+                            'description' => 'Argumentos definidos via @method',
+                            'optional' => true,
+                            'default' => null
+                        ]
+                    ],
+                    'return' => ['type' => $vMethod['type'], 'description' => ''],
+                    'examples' => []
+                ];
+            }
+        }
+
+        foreach ($classDoc['properties'] as $name => $vProp) {
+            $exists = false;
+            foreach ($properties as $p) {
+                if ($p['name'] === $name) {
+                    $exists = true;
+                    break;
+                }
+            }
+
+            if (!$exists) {
+                $properties[] = [
+                    'name' => $name,
+                    'visibility' => 'public',
+                    'static' => false,
+                    'line' => null,
+                    'type' => $vProp['type'],
+                    'description' => [$vProp['description']],
+                ];
+            }
+        }
+
+        return [
+            'ref' => $reflection->getName(),
+            'origin' => self::originPath($file),
+            'file' => $reflection->getFileName(),
+            'line' => substr_count(substr($content, 0, strpos($content, $shortName)), "\n") + 1,
+            'type' => $type,
+            'extends' => $extends,
+            'implements' => $implements,
+            'abstract' => $reflection->isAbstract(),
+            'final' => $reflection->isFinal(),
+            'uses' => $traits,
+            'description' => $classDoc['description'],
+            'examples' => $classDoc['examples'],
+            'constants' => $constants,
+            'properties' => $properties,
+            'methods' => $methods,
+        ];
     }
 
-    /** Carrega esquema de documentação de um arquivo de trait */
-    static function getDocSchemeFileTrait(string $file): array
+    /** Retorna o pacote de origem de um diretório ou arquivo */
+    static function originPath($path): string
     {
-        return [];
-    }
-
-    /** Carrega esquema de documentação de um arquivo de interface */
-    static function getDocSchemeFileInterface(string $file): array
-    {
-        return [];
-    }
-
-    static function getOriginPath($path): string
-    {
+        $path = path($path);
         if (str_starts_with($path, 'vendor/')) {
             $path = strtolower($path);
             $path = explode('/', $path);
@@ -230,7 +319,7 @@ abstract class Autodoc
         return 'current-project';
     }
 
-    protected static function getDocBefore(string $code, int $pos): string
+    protected static function docBlockBefore(string $code, int $pos): string
     {
         $before = substr($code, 0, $pos);
         if (preg_match_all('/\/\*\*(?:[^*]|\*(?!\/))*?\*\//s', $before, $matches, PREG_OFFSET_CAPTURE)) {
@@ -244,102 +333,75 @@ abstract class Autodoc
         return '';
     }
 
-    protected static function parseDoc(string $docBlock): array
+    protected static function parseDocBlock(?string $docBlock, array $keys = ['description', 'params', 'return', 'examples', 'methods', 'properties']): array
     {
-        if (empty($docBlock) || !str_starts_with(trim($docBlock), '/**')) return [];
+        $data = [
+            'description' => [],
+            'params' => [],
+            'return' => null,
+            'examples' => [],
+            'methods' => [],
+            'properties' => []
+        ];
+
+        if (empty($docBlock) || !str_starts_with(trim($docBlock), '/**')) {
+            return array_intersect_key($data, array_flip($keys));
+        }
+
         $clean = preg_replace(['/^\/\*\*/', '/\*\//', '/^\s*\*\s?/m'], '', $docBlock);
-        $clean = trim($clean);
-        if (empty($clean)) return [];
-        $lines = explode("\n", $clean);
-        $result = [];
+        $lines = explode("\n", trim($clean));
         $currentTag = null;
-        $descriptionLines = [];
+
         foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '') continue;
-            if (preg_match('/^@([a-zA-Z0-9_-]+)\b/', $line, $m)) {
+            $trimmedLine = trim($line);
+            if (preg_match('/^@([a-zA-Z0-9_-]+)\b/', $trimmedLine, $m)) {
                 $tag = $m[1];
-                $content = trim(substr($line, strlen($m[0])));
+                $content = trim(substr($trimmedLine, strlen($m[0])));
+                $currentTag = $tag;
+
                 switch ($tag) {
                     case 'param':
-                        if (preg_match('/^([^\s]+(?:\s*\|\s*[^\s]+)*)\s+\$(\w+)\s*(.*)$/', $content, $pm)) {
-                            $result['params'] ??= [];
-                            $result['params'][$pm[2]] = [
-                                'type' => $pm[1],
-                                'description' => trim($pm[3])
-                            ];
-                        }
+                        if (preg_match('/^([^\s]+)\s+\$(\w+)\s*(.*)$/', $content, $pm))
+                            $data['params'][$pm[2]] = ['type' => $pm[1], 'description' => trim($pm[3])];
                         break;
                     case 'return':
-                        if (preg_match('/^([^\s]+(?:\s*\|\s*[^\s]+)*)\s*(.*)$/', $content, $rm)) {
-                            $result['return'] = [
-                                'type' => $rm[1],
-                                'description' => trim($rm[2] ?? '')
+                        if (preg_match('/^([^\s]+)\s*(.*)$/', $content, $rm))
+                            $data['return'] = ['type' => $rm[1], 'description' => trim($rm[2])];
+                        break;
+                    case 'method':
+                        if (preg_match('/^([^\s]+)\s+(\w+)\((.*?)\)\s*(.*)$/', $content, $mm))
+                            $data['methods'][$mm[2]] = [
+                                'type' => $mm[1],
+                                'args' => $mm[3],
+                                'description' => trim($mm[4])
                             ];
-                        }
+                        break;
+                    case 'property':
+                        if (preg_match('/^([^\s]+)\s+\$(\w+)\s*(.*)$/', $content, $prm))
+                            $data['properties'][$prm[2]] = [
+                                'type' => $prm[1],
+                                'description' => trim($prm[3])
+                            ];
                         break;
                     case 'example':
-                        $result['examples'] ??= [];
-                        $result['examples'][] = $content;
-                        $currentTag = 'example';
-                        break;
-                    case 'throws':
-                    case 'throw':
-                        if (preg_match('/^([^\s]+(?:\s*\|\s*[^\s]+)*)\s*(.*)$/', $content, $tm)) {
-                            $result['throws'] ??= [];
-                            $result['throws'][] = [
-                                'type' => $tm[1],
-                                'description' => trim($tm[2] ?? '')
-                            ];
-                        }
-                        break;
-                    case 'see':
-                        $result['see'] ??= [];
-                        $result['see'][] = $content;
-                        break;
-                    case 'since':
-                        $result['since'] = $content;
-                        break;
-
-                    case 'deprecated':
-                        $result['deprecated'] = $content ?: true;
-                        break;
-                    case 'author':
-                        $result['author'] ??= [];
-                        $result['author'][] = $content;
-                        break;
-                    case 'version':
-                        $result['version'] = $content;
-                        break;
-                    case 'internal':
-                        $result['internal'] = true;
-                        break;
-                    default:
-                        $result['other'] ??= [];
-                        $result['other'][$tag] = $content;
+                        $data['examples'][] = [$content];
                         break;
                 }
-                $currentTag = $tag === 'example' ? 'example' : null;
-            } elseif ($currentTag === 'example') {
-                $lastExample = &$result['examples'][count($result['examples']) - 1];
-                $lastExample .= "\n" . $line;
             } else {
-                $descriptionLines[] = $line;
+                if ($currentTag === 'example' && !empty($data['examples']))
+                    $data['examples'][count($data['examples']) - 1][] = $line;
+                elseif ($currentTag === null && $trimmedLine !== '')
+                    $data['description'][] = $trimmedLine;
             }
         }
-        $description = trim(implode("\n", $descriptionLines));
-        if ($description !== '') $result['description'] = $description;
-        return $result;
+
+        return array_intersect_key($data, array_flip($keys));
     }
 
     protected static function formatRouteResponse($response): array
     {
         if (is_int($response)) {
-            return [
-                'type' => 'status',
-                'code' => $response,
-                'description' => env("STM_$response") ?? 'HTTP Status ' . $response,
-            ];
+            return ['type' => 'status', 'code' => $response, 'description' => ''];
         }
 
         $parts = is_array($response) ? $response : [$response];
@@ -347,13 +409,13 @@ abstract class Autodoc
         $method = array_shift($parts) ?? '__invoke';
 
         $info = [
-            'type' => 'controller',
+            'type' => 'class',
             'class' => $controller,
             'method' => $method,
+            'description' => '',
             'callable' => false,
             'file' => null,
             'line' => null,
-            'description' => '',
         ];
 
         if (class_exists($controller)) {
@@ -361,14 +423,96 @@ abstract class Autodoc
                 $refMethod = new ReflectionMethod($controller, $method);
                 $info['file'] = path($refMethod->getFileName());
                 $info['line'] = $refMethod->getStartLine();
-                $info['description'] = self::parseDoc($refMethod->getDocComment())['description'] ?? '';
                 $info['callable'] = true;
+                $info['description'] = self::parseDocBlock($refMethod->getDocComment(), ['description'])['description'];
             } else {
-                $reflection = new \ReflectionClass($controller);
+                $reflection = new ReflectionClass($controller);
                 $info['file'] = path($reflection->getFileName());
             }
         }
 
         return $info;
+    }
+
+    protected static function extractConstantsReflection(ReflectionClass $reflect): array
+    {
+        $constants = [];
+        foreach ($reflect->getReflectionConstants() as $const) {
+            if ($const->getDeclaringClass()->getName() !== $reflect->getName()) continue;
+            $constants[] = [
+                'name' => $const->getName(),
+                'value' => $const->getValue(),
+                'visibility' => Reflection::getModifierNames($const->getModifiers())[0] ?? 'public',
+                ...self::parseDocBlock($const->getDocComment()),
+            ];
+        }
+        return $constants;
+    }
+
+    protected static function extractPropertiesReflection(ReflectionClass $reflect): array
+    {
+        $props = [];
+        foreach ($reflect->getProperties() as $prop) {
+            if ($prop->getDeclaringClass()->getName() !== $reflect->getName()) continue;
+
+            $doc = self::parseDocBlock($prop->getDocComment(), ['description', 'return']);
+
+            $props[] = [
+                'name' => $prop->getName(),
+                'visibility' => Reflection::getModifierNames($prop->getModifiers())[0] ?? 'public',
+                'static' => $prop->isStatic(),
+                'type' => $doc['return']['type'] ?? ($prop->hasType() ? (string)$prop->getType() : 'mixed'),
+                'description' => $doc['description'],
+            ];
+        }
+        return $props;
+    }
+
+    protected static function extractMethodsReflection(ReflectionClass $reflect): array
+    {
+        $methods = [];
+        foreach ($reflect->getMethods() as $method) {
+            if ($method->getDeclaringClass()->getName() !== $reflect->getName()) continue;
+
+            $parsedDoc = self::parseDocBlock($method->getDocComment(), ['description', 'params', 'return', 'examples']);
+
+            $params = [];
+            foreach ($method->getParameters() as $param) {
+                $name = $param->getName();
+
+                $type = $parsedDoc['params'][$name]['type'] ?? ($param->hasType() ? (string)$param->getType() : 'mixed');
+
+                $params[] = [
+                    'name' => $name,
+                    'type' => $type,
+                    'optional' => $param->isOptional(),
+                    'default' => $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null,
+                    'reference' => $param->isPassedByReference(),
+                    'description' => $parsedDoc['params'][$name]['description'] ?? ''
+                ];
+            }
+
+            $returnType = $parsedDoc['return']['type'] ?? ($method->hasReturnType() ? (string)$method->getReturnType() : 'mixed');
+            $returnDesc = $parsedDoc['return']['description'] ?? '';
+
+            $methods[] = [
+                'name' => $method->getName(),
+                'visibility' => Reflection::getModifierNames($method->getModifiers())[0] ?? 'public',
+                'static' => $method->isStatic(),
+                'final' => $method->isFinal(),
+                'line' => $method->getStartLine(),
+                'static' => $method->isStatic(),
+                'final' => $method->isFinal(),
+                'abstract' => $method->isAbstract(),
+                'description' => $parsedDoc['description'],
+                'params' => $params,
+                'return' => [
+                    'type' => $returnType,
+                    'description' => $returnDesc
+                ],
+                'examples' => $parsedDoc['examples']
+            ];
+        }
+        return $methods;
     }
 }

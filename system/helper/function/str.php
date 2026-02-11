@@ -130,20 +130,3 @@ if (!function_exists('mb_str_replace_all')) {
         return $subject;
     }
 }
-
-if (!function_exists('mb_str_split')) {
-
-    /** Converte uma string em um array */
-    function mb_str_split(string $string, int $string_length = 1): array
-    {
-        if (mb_strlen($string) > $string_length || !$string_length) {
-            do {
-                $parts[] = mb_substr($string, 0, $string_length);
-                $string = mb_substr($string, $string_length);
-            } while (!empty($string));
-        } else {
-            $parts = array($string);
-        }
-        return $parts;
-    }
-}

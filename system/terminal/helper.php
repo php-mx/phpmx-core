@@ -16,12 +16,13 @@ return new class {
             'system/terminal',
             $filter,
             function ($item) {
+
+                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                foreach ($item['description'] as $description)
+                    Terminal::echol("      $description");
                 Terminal::echol();
-                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file]', $item);
-                if (!empty($item['description']))
-                    Terminal::echol('     [#description]', $item);
                 foreach ($item['variations'] as $variation)
-                    Terminal::echol('       [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
+                    Terminal::echol('         [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
             }
         );
     }
@@ -35,20 +36,15 @@ return new class {
             $variations = [''];
             foreach ($scheme['params'] ?? [] as $param) {
                 $name = '<' . $param['name'] . '>';
-
                 if (!$param['optional'])
                     $variations[0] .= " $name";
-
                 if ($param['optional'])
                     $variations[] = end($variations) . " $name";
             }
 
-            $commands[] = [
-                'ref' => $scheme['ref'],
-                'description' => str_replace("\n", ' ', $scheme['doc']['description'] ?? ''),
-                'variations' => $variations,
-                'file' => $scheme['file'],
-            ];
+            $scheme['variations'] = $variations;
+
+            $commands[] = $scheme;
         }
 
         return $commands;

@@ -258,7 +258,7 @@ abstract class Terminal
     }
 
     /** Barra de progresso */
-    static function progress(int $current, int $total, string $label = '', string $color = 'p')
+    static function progress(int $current, int $total, string $label = '', string $color = 'pd')
     {
         $percent = ($current / $total);
         $barWidth = 33;

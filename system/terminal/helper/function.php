@@ -16,25 +16,37 @@ return new class {
             'system/helper/function',
             $filter,
             function ($item) {
-                Terminal::echol();
                 Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
-                Terminal::echol('     [#description]', $item);
+                foreach ($item['description'] as $description)
+                    Terminal::echol("      $description");
+                Terminal::echol();
+                foreach ($item['variations'] as $variations) {
+                    $variations = explode(' ', $variations);
+                    $variations = array_map(fn($v) => "[#c:dd,$v]", $variations);
+                    $variations = implode("[#c:d,#sep]", $variations);
+                    Terminal::echol("         [#][#c:d,(]{$variations}[#c:d,)]", [$item['ref'], 'sep' => ', ']);
+                }
             }
         );
     }
 
     protected function scan($path): array
     {
-        $functions = [];
+        $items = [];
         foreach (Dir::seekForFile($path, true) as $item)
-            foreach (Autodoc::getDocSchemeHelperFileFunctions(path($path, $item)) as $scheme)
-                $functions[] = [
-                    'ref' => $scheme['ref'],
-                    'description' => str_replace("\n", ' ', $scheme['doc']['description'] ?? ''),
-                    'file' => $scheme['file'],
-                    'line' => $scheme['line'],
-                ];
+            foreach (Autodoc::docSchemesFunctionFile(path($path, $item)) as $scheme) {
+                $variations = [''];
+                foreach ($scheme['params'] ?? [] as $param) {
+                    $name = '$' . $param['name'];
+                    if (!$param['optional'])
+                        $variations[0] .= " $name";
+                    if ($param['optional'])
+                        $variations[] = end($variations) . " $name";
+                }
+                $scheme['variations'] = array_map(fn($v) => trim($v), $variations);
+                $items[] = $scheme;
+            }
 
-        return $functions;
+        return $items;
     }
 };

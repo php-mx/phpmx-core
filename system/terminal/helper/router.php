@@ -18,57 +18,25 @@ return new class {
 
         foreach (Path::seekForDirs('system/router') as $path) {
             foreach (array_reverse(Dir::seekForFile($path, true)) as $file) {
-                $origim = Autodoc::getOriginPath($path, 'system/router');
+                $origim = Autodoc::originPath($path);
                 $registredRoutes[$origim] = $registredRoutes[$origim] ?? $defaultScheme;
+                foreach (Autodoc::docSchemeRouteFile(path($path, $file)) as $scheme) {
+                    $routeTemplate = $scheme['ref'];
+                    $routeMethod = $scheme['method'];
 
-                foreach (Autodoc::getDocSchemeFileRoutes(path($path, $file)) as $schemeRoute) {
-                    $template = $schemeRoute['ref'];
+                    $scheme['order'] = $routeTemplate;
+                    $scheme['template'] = '/' . trim($routeTemplate, '/');
+                    $scheme['replaced'] = $key[$routeMethod][$routeTemplate] ?? false;
 
-                    $response = '';
-
-                    if ($schemeRoute['response']['type'] == 'status') {
-                        $responseStauts = $schemeRoute['response']['code'];
-                        $color = is_httpStatusError($responseStauts) ? 'ed' : 'wd';
-                        $response = "[#c:$color,$responseStauts]";
-                    } elseif ($schemeRoute['response']['type'] == 'controller') {
-                        if ($schemeRoute['response']['callable']) {
-                            $responseFile = $schemeRoute['response']['file'];
-                            $responseMethod = $schemeRoute['response']['method'];
-                            $responseLine = $schemeRoute['response']['line'];
-
-                            $response = "[#c:sd,$responseFile:$responseLine][#c:sd,$responseMethod()]";
-                        } elseif ($schemeRoute['response']['file']) {
-                            $responseFile = $schemeRoute['response']['file'];
-                            $responseMethod = $schemeRoute['response']['method'];
-                            $response = "[#c:ed,$responseFile:$responseLine] [#c:e,$responseMethod()]";
-                        } else {
-                            $responseClass = $schemeRoute['response']['class'];
-                            $response = "[#c:e,$responseClass]";
-                        }
-                    }
-
-                    $currentRoute = [
-                        'order' =>  $template,
-                        'type' => $schemeRoute['response']['type'],
-                        'template' => '/' . trim($template, '/'),
-                        'response' => $response,
-                        'middlewares' => empty($schemeRoute['middlewares']) ? '' : '[' . implode(', ', $schemeRoute['middlewares']) . '] ',
-                        'description' => str_replace("\n", ' ', $schemeRoute['response']['description'] ?? ''),
-                        'origim' => $schemeRoute['origin'],
-                        'file' => $schemeRoute['file'],
-                        'replaced' => $key[$schemeRoute['method']][$template] ?? false,
-                        'method' => $schemeRoute['method'],
-                    ];
-
-                    $key[$schemeRoute['method']][$template] = true;
+                    $key[$routeMethod][$routeTemplate] = true;
 
                     if ($useFilter)
-                        if ($match == '/' && $template != '/')
+                        if ($match == '/' && $routeTemplate != '/')
                             continue;
-                        else if (!str_starts_with(trim($template, '/'), trim($match, '/')) && !$this->checkRouteMatch([$match], $template))
+                        else if (!str_starts_with(trim($routeTemplate, '/'), trim($match, '/')) && !$this->checkRouteMatch([$match], $routeTemplate))
                             continue;
 
-                    $registredRoutes[$schemeRoute['origin']][$schemeRoute['method']][] = $currentRoute;
+                    $registredRoutes[$origim][$routeMethod][] = $scheme;
                 }
             }
         }
@@ -78,7 +46,6 @@ return new class {
         foreach (array_reverse($registredRoutes) as $origin => $methods) {
             $count = 0;
             foreach ($methods as $routes) $count += count($routes);
-
             if (!$count) continue;
 
             if (++$originsLn) Terminal::echol();
@@ -87,17 +54,31 @@ return new class {
             foreach (array_reverse($methods) as $curentMethod => $routes) {
                 if (!is_null($method) && $curentMethod != $method) continue;
                 if (empty($routes)) continue;
+
                 $routes = $this->organize($routes);
 
-                foreach (array_reverse($routes) as $route) {
+                foreach (array_reverse($routes) as $item) {
                     Terminal::echol();
-                    if (!$route['replaced']) {
-                        $response = $route['response'];
-                        Terminal::echol(" - [#c:dd,$curentMethod][#c:dd,:][#c:p,#template] $response", $route);
-                        if ($route['type'] != 'status' && !empty($route['description']))
-                            Terminal::echol("     [#description]", $route);
+                    if (!$item['replaced']) {
+                        Terminal::echol(' - [#c:d,#method][#c:d,:][#c:p,#template] [#c:sd,#file]', $item);
+                        $response = $item['response'];
+
+                        if ($response['type'] == 'status')
+                            Terminal::echol("      [#c:s,status] [#c:s,#code]", $response);
+
+                        if ($response['type'] == 'class') {
+                            if ($response['callable']) {
+                                Terminal::echol("      [#c:s,#class][#c:s,::][#c:s,#method][#c:s,()] [#c:sd,#file][#c:sd,:][#c:sd,#line]", $response);
+                                foreach ($response['description'] as $description)
+                                    Terminal::echol("         $description");
+                            } elseif ($response['file']) {
+                                Terminal::echol("      [#c:dd,#class][#c:dd,::][#c:e,#method][#c:e,()] [#c:sd,#file]", $response);
+                            } else {
+                                Terminal::echol("      [#c:e,#class][#c:dd,::][#c:dd,#method][#c:dd,()]", $response);
+                            }
+                        }
                     } else {
-                        Terminal::echol(" - [#c:dd,$curentMethod][#c:sd,:][#c:pd,#template] [#c:wd,replaced]", $route);
+                        Terminal::echol(' - [#c:dd,#method][#c:sd,:][#c:pd,#template] [#c:sd,#file] [#c:wd,replaced]', $item);
                     }
                 }
             }

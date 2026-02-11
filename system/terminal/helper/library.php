@@ -15,10 +15,7 @@ return new class {
         $this->handle(
             'library',
             $filter,
-            function ($item) {
-                Terminal::echol();
-                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file]', $item);
-            }
+            ' - [#c:p,#ref] [#c:sd,#file]'
         );
     }
 

@@ -2,7 +2,6 @@
 
 use PhpMx\Autodoc;
 use PhpMx\Dir;
-use PhpMx\Import;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -17,26 +16,19 @@ return new class {
             'system/middleware',
             $fitler,
             function ($item) {
-                Terminal::echol();
-                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file]', $item);
-                Terminal::echol('     [#description]', $item);
+                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                foreach ($item['description'] as $description)
+                    Terminal::echol("      $description");
             }
         );
     }
 
     protected function scan($path)
     {
-        $commands = [];
-        foreach (Dir::seekForFile($path, true) as $item) {
-            $scheme = Autodoc::getDocSchemeFileMiddleware(path($path, $item));
+        $items = [];
+        foreach (Dir::seekForFile($path, true) as $item)
+            $items[] = Autodoc::docSchemeMiddlewareFile(path($path, $item));
 
-            $commands[] = [
-                'ref' => $scheme['ref'],
-                'description' => str_replace("\n", ' ', $scheme['doc']['description'] ?? ''),
-                'file' => $scheme['file'],
-            ];
-        }
-
-        return $commands;
+        return $items;
     }
 };

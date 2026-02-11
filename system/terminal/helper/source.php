@@ -5,7 +5,7 @@ use PhpMx\Dir;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
-/** Lista todas as constantes helper registradas no sistema */
+/** */
 return new class {
 
     use TerminalHelperTrait;
@@ -13,9 +13,10 @@ return new class {
     function __invoke($filter = null)
     {
         $this->handle(
-            'system/helper/constant',
+            'class',
             $filter,
             function ($item) {
+                dd($item);
                 Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
@@ -27,8 +28,7 @@ return new class {
     {
         $items = [];
         foreach (Dir::seekForFile($path, true) as $item)
-            foreach (Autodoc::docSchemeSourceFile(path($path, $item)) as $scheme)
-                $items[] = $scheme;
+            $items[] = Autodoc::docSchemeSourceFile(path($path, $item));
 
         return $items;
     }

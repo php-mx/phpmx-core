@@ -16,12 +16,9 @@ return new class {
             'system/view',
             $filter,
             function ($item) {
-
                 $imports = $item['imports'];
                 $imports = array_map(fn($i) => "[#c:sd," . path($item['path'], $item['ref']) . ".$i]", $imports);
                 $imports = implode(' ', $imports);
-
-                Terminal::echol();
                 Terminal::echol(" - [#c:p,#ref] $imports", $item);
             }
         );

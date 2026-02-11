@@ -19,3 +19,5 @@
 /system/datalayer
 /system/router/*
 !/library/certificate/mx.php
+
+/docs

@@ -3,11 +3,11 @@
 use PhpMx\Datalayer;
 use PhpMx\File;
 use PhpMx\Terminal;
-use PhpMx\Trait\TerminalHelperTrait;
 use PhpMx\Trait\TerminalMigrationTrait;
 
-/** */
+/** Lista a situação da migrations de uma conexão com banco de dados */
 return new class {
+
     use TerminalMigrationTrait;
 
     function __invoke($dbName = 'main')
@@ -18,7 +18,7 @@ return new class {
         if (!empty($files)) {
             $executeds = Datalayer::get($dbName)->getConfigGroup('migration');
 
-            Terminal::echol('[#c:sb,#]', Datalayer::externalName($dbName));
+            Terminal::echol('[#c:sb,#]', strToPascalCase('Db ' . Datalayer::externalName($dbName)));
 
             foreach ($files as $id => $file) {
                 $name = substr(File::getName($file), strlen($id) + 1);
@@ -29,6 +29,7 @@ return new class {
                 $color = $executed ? 's' : 'd';
                 if ($locked) $color .= 'd';
 
+                Terminal::echol();
                 Terminal::echo(" - [#c:$color,$name] [#c:sd,$file]");
                 if ($locked)
                     Terminal::echo(" [#c:wd,#]", $locked);

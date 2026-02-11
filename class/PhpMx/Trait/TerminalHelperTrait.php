@@ -26,6 +26,7 @@ trait TerminalHelperTrait
         foreach ($paths as $path) {
             $items = $this->scan($path);
             foreach ($items as $p => $item) {
+
                 $item['filter'] = $item['filter'] ?? $item['ref'];
                 if (isset($this->key[$item['ref']])) {
                     $item['replaced'] = $this->key[$item['ref']];
@@ -37,7 +38,7 @@ trait TerminalHelperTrait
                 $items[$p] = $item;
             }
             usort($items, fn($a, $b) => $a['ref'] <=> $b['ref']);
-            $origins[Autodoc::getOriginPath($path, $scan)] = $items;
+            $origins[Autodoc::originPath($path, $scan)] = $items;
         }
 
         $origins = array_reverse($origins);
@@ -52,6 +53,7 @@ trait TerminalHelperTrait
                 if (++$originsLn) Terminal::echol();
                 Terminal::echol('[#c:sb,#]', $origin);
                 foreach ($items as $item) {
+                    Terminal::echol();
                     !$item['replaced'] ? $echo($item) : $replaced($item);
                 }
             }
