@@ -1,6 +1,6 @@
 <?php
 
-use PhpMx\Autodoc;
+use PhpMx\DocScheme;
 use PhpMx\Dir;
 use PhpMx\Path;
 use PhpMx\Terminal;
@@ -18,9 +18,9 @@ return new class {
 
         foreach (Path::seekForDirs('system/router') as $path) {
             foreach (array_reverse(Dir::seekForFile($path, true)) as $file) {
-                $origim = Autodoc::originPath($path);
+                $origim = DocScheme::originPath($path);
                 $registredRoutes[$origim] = $registredRoutes[$origim] ?? $defaultScheme;
-                foreach (Autodoc::docSchemeRouteFile(path($path, $file)) as $scheme) {
+                foreach (DocScheme::docSchemeRouteFile(path($path, $file)) as $scheme) {
                     $routeTemplate = $scheme['ref'];
                     $routeMethod = $scheme['method'];
 

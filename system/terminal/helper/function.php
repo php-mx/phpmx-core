@@ -1,6 +1,6 @@
 <?php
 
-use PhpMx\Autodoc;
+use PhpMx\DocScheme;
 use PhpMx\Dir;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
@@ -19,7 +19,6 @@ return new class {
                 Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
-                Terminal::echol();
                 foreach ($item['variations'] as $variations) {
                     $variations = explode(' ', $variations);
                     $variations = array_map(fn($v) => "[#c:dd,$v]", $variations);
@@ -34,7 +33,7 @@ return new class {
     {
         $items = [];
         foreach (Dir::seekForFile($path, true) as $item)
-            foreach (Autodoc::docSchemesFunctionFile(path($path, $item)) as $scheme) {
+            foreach (DocScheme::docSchemesFunctionFile(path($path, $item)) as $scheme) {
                 $variations = [''];
                 foreach ($scheme['params'] ?? [] as $param) {
                     $name = '$' . $param['name'];

@@ -1,6 +1,6 @@
 <?php
 
-use PhpMx\Autodoc;
+use PhpMx\DocScheme;
 use PhpMx\Dir;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
@@ -27,7 +27,7 @@ return new class {
     {
         $items = [];
         foreach (Dir::seekForFile($path, true) as $item)
-            $items[] = Autodoc::docSchemeMiddlewareFile(path($path, $item));
+            $items[] = DocScheme::docSchemeMiddlewareFile(path($path, $item));
 
         return $items;
     }

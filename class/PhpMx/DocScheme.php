@@ -8,7 +8,7 @@ use ReflectionFunction;
 use ReflectionMethod;
 
 /** Classe utilitária para mapear e documentar projetos. */
-abstract class Autodoc
+abstract class DocScheme
 {
     /** Retorna o docScheme das constantes de um arquivo */
     static function docSchemesConstantFile(string $file): array
@@ -25,7 +25,7 @@ abstract class Autodoc
                 'origin' => self::originPath($file),
                 'file' => $file,
                 'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
-                ...self::parseDocBlock($docBlock, ['description', 'examples'])
+                ...self::parseDocBlock($docBlock, ['description', 'examples', 'see', ' internal'])
             ];
         }
         return $scheme;
@@ -41,7 +41,7 @@ abstract class Autodoc
             $functionName = $match[1][0];
 
             $reflection = new ReflectionFunction($functionName);
-            $docBlock = self::parseDocBlock($reflection->getDocComment(), ['description', 'params', 'return', 'examples']);
+            $docBlock = self::parseDocBlock($reflection->getDocComment(), ['description', 'params', 'return', 'examples', 'see', ' internal']);
             $params = [];
             foreach ($reflection->getParameters() as $p) {
                 $name = $p->getName();
@@ -90,7 +90,7 @@ abstract class Autodoc
                 'origin' => self::originPath($file),
                 'file' => $file,
                 'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
-                ...self::parseDocBlock($docBlock, ['description'])
+                ...self::parseDocBlock($docBlock, ['description', 'see', ' internal'])
             ];
         }
 
@@ -107,7 +107,7 @@ abstract class Autodoc
         if (!$match) return [];
 
         $pos = $match[0][1];
-        $docBlock = self::parseDocBlock(self::docBlockBefore($content, $pos), ['description', 'params', 'return', 'examples']);
+        $docBlock = self::parseDocBlock(self::docBlockBefore($content, $pos), ['description', 'params', 'return', 'examples', 'see', ' internal']);
 
         $ref = explode('system/terminal/', $file);
         $ref = array_pop($ref);
@@ -169,7 +169,7 @@ abstract class Autodoc
             'origin' => self::originPath($file),
             'file' => $file,
             'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
-            ...self::parseDocBlock($docBlock, ['description'])
+            ...self::parseDocBlock($docBlock, ['description', 'see', ' internal'])
         ];
     }
 
@@ -229,7 +229,7 @@ abstract class Autodoc
         $properties = self::extractPropertiesReflection($reflection);
         $methods = self::extractMethodsReflection($reflection);
 
-        $classDoc = self::parseDocBlock($reflection->getDocComment(), ['description', 'examples', 'methods', 'properties']);
+        $classDoc = self::parseDocBlock($reflection->getDocComment(), ['description', 'examples', 'methods', 'properties', 'see', ' internal']);
 
         $extends = $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null;
         $implements = $reflection->getInterfaceNames();
@@ -341,7 +341,9 @@ abstract class Autodoc
             'return' => null,
             'examples' => [],
             'methods' => [],
-            'properties' => []
+            'properties' => [],
+            'internal' => false,
+            'see' => []
         ];
 
         if (empty($docBlock) || !str_starts_with(trim($docBlock), '/**')) {
@@ -360,6 +362,12 @@ abstract class Autodoc
                 $currentTag = $tag;
 
                 switch ($tag) {
+                    case 'internal':
+                        $data['internal'] = true;
+                        break;
+                    case 'see':
+                        if ($content !== '') $data['see'][] = $content;
+                        break;
                     case 'param':
                         if (preg_match('/^([^\s]+)\s+\$(\w+)\s*(.*)$/', $content, $pm))
                             $data['params'][$pm[2]] = ['type' => $pm[1], 'description' => trim($pm[3])];
@@ -443,7 +451,7 @@ abstract class Autodoc
                 'name' => $const->getName(),
                 'value' => $const->getValue(),
                 'visibility' => Reflection::getModifierNames($const->getModifiers())[0] ?? 'public',
-                ...self::parseDocBlock($const->getDocComment()),
+                ...self::parseDocBlock($const->getDocComment(), ['description', 'exemples', 'see', ' internal']),
             ];
         }
         return $constants;
@@ -455,7 +463,7 @@ abstract class Autodoc
         foreach ($reflect->getProperties() as $prop) {
             if ($prop->getDeclaringClass()->getName() !== $reflect->getName()) continue;
 
-            $doc = self::parseDocBlock($prop->getDocComment(), ['description', 'return']);
+            $doc = self::parseDocBlock($prop->getDocComment(), ['description', 'return', 'see', ' internal']);
 
             $props[] = [
                 'name' => $prop->getName(),
@@ -474,7 +482,7 @@ abstract class Autodoc
         foreach ($reflect->getMethods() as $method) {
             if ($method->getDeclaringClass()->getName() !== $reflect->getName()) continue;
 
-            $parsedDoc = self::parseDocBlock($method->getDocComment(), ['description', 'params', 'return', 'examples']);
+            $parsedDoc = self::parseDocBlock($method->getDocComment(), ['description', 'params', 'return', 'examples', 'see', ' internal']);
 
             $params = [];
             foreach ($method->getParameters() as $param) {

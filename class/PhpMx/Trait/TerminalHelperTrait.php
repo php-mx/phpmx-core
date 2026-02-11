@@ -3,7 +3,7 @@
 namespace PhpMx\Trait;
 
 use Closure;
-use PhpMx\Autodoc;
+use PhpMx\DocScheme;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
@@ -38,7 +38,7 @@ trait TerminalHelperTrait
                 $items[$p] = $item;
             }
             usort($items, fn($a, $b) => $a['ref'] <=> $b['ref']);
-            $origins[Autodoc::originPath($path, $scan)] = $items;
+            $origins[DocScheme::originPath($path, $scan)] = $items;
         }
 
         $origins = array_reverse($origins);
