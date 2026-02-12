@@ -126,7 +126,7 @@ abstract class File
     }
 
     /** Retorna o tamanho do arquivo */
-    public static function getSize($path, $human = true): int|string
+    static function getSize($path, $human = true): int|string
     {
         $path = path($path);
 
@@ -148,7 +148,7 @@ abstract class File
     }
 
     /** Retorna a data de modificação do arquivo */
-    public static function getLastModified($path): ?int
+    static function getLastModified($path): ?int
     {
         $path = path($path);
 

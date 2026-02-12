@@ -1,7 +1,7 @@
 <?php
 
-use PhpMx\DocScheme;
 use PhpMx\Dir;
+use PhpMx\ReflectionFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -16,7 +16,7 @@ return new class {
             'system/helper/constant',
             $filter,
             function ($item) {
-                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                Terminal::echol(' - [#c:p,#name] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
             }
@@ -26,9 +26,11 @@ return new class {
     protected function scan($path): array
     {
         $items = [];
+
         foreach (Dir::seekForFile($path, true) as $item)
-            foreach (DocScheme::docSchemeSourceFile(path($path, $item)) as $scheme)
-                $items[] = $scheme;
+            foreach (ReflectionFile::helperFile(path($path, $item)) as $scheme)
+                if ($scheme['typeKey'] == 'environment')
+                    $items[] = $scheme;
 
         return $items;
     }

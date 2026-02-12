@@ -7,6 +7,18 @@ abstract class Path
 {
     static protected array $paths = [];
 
+    /** Retorna o pacote de origem de um diretório ou arquivo */
+    static function origin($path): string
+    {
+        $path = path($path);
+        if (str_starts_with($path, 'vendor/')) {
+            $path = strtolower($path);
+            $path = explode('/', $path);
+            return $path[1] . '-' . $path[2];
+        }
+        return 'current-project';
+    }
+
     /** Formata um caminho de diretório */
     static function format(): string
     {

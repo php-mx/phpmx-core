@@ -2,7 +2,6 @@
 
 namespace PhpMx\Trait;
 
-use Error;
 use PhpMx\Datalayer;
 use PhpMx\Dir;
 use PhpMx\File;
@@ -122,9 +121,7 @@ trait TerminalMigrationTrait
             } else {
                 $lastId = array_key_last($executed);
 
-                // Se estiver travado, apenas avisamos e NÃO removemos do banco
                 if ($lastId && ($executed[$lastId]['lock'] ?? 0) > 0) {
-                    // Retornamos o ID para o executePrev saber quem ignorar
                     return $lastId;
                 }
 

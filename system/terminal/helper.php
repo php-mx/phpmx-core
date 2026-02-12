@@ -1,7 +1,7 @@
 <?php
 
-use PhpMx\DocScheme;
 use PhpMx\Dir;
+use PhpMx\ReflectionFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -16,36 +16,37 @@ return new class {
             'system/terminal',
             $filter,
             function ($item) {
-
-                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                Terminal::echol(' - [#c:p,#name] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
                 foreach ($item['variations'] as $variation)
-                    Terminal::echol('         [#c:dd,php] mx [#][#c:dd,#]', [$item['ref'], $variation]);
+                    Terminal::echol('         [#c:dd,php] mx [#][#c:dd,#]', [$item['name'], $variation]);
             }
         );
     }
 
     protected function scan($path)
     {
-        $commands = [];
+        $items = [];
         foreach (Dir::seekForFile($path, true) as $item) {
-            $scheme = DocScheme::docSchemeCommandFile(path($path, $item));
+            $scheme = ReflectionFile::commandFile(path($path, $item));
+            if (!empty($scheme)) {
+                $variations = [''];
 
-            $variations = [''];
-            foreach ($scheme['params'] ?? [] as $param) {
-                $name = '<' . $param['name'] . '>';
-                if (!$param['optional'])
-                    $variations[0] .= " $name";
-                if ($param['optional'])
-                    $variations[] = end($variations) . " $name";
+                foreach ($scheme['params'] ?? [] as $param) {
+                    $name = '<' . $param['name'] . '>';
+                    if (!$param['optional'])
+                        $variations[0] .= " $name";
+                    if ($param['optional'])
+                        $variations[] = end($variations) . " $name";
+                }
+
+                $scheme['variations'] = $variations;
+
+                $items[] = $scheme;
             }
-
-            $scheme['variations'] = $variations;
-
-            $commands[] = $scheme;
         }
 
-        return $commands;
+        return $items;
     }
 };

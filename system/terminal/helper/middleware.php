@@ -1,7 +1,7 @@
 <?php
 
-use PhpMx\DocScheme;
 use PhpMx\Dir;
+use PhpMx\ReflectionFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -16,7 +16,7 @@ return new class {
             'system/middleware',
             $fitler,
             function ($item) {
-                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                Terminal::echol(' - [#c:p,#name] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
             }
@@ -26,8 +26,12 @@ return new class {
     protected function scan($path)
     {
         $items = [];
-        foreach (Dir::seekForFile($path, true) as $item)
-            $items[] = DocScheme::docSchemeMiddlewareFile(path($path, $item));
+
+        foreach (Dir::seekForFile($path, true) as $item) {
+            $scheme = ReflectionFile::middlewareFile(path($path, $item));
+            if (!empty($scheme))
+                $items[] = $scheme;
+        }
 
         return $items;
     }

@@ -1,8 +1,6 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\Path;
-use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /** Lista as bibliotecas registradas no projeto */

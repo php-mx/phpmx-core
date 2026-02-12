@@ -3,7 +3,6 @@
 namespace PhpMx\Trait;
 
 use Closure;
-use PhpMx\DocScheme;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
@@ -14,8 +13,8 @@ trait TerminalHelperTrait
 
     protected function handle(string $scan, ?string $filter, null|Closure|string $echo = null, null|Closure|string $replaced = null)
     {
-        $echo = $echo ?? ' - [#c:p,#ref] [#description]';
-        $replaced = $replaced ?? ' - [#c:pd,#ref] [#c:wd,replaced]';
+        $echo = $echo ?? ' - [#c:p,#name] [#description]';
+        $replaced = $replaced ?? ' - [#c:pd,#name] [#c:wd,replaced]';
 
         $echo = is_closure($echo) ? $echo : fn($item) => Terminal::echol($echo, $item);
         $replaced = is_closure($replaced) ? $replaced : fn($item) => Terminal::echol($replaced, $item);
@@ -27,18 +26,18 @@ trait TerminalHelperTrait
             $items = $this->scan($path);
             foreach ($items as $p => $item) {
 
-                $item['filter'] = $item['filter'] ?? $item['ref'];
-                if (isset($this->key[$item['ref']])) {
-                    $item['replaced'] = $this->key[$item['ref']];
+                $item['filter'] = $item['filter'] ?? $item['name'];
+                if (isset($this->key[$item['key']])) {
+                    $item['replaced'] = $this->key[$item['key']];
                 } else {
                     $item['replaced'] = false;
-                    $this->key[$item['ref']] = $item;
+                    $this->key[$item['key']] = $item;
                 }
                 $item['description'] = $item['description'] ?? '';
                 $items[$p] = $item;
             }
-            usort($items, fn($a, $b) => $a['ref'] <=> $b['ref']);
-            $origins[DocScheme::originPath($path, $scan)] = $items;
+            usort($items, fn($a, $b) => $a['name'] <=> $b['name']);
+            $origins[Path::origin($path, $scan)] = $items;
         }
 
         $origins = array_reverse($origins);

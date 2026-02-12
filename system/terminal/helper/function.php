@@ -2,6 +2,7 @@
 
 use PhpMx\DocScheme;
 use PhpMx\Dir;
+use PhpMx\ReflectionFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -16,14 +17,14 @@ return new class {
             'system/helper/function',
             $filter,
             function ($item) {
-                Terminal::echol(' - [#c:p,#ref] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
+                Terminal::echol(' - [#c:p,#name][#c:p,()] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
                 foreach ($item['variations'] as $variations) {
                     $variations = explode(' ', $variations);
                     $variations = array_map(fn($v) => "[#c:dd,$v]", $variations);
                     $variations = implode("[#c:d,#sep]", $variations);
-                    Terminal::echol("         [#][#c:d,(]{$variations}[#c:d,)]", [$item['ref'], 'sep' => ', ']);
+                    Terminal::echol("         [#][#c:d,(]{$variations}[#c:d,)]", [$item['name'], 'sep' => ', ']);
                 }
             }
         );
@@ -32,19 +33,11 @@ return new class {
     protected function scan($path): array
     {
         $items = [];
+
         foreach (Dir::seekForFile($path, true) as $item)
-            foreach (DocScheme::docSchemesFunctionFile(path($path, $item)) as $scheme) {
-                $variations = [''];
-                foreach ($scheme['params'] ?? [] as $param) {
-                    $name = '$' . $param['name'];
-                    if (!$param['optional'])
-                        $variations[0] .= " $name";
-                    if ($param['optional'])
-                        $variations[] = end($variations) . " $name";
-                }
-                $scheme['variations'] = array_map(fn($v) => trim($v), $variations);
-                $items[] = $scheme;
-            }
+            foreach (ReflectionFile::helperFile(path($path, $item)) as $scheme)
+                if ($scheme['typeKey'] == 'function')
+                    $items[] = $scheme;
 
         return $items;
     }
