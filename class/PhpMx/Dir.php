@@ -2,10 +2,16 @@
 
 namespace PhpMx;
 
-/** Classe utilitária para manipulação de diretórios. */
+/**
+ * Classe utilitária para manipulação de diretórios.
+ */
 abstract class Dir
 {
-    /** Cria um diretório */
+    /**
+     * Cria um diretório de forma recursiva.
+     * @param string $path Caminho do diretório.
+     * @return bool|null True se criado, null em caso de erro ou se o caminho for vazio.
+     */
     static function create(string $path): ?bool
     {
         $path = self::getOnly($path);
@@ -27,7 +33,12 @@ abstract class Dir
         });
     }
 
-    /** Remove um diretório */
+    /**
+     * Remove um diretório e seu conteúdo.
+     * @param string $path Caminho do diretório.
+     * @param bool $recursive Se true, remove subdiretórios e arquivos recursivamente.
+     * @return bool|null True se removido, null se não existir.
+     */
     static function remove(string $path, bool $recursive = false): ?bool
     {
         $path = self::getOnly($path);
@@ -53,7 +64,13 @@ abstract class Dir
         });
     }
 
-    /** Cria uma copia de um diretório */
+    /**
+     * Cria uma cópia de um diretório.
+     * @param string $path_from Caminho de origem.
+     * @param string $path_to Caminho de destino.
+     * @param bool $replace Se deve substituir arquivos existentes no destino.
+     * @return bool|null
+     */
     static function copy(string $path_from, string $path_to, bool $replace = false): ?bool
     {
         $path_from = path($path_from);
@@ -75,7 +92,12 @@ abstract class Dir
         });
     }
 
-    /** Altera o local de um diretório */
+    /**
+     * Altera o local ou nome de um diretório.
+     * @param string $path_from Caminho de origem.
+     * @param string $path_to Caminho de destino.
+     * @return bool|null
+     */
     static function move(string $path_from, string $path_to): ?bool
     {
         $path_from = path($path_from);
@@ -91,43 +113,53 @@ abstract class Dir
         });
     }
 
-    /** Vasculha um diretório em busca de arquivos */
+    /**
+     * Lista apenas os arquivos contidos em um diretório.
+     * @param string $path Caminho do diretório.
+     * @param bool $recursive Se true, busca arquivos em subdiretórios.
+     * @return array
+     */
     static function seekForFile(string $path, bool $recursive = false): array
     {
         $path = path($path);
 
         return Log::add('dir', "seek for file in $path", function () use ($path, $recursive) {
             $return = [];
-
             foreach (self::seekForAll($path, $recursive) as $item)
                 if (File::check("$path/$item"))
                     $return[] = $item;
-
             return $return;
         });
     }
 
-    /** Vasculha um diretório em busca de diretórios */
+    /**
+     * Lista apenas os diretórios contidos em um diretório.
+     * @param string $path Caminho do diretório.
+     * @param bool $recursive Se true, busca subdiretórios recursivamente.
+     * @return array
+     */
     static function seekForDir(string $path, bool $recursive = false): array
     {
         $path = path($path);
 
         return Log::add('dir', "seek for dir in $path", function () use ($path, $recursive) {
             $return = [];
-
             foreach (self::seekForAll($path, $recursive) as $item)
                 if (self::check("$path/$item"))
                     $return[] = $item;
-
             return $return;
         });
     }
 
-    /** Vasculha um diretório em busca de arquivos e diretórios */
+    /**
+     * Lista todos os arquivos e diretórios contidos em um caminho.
+     * @param string $path Caminho do diretório.
+     * @param bool $recursive Se true, vasculha de forma profunda.
+     * @return array
+     */
     static function seekForAll(string $path, bool $recursive = false): array
     {
         $path = self::getOnly($path);
-
         $return = [];
         if (is_dir($path)) {
             foreach (scandir($path) as $item) {
@@ -139,25 +171,30 @@ abstract class Dir
                 }
             }
         }
-
         return $return;
     }
 
-    /** Retorna um caminho sem referenciar arquivos */
+    /**
+     * Retorna o caminho do diretório pai, removendo o nome do arquivo se presente.
+     * @param string $path Caminho original.
+     * @return string
+     */
     static function getOnly(string $path): string
     {
         $path = path($path);
         if ($path != '.' && !is_dir($path)) {
             $path = explode('/', $path);
-
             if (strpos(end($path), '.') !== false) array_pop($path);
-
             $path = implode('/', $path);
         }
         return $path;
     }
 
-    /** Verifica se um diretório existe */
+    /**
+     * Verifica se o caminho informado é um diretório válido.
+     * @param string $path
+     * @return bool
+     */
     static function check(string $path): bool
     {
         return is_dir(path($path));

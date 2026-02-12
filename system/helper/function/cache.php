@@ -5,7 +5,12 @@ use PhpMx\Log;
 
 if (!function_exists('cache')) {
 
-    /** Armazena e recupera o retorno de uma Closure em /library/cache */
+    /**
+     * Armazena e recupera o retorno de uma Closure em /library/cache.
+     * @param string $cacheName Nome identificador do cache.
+     * @param Closure $action Função que gera o valor caso o cache não exista ou esteja em DEV.
+     * @return mixed Resultado processado ou recuperado do arquivo JSON.
+     */
     function cache(string $cacheName, Closure $action): mixed
     {
         $cacheName = strToCamelCase($cacheName);
@@ -39,10 +44,15 @@ if (!function_exists('cache')) {
     }
 }
 
-
 if (!function_exists('cacheTime')) {
 
-    /** Armazena e recupera o retorno de uma Closure em /library/cache durante um determinado tempo */
+    /**
+     * Armazena e recupera o retorno de uma Closure em /library/cache por um período determinado.
+     * @param string $cacheName Nome identificador do cache.
+     * @param int $seconds Tempo de vida do cache em segundos.
+     * @param Closure $action Função que gera o valor caso o cache tenha expirado.
+     * @return mixed
+     */
     function cacheTime(string $cacheName, int $seconds, Closure $action): mixed
     {
         $cacheName = strToCamelCase($cacheName) . '_time';

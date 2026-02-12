@@ -1,0 +1,53 @@
+<?php
+
+use PhpMx\Terminal;
+use PhpMx\Trait\TerminalInstallTrait;
+
+return new class {
+
+    use TerminalInstallTrait;
+
+    function __invoke()
+    {
+        self::createDir('class');
+        self::createDir('library');
+        self::createDir('system');
+        self::createDir('system/helper');
+        self::createDir('system/helper/function');
+        self::createDir('system/helper/constant');
+        self::createDir('system/helper/script');
+
+        self::promote('system/helper/script/path.php');
+
+        self::blockFile('.env', 'MX-CORE', [
+            'DEV = true',
+        ]);
+
+        self::blockFile('.gitignore', 'MX-CORE', [
+            '/.env',
+            '/vendor',
+            '/library/cache',
+            '/library/certificate',
+        ]);
+
+        self::createFile('.conf', [
+            '# PUBLIC ENVIRONMENT VARIABLES'
+        ]);
+
+        self::createFile('mx', [
+            '<?php',
+            '',
+            'chdir(__DIR__);',
+            '',
+            'require_once "./vendor/autoload.php";',
+            '',
+            'echo "\n";',
+            '',
+            '$terminalArgs = $argv;',
+            'array_shift($terminalArgs);',
+            '\PhpMx\Terminal::run(...$terminalArgs);',
+            '',
+            'echo "\n";',
+        ]);
+    }
+};

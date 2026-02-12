@@ -2,7 +2,11 @@
 
 if (!function_exists('dbug')) {
 
-    /** Realiza o var_dump de variaveis */
+    /**
+     * Realiza o var_dump de múltiplas variáveis com configurações otimizadas de profundidade e exibição.
+     * @param mixed ...$params Variáveis para depuração.
+     * @return void
+     */
     function dbug(mixed ...$params): void
     {
         ini_set('xdebug.var_display_max_depth', '10');
@@ -14,33 +18,16 @@ if (!function_exists('dbug')) {
     }
 }
 
-if (!function_exists('dbugpre')) {
-
-    /** Realiza o var_dump de variaveis dentro de uma tag HTML pre */
-    function dbugpre(mixed ...$params): void
-    {
-        echo '<pre>';
-        dbug(...$params);
-        echo '</pre>';
-    }
-}
-
 if (!function_exists('dd')) {
 
-    /** Realiza o var_dump de variaveis finalizando o sistema */
+    /**
+     * Exibe os dados das variáveis (dump) e encerra a execução do sistema (die).
+     * @param mixed ...$params Variáveis para depuração.
+     * @return void
+     */
     function dd(mixed ...$params): void
     {
         dbug(...$params);
-        die;
-    }
-}
-
-if (!function_exists('ddpre')) {
-
-    /** Realiza o var_dump de variaveis dentro de uma tag HTML pre finalizando o sistema */
-    function ddpre(mixed ...$params): void
-    {
-        dbugpre(...$params);
         die;
     }
 }

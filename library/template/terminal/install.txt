@@ -1,0 +1,15 @@
+<?php
+
+use PhpMx\Terminal;
+use PhpMx\Trait\TerminalInstallTrait;
+
+return new class {
+
+    use TerminalInstallTrait;
+
+    function __invoke()
+    {
+        // Install code here
+        Terminal::echol('installing');
+    }
+};

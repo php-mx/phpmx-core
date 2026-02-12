@@ -1,8 +1,13 @@
 <?php
 
-if (!function_exists('str_var')) {
+if (!function_exists('str_get_var')) {
 
-    /** Extrai uma variavel de dentro de uma string */
+    /**
+     * Extrai e converte um valor de dentro de uma string para seu tipo real (bool, int, float ou null).
+     * Útil para processar valores vindos de arquivos .env ou inputs de texto.
+     * @param mixed $var
+     * @return mixed
+     */
     function str_get_var($var): mixed
     {
         if (!is_string($var))
@@ -29,7 +34,14 @@ if (!function_exists('str_var')) {
 
 if (!function_exists('str_replace_all')) {
 
-    /** Substitua todas as ocorrências da string de pesquisa pela string de substituição */
+    /**
+     * Substitui repetidamente as ocorrências de uma string até que não haja mais mudanças ou atinja o limite.
+     * @param array|string $search
+     * @param array|string $replace
+     * @param string $subject
+     * @param int $loop Limite de iterações para evitar loops infinitos.
+     * @return string
+     */
     function str_replace_all(array|string $search, array|string $replace, string $subject, int $loop = 10): string
     {
         $count = 0;
@@ -44,7 +56,13 @@ if (!function_exists('str_replace_all')) {
 
 if (!function_exists('str_replace_first')) {
 
-    /** Substitua a primeira ocorrência da string de pesquisa pela string de substituição */
+    /**
+     * Substitui apenas a primeira ocorrência encontrada da string de pesquisa.
+     * @param array|string $search
+     * @param array|string $replace
+     * @param string $subject
+     * @return string
+     */
     function str_replace_first(array|string $search, array|string $replace, string $subject): string
     {
         $pos = strpos($subject, $search);
@@ -57,7 +75,13 @@ if (!function_exists('str_replace_first')) {
 
 if (!function_exists('str_replace_last')) {
 
-    /** Substitua a ultima ocorrência da string de pesquisa pela string de substituição */
+    /**
+     * Substitui apenas a última ocorrência encontrada da string de pesquisa.
+     * @param array|string $search
+     * @param array|string $replace
+     * @param string $subject
+     * @return string
+     */
     function str_replace_last(array|string $search, array|string $replace, string $subject): string
     {
         $pos = strrpos($subject, $search);
@@ -70,7 +94,13 @@ if (!function_exists('str_replace_last')) {
 
 if (!function_exists('str_trim')) {
 
-    /** Tira o espaço em branco (ou outros caracteres) do início e do fim de uma substring dentro de uma string */
+    /**
+     * Remove espaços ou caracteres específicos do entorno de uma substring dentro de uma string maior.
+     * @param string $string O texto completo.
+     * @param array|string $substring A parte que deve ser limpa.
+     * @param array|string $characters Caracteres a serem removidos.
+     * @return string
+     */
     function str_trim(string $string, array|string $substring, array|string $characters = " \t\n\r\0\x0B"): string
     {
         $charactersArray = [];
@@ -95,7 +125,14 @@ if (!function_exists('str_trim')) {
 
 if (!function_exists('mb_str_replace')) {
 
-    /** Substitua ocorrências da string de pesquisa pela string de substituição */
+    /**
+     * Versão multibyte segura da função str_replace.
+     * @param array|string $search
+     * @param array|string $replace
+     * @param string $subject
+     * @param int &$count Referência para contagem de substituições.
+     * @return string
+     */
     function mb_str_replace(array|string $search, array|string $replace, string $subject, &$count = 0): string
     {
         if (!is_array($subject)) {
@@ -117,7 +154,14 @@ if (!function_exists('mb_str_replace')) {
 
 if (!function_exists('mb_str_replace_all')) {
 
-    /** Substitui todas as ocorrências da string de procura com a string de substituição */
+    /**
+     * Versão multibyte segura da função str_replace_all.
+     * @param array|string $search
+     * @param array|string $replace
+     * @param string $subject
+     * @param int $loop
+     * @return string
+     */
     function mb_str_replace_all(array|string $search, array|string $replace, string $subject, int $loop = 10): string
     {
         $pre = $subject;

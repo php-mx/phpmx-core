@@ -2,7 +2,11 @@
 
 if (!function_exists('uuid')) {
 
-    /** Gera uma string de id unica */
+    /**
+     * Gera uma string de identificação única curta e personalizada.
+     * Combina 12 caracteres aleatórios com o timestamp atual convertido para base 36.
+     * @return string ID gerado (ex: _aB1c2D3e4F5g6h7i8j).
+     */
     function uuid(): string
     {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

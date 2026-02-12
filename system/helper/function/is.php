@@ -5,7 +5,11 @@ use PhpMx\Mx5;
 
 if (!function_exists('is_base64')) {
 
-    /** Verifica se uma variavel é uma string base64 */
+    /**
+     * Verifica se uma variável é uma string codificada em Base64 válida.
+     * @param mixed $var
+     * @return bool
+     */
     function is_base64(mixed $var): bool
     {
         if (empty($var) || !is_string($var))
@@ -17,7 +21,12 @@ if (!function_exists('is_base64')) {
 
 if (!function_exists('is_blank')) {
 
-    /** Verifica se uma variavel é nula, vazia ou composta de espaços em branco */
+    /**
+     * Verifica se uma variável é nula, vazia ou composta apenas de espaços em branco.
+     * Diferente de empty(), retorna false para números (0) e booleanos.
+     * @param mixed $var
+     * @return bool
+     */
     function is_blank(mixed $var): bool
     {
         if (is_string($var))
@@ -29,7 +38,12 @@ if (!function_exists('is_blank')) {
 
 if (!function_exists('is_class')) {
 
-    /** Verifica se um objeto é ou extende uma classe */
+    /**
+     * Verifica se um objeto ou string de classe é exatamente a classe informada ou a estende.
+     * @param mixed $object Objeto ou nome da classe para verificar.
+     * @param object|string $class Classe de referência.
+     * @return bool
+     */
     function is_class(mixed $object, object|string $class): bool
     {
         if (is_string($object) || is_object($object)) {
@@ -46,7 +60,11 @@ if (!function_exists('is_class')) {
 
 if (!function_exists('is_cif')) {
 
-    /** Verifica se uma variavel atende os requisitos para ser uma cifra */
+    /**
+     * Atalho para verificar se uma variável é uma cifra MX válida (via Cif::check).
+     * @param mixed $var
+     * @return bool
+     */
     function is_cif(mixed $var): bool
     {
         return Cif::check($var);
@@ -55,7 +73,11 @@ if (!function_exists('is_cif')) {
 
 if (!function_exists('is_closure')) {
 
-    /** Verifica se uma variavel é uma função anonima ou objeto callable */
+    /**
+     * Verifica se uma variável é uma função anônima ou um objeto invocável (callable).
+     * @param mixed $var
+     * @return bool
+     */
     function is_closure(mixed $var): bool
     {
         return ($var instanceof Closure) || (is_object($var) && is_callable($var));
@@ -64,7 +86,12 @@ if (!function_exists('is_closure')) {
 
 if (!function_exists('is_extend')) {
 
-    /** Verifica se um objeto extende uma classe */
+    /**
+     * Verifica especificamente se um objeto ou classe estende uma classe pai.
+     * @param mixed $object
+     * @param object|string $class
+     * @return bool
+     */
     function is_extend(mixed $object, object|string $class): bool
     {
         if (is_string($object) || is_object($object)) {
@@ -81,12 +108,15 @@ if (!function_exists('is_extend')) {
 
 if (!function_exists('is_image_base64')) {
 
-    /** Verifica se uma variavel é uma url de imagem base64 */
+    /**
+     * Verifica se uma string é uma URL de imagem codificada em Base64 (data:image/...).
+     * @param mixed $var
+     * @return bool
+     */
     function is_image_base64(mixed $var): bool
     {
         if (empty($var) || !is_string($var))
             return false;
-
 
         if (preg_match('/^data:image\/(jpeg|jpg|png|gif|bmp|webp);base64,/', $var)) {
             $data = explode(',', $var);
@@ -100,7 +130,12 @@ if (!function_exists('is_image_base64')) {
 
 if (!function_exists('is_implement')) {
 
-    /** Verifica se um objeto implementa uma interface */
+    /**
+     * Verifica se um objeto ou classe implementa uma interface específica.
+     * @param mixed $object
+     * @param object|string $interface
+     * @return bool
+     */
     function is_implement(mixed $object, object|string $interface): bool
     {
         if (is_string($object) || is_object($object)) {
@@ -116,7 +151,11 @@ if (!function_exists('is_implement')) {
 
 if (!function_exists('is_json')) {
 
-    /** Verifica se uma variavel é uma string JSON */
+    /**
+     * Verifica se uma string é um JSON válido.
+     * @param mixed $var
+     * @return bool
+     */
     function is_json(mixed $var): bool
     {
         if (is_string($var))
@@ -132,7 +171,11 @@ if (!function_exists('is_json')) {
 
 if (!function_exists('is_md5')) {
 
-    /** Verifica se uma variavel é md5 */
+    /**
+     * Verifica se uma string possui o formato hexadecimal de 32 caracteres de um MD5.
+     * @param mixed $var
+     * @return bool
+     */
     function is_md5(mixed $var): bool
     {
         return is_string($var) ? boolval(preg_match('/^[a-fA-F0-9]{32}$/', $var)) : false;
@@ -141,7 +184,11 @@ if (!function_exists('is_md5')) {
 
 if (!function_exists('is_password')) {
 
-    /** Verifica se uma hash de password */
+    /**
+     * Verifica se uma string é um hash de senha BCRYPT válido de 60 caracteres.
+     * @param string $value
+     * @return bool
+     */
     function is_password(string $value): bool
     {
         return password_needs_rehash($value, PASSWORD_BCRYPT) === false
@@ -151,7 +198,11 @@ if (!function_exists('is_password')) {
 
 if (!function_exists('is_mx5')) {
 
-    /** Verifica se uma variavel é um mx5 */
+    /**
+     * Atalho para verificar se uma variável é um hash MX5 válido (via Mx5::check).
+     * @param mixed $var
+     * @return bool
+     */
     function is_mx5(mixed $var): bool
     {
         return Mx5::check($var);
@@ -160,7 +211,12 @@ if (!function_exists('is_mx5')) {
 
 if (!function_exists('is_serialized')) {
 
-    /** Verifica se uma variavel corresponde uma string serializada */
+    /**
+     * Verifica se uma variável corresponde a uma string serializada pelo PHP.
+     * @param mixed $var
+     * @param bool $strict Se deve realizar uma verificação rigorosa de fim de linha.
+     * @return bool
+     */
     function is_serialized($var, $strict = true): bool
     {
         if (!is_string($var)) {
@@ -220,7 +276,11 @@ if (!function_exists('is_serialized')) {
 
 if (!function_exists('is_stringable')) {
 
-    /** Verifica se uma variavel é uma string ou algo que possa ser convertido para string */
+    /**
+     * Verifica se uma variável pode ser convertida para string (string, número ou objeto com __toString).
+     * @param mixed $var
+     * @return bool
+     */
     function is_stringable(mixed $var): bool
     {
         return is_string($var) || is_numeric($var) || ($var instanceof Stringable);
@@ -229,7 +289,12 @@ if (!function_exists('is_stringable')) {
 
 if (!function_exists('is_trait')) {
 
-    /** Verifica se um objeto utiliza uma trait */
+    /**
+     * Verifica se um objeto ou classe utiliza uma Trait específica (incluindo herança).
+     * @param mixed $object
+     * @param object|string|null $trait
+     * @return bool
+     */
     function is_trait(mixed $object, object|string|null $trait): bool
     {
         if (is_string($object) || is_object($object)) {

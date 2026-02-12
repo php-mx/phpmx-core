@@ -2,12 +2,19 @@
 
 namespace PhpMx;
 
-/** Classe utilitária para gerenciamento de variáveis de ambiente. */
+/**
+ * Classe utilitária para gerenciamento de variáveis de ambiente.
+ */
 abstract class Env
 {
+    /** @ignore */
     protected static array $DEFAULT = [];
 
-    /** Carrega variaveis de ambiente de um arquivo para o sistema */
+    /**
+     * Carrega variáveis de ambiente a partir de um arquivo de texto para o sistema.
+     * @param string $filePath Caminho do arquivo (ex: .env).
+     * @return bool True se o arquivo foi encontrado e processado.
+     */
     static function loadFile(string $filePath): bool
     {
         $filePath = path($filePath);
@@ -26,7 +33,12 @@ abstract class Env
         return false;
     }
 
-    /** Define o valor de uma variavel de ambiente */
+    /**
+     * Define o valor de uma variável de ambiente no escopo global $_ENV.
+     * @param string $name Nome da variável.
+     * @param mixed $value Valor a ser atribuído.
+     * @return void
+     */
     static function set(string $name, mixed $value): void
     {
         $name = trim($name);
@@ -38,13 +50,22 @@ abstract class Env
             $_ENV[$name] = $_ENV[$name] ?? $value;
     }
 
-    /** Recupera o valor de uma variavel de ambiente */
+    /**
+     * Recupera o valor de uma variável de ambiente ou o seu valor padrão.
+     * @param string $name Nome da variável.
+     * @return mixed O valor da variável ou null se não encontrada.
+     */
     static function get(string $name): mixed
     {
         return $_ENV[$name] ?? self::$DEFAULT[$name] ?? null;
     }
 
-    /** Define variaveis de ambiente padrão caso não tenha sido declarada */
+    /**
+     * Define um valor padrão para uma variável de ambiente caso ela não tenha sido declarada.
+     * @param string $name Nome da variável.
+     * @param mixed $value Valor padrão.
+     * @return void
+     */
     static function default(string $name, mixed $value): void
     {
         $value = str_get_var($value);

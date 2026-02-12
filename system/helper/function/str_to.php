@@ -2,7 +2,12 @@
 
 if (!function_exists('strToCamelCase')) {
 
-    /** Converte uma string para camelCase */
+    /**
+     * Converte uma string para o formato camelCase.
+     * Remove acentos, caracteres especiais e normaliza a capitalização (ex: "Test string" -> "testString").
+     * @param string $str
+     * @return string
+     */
     function strToCamelCase(string $str): string
     {
         $str = remove_accents($str);
@@ -17,7 +22,11 @@ if (!function_exists('strToCamelCase')) {
 
 if (!function_exists('strToKebabCase')) {
 
-    /** Converte uma string para kebabCase */
+    /**
+     * Converte uma string para o formato kebab-case (hifenizado).
+     * @param string $str
+     * @return string
+     */
     function strToKebabCase(string $str): string
     {
         $str = remove_accents($str);
@@ -31,7 +40,11 @@ if (!function_exists('strToKebabCase')) {
 
 if (!function_exists('strToPascalCase')) {
 
-    /** Converte uma string para pascalCase */
+    /**
+     * Converte uma string para o formato PascalCase.
+     * @param string $str
+     * @return string
+     */
     function strToPascalCase(string $str): string
     {
         $str = remove_accents($str);
@@ -45,7 +58,11 @@ if (!function_exists('strToPascalCase')) {
 
 if (!function_exists('strToSnakeCase')) {
 
-    /** Converte uma string para snakeCase */
+    /**
+     * Converte uma string para o formato snake_case (sublinhado).
+     * @param string $str
+     * @return string
+     */
     function strToSnakeCase(string $str): string
     {
         $str = remove_accents($str);

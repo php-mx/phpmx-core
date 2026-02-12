@@ -5,16 +5,25 @@ namespace PhpMx;
 use Closure;
 use Throwable;
 
-/** Classe utilitária para registro estruturado de logs e escopos. */
+/**
+ * Classe utilitária para registro estruturado de logs e escopos.
+ * Permite o rastreamento de execução, medição de memória e aninhamento de mensagens.
+ */
 abstract class Log
 {
+    /** @ignore */
     protected static array $log = [];
+    /** @ignore */
     protected static array $scope = [];
+    /** @ignore */
     protected static bool $useLog = true;
-
+    /** @ignore */
     protected static array $snap = ['log' => [], 'scope' => [], 'useLog' => true];
 
-    /** Grava um snap do log */
+    /**
+     * Captura um snapshot do estado atual do log.
+     * @return void
+     */
     static function snap(): void
     {
         self::$snap['log'] = self::$log;
@@ -22,7 +31,10 @@ abstract class Log
         self::$snap['useLog'] = self::$useLog;
     }
 
-    /** Restaura o log ao ultimo snap */
+    /**
+     * Restaura o log para o estado do último snapshot capturado.
+     * @return void
+     */
     static function reset(): void
     {
         self::$log = self::$snap['log'];
@@ -30,13 +42,23 @@ abstract class Log
         self::$useLog = self::$snap['useLog'];
     }
 
-    /** Define se o log deve ser utilizado */
+    /**
+     * Habilita ou desabilita o registro de logs.
+     * @param bool $useLog
+     * @return void
+     */
     static function useLog(bool $useLog): void
     {
         self::$useLog = $useLog;
     }
 
-    /** Adicona uma linha de log ou um escopo de linhas de log */
+    /**
+     * Adiciona uma linha de log ou abre um escopo de execução via Closure.
+     * @param string $type Categoria do log.
+     * @param string $message Mensagem do log.
+     * @param Closure|null $scope Closure opcional para criar um escopo de log.
+     * @return mixed Retorno do Closure ou o resultado do log.
+     */
     static function add(string $type, string $message, ?Closure $scope = null): mixed
     {
         if (!self::$useLog)
@@ -57,7 +79,12 @@ abstract class Log
         }
     }
 
-    /** Altera a linha de escopo aberta */
+    /**
+     * Altera os dados da linha do escopo que está aberto no momento.
+     * @param string $type Novo tipo/categoria.
+     * @param string $message Nova mensagem.
+     * @return void
+     */
     static function changeScope(string $type, string $message): void
     {
         if (!self::$useLog) return;
@@ -69,7 +96,11 @@ abstract class Log
         }
     }
 
-    /** Adiciona uma linha de exceção ao log */
+    /**
+     * Registra uma exceção detalhada no log.
+     * @param Throwable $e
+     * @return void
+     */
     static function exception(Throwable $e): void
     {
         if (!self::$useLog) return;
@@ -82,12 +113,14 @@ abstract class Log
         self::set($type, "$message $file ($line)");
     }
 
-    /** Retorna o log atual com contadores */
-    static function get()
+    /**
+     * Retorna o log processado com contadores de categorias.
+     * @return array ['log' => array, 'count' => array]
+     */
+    static function get(): array
     {
         $currentLog = self::$log;
         $currentScope = self::$scope;
-
         $encapsLine = ['mx', 'log', -1, memory_get_peak_usage(true)];
 
         while (count($currentScope)) {
@@ -96,16 +129,14 @@ abstract class Log
         }
 
         array_unshift($currentLog, $encapsLine);
-
         $count = [];
+
         foreach ($currentLog as $pos => $line) {
             list($type, $message, $scope, $memory) = $line;
-
             $type = strToCamelCase($type);
             $message = str_replace('\\', '.', $message);
             $scope += 1;
             $memory = self::formatMemory($memory);
-
             $count[$type] = $count[$type] ?? 0;
             $count[$type]++;
 
@@ -123,13 +154,15 @@ abstract class Log
         ];
     }
 
-    /** Retorna o log em forma de array */
+    /**
+     * Retorna o log formatado em um array de strings.
+     * @return array
+     */
     static function getArray(): array
     {
         $logData = self::get();
         $lines = $logData['log'];
         $count = $logData['count'];
-
         $output = [];
 
         foreach ($lines as $line) {
@@ -145,17 +178,18 @@ abstract class Log
         }
 
         $output[] = $count;
-
         return $output;
     }
 
-    /** Retorna o log em forma de string */
+    /**
+     * Retorna o log formatado como uma string completa.
+     * @return string
+     */
     static function getString(): string
     {
         $logData = self::get();
         $lines = $logData['log'];
         $count = $logData['count'];
-
         $output = "-------------------------\n";
 
         foreach ($lines as $line) {
@@ -180,22 +214,23 @@ abstract class Log
         return trim($output);
     }
 
+    /** @ignore */
     protected static function set(string $type, ?string $message = null, bool $isScope = false)
     {
         $scope = count(self::$scope);
         self::$log[] = [$type, $message, $scope, null];
     }
 
+    /** @ignore */
     protected static function openScope(string $type, ?string $message = null)
     {
         self::set($type, $message);
         $index = count(self::$log) - 1;
-
         self::$log[$index][3] = memory_get_peak_usage(true);
-
         self::$scope[] = $index;
     }
 
+    /** @ignore */
     protected static function closeScope()
     {
         if (count(self::$scope)) {
@@ -204,11 +239,13 @@ abstract class Log
         }
     }
 
+    /** @ignore */
     protected static function closeLine(&$line)
     {
         $line[3] = $line[3] ? memory_get_peak_usage(true) - $line[3] : null;
     }
 
+    /** @ignore */
     protected static function formatMemory(?int $bytes): ?string
     {
         if (is_null($bytes)) return null;
@@ -216,11 +253,8 @@ abstract class Log
         if ($bytes < 1) return null;
 
         if ($bytes < 1024) return $bytes . 'b';
-
         if ($bytes < 1048576) return round($bytes / 1024, 2) . 'kb';
-
         if ($bytes < 1073741824) return round($bytes / 1048576, 2) . 'mb';
-
         return round($bytes / 1073741824, 2) . 'gb';
     }
 }

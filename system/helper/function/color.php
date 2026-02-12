@@ -2,7 +2,12 @@
 
 if (!function_exists('colorRGB')) {
 
-    /** Converte uma string de cor Hexadecimal em RGB */
+    /**
+     * Converte uma string de cor Hexadecimal (com ou sem #) em uma string RGB separada por vírgulas.
+     * Suporta formatos de 6, 3 ou 1 caractere (ex: 'FF0000', 'F00', 'F').
+     * @param string $color A cor em hexadecimal ou já em formato RGB.
+     * @return string Valores RGB (ex: '255,0,0').
+     */
     function colorRGB(string $color): string
     {
         if (count(explode(',', $color)) == 3)
@@ -30,7 +35,11 @@ if (!function_exists('colorRGB')) {
 
 if (!function_exists('colorHex')) {
 
-    /** Converte uma string de cor RGB em Hexadecimal */
+    /**
+     * Converte uma string de cor RGB (separada por vírgulas) em Hexadecimal de 6 caracteres.
+     * @param string $color Valores RGB (ex: '255,0,0') ou hexadecimal.
+     * @return string Cor em Hexadecimal sem o caractere # (ex: 'ff0000').
+     */
     function colorHex(string $color): string
     {
         if (strpos($color, ',') === false)

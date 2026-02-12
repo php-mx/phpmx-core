@@ -4,7 +4,10 @@ use PhpMx\Dir;
 use PhpMx\Json;
 use PhpMx\Terminal;
 
-/** Atualiza o autoload do composer mapeando automaticamente as classes e arquivos de helper do sistema */
+/**
+ * Gerencia o mapeamento automático do Composer para o framework.
+ * @param int forceDev Define se deve forçar o dump em modo desenvolvimento (0 ou 1).
+ */
 return new class {
 
     function __invoke($forceDev = 0)

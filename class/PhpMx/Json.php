@@ -2,10 +2,16 @@
 
 namespace PhpMx;
 
-/** Classe utilitária para importar e exportar arquivos JSON. */
+/**
+ * Classe utilitária para importar e exportar arquivos JSON.
+ */
 abstract class Json
 {
-    /** Importa o conteúdo de um arquivo json para um array */
+    /**
+     * Importa o conteúdo de um arquivo json para um array
+     * @param string $path
+     * @return array|null
+     */
     static function import(string $path): ?array
     {
         $path = File::setEx($path, 'json');
@@ -16,7 +22,13 @@ abstract class Json
         return $content;
     }
 
-    /** Exporta um array para um arquivo json */
+    /**
+     * Exporta um array para um arquivo json
+     * @param string $path
+     * @param array $array
+     * @param bool $merge
+     * @return void
+     */
     static function export(string $path, array $array, bool $merge = false): void
     {
         $path = File::setEx($path, 'json');

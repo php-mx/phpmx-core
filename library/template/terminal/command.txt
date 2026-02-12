@@ -1,0 +1,12 @@
+<?php
+
+use PhpMx\Terminal;
+
+/** */
+return new class {
+
+    function __invoke()
+    {
+        Terminal::echol('Command [#c:p,#] running', '[#command]');
+    }
+};

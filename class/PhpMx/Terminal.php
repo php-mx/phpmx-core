@@ -6,15 +6,30 @@ use Exception;
 use ReflectionMethod;
 use Throwable;
 
-/** Classe base para criação e execução de comandos de terminal. */
+/**
+ * Classe base para criação e execução de comandos de terminal.
+ * Oferece suporte a estilização ANSI via tags de composição:
+ * - Formato: `[#c:estilo,texto]` ou `[#c:estilo,#]` com prepare.
+ * - Estilos (Cores): `p` (Primária), `s` (Sucesso), `e` (Erro), `w` (Alerta), `d` (Padrão).
+ * - Modificadores: `b` (Negrito), `i` (Itálico), `u` (Sublinhado), `s` (Riscado).
+ * @example self::echo("[#c:pb,Texto em negrito ciano]");
+ * @example self::echol("[#c:e,#]", ["Mensagem de Erro"]);
+ */
 abstract class Terminal
 {
+    /** @ignore */
     private static ?array $colors = null;
 
-    /** Executa uma linha de comando */
-    final static function run(...$commandLine)
+    /**
+     * Executa uma linha de comando 
+     * @example Terminal::run('make.command teste') Equivalente a php mx make.command teste
+     * @example Terminal::run('make.command', 'teste') Equivalente a php mx make.command teste
+     */
+    final static function run()
     {
         self::loadColors();
+
+        $commandLine = func_get_args();
 
         if (count($commandLine) == 1)
             $commandLine = explode(' ', array_shift($commandLine));
@@ -93,31 +108,50 @@ abstract class Terminal
         return $result;
     }
 
-    /** Exibe uma linha de texto no terminal com quebra de linha */
+    /**
+     * Exibe uma linha de texto no terminal com quebra de linha.
+     * Aceita argumentos prepare para compor texto dinâmico
+     * @param string $text Texto que deve ser exibido
+     * @param array $prepare Dados prepare para compor o texto
+     * @return void
+     * @see \PhpMx\Prepare
+     */
     static function echol(string $text = '', string|array $prepare = []): void
     {
         self::echo("$text\n", $prepare);
     }
 
-    /** Exibe uma linha de texto no terminal */
-    static function echo(string $text = '', string|array $prepare = [])
+    /**
+     * Exibe uma linha de texto no terminal sem quebra de linha.
+     * Aceita argumentos prepare para compor texto dinâmico
+     * @param string $text Texto que deve ser exibido
+     * @param array $prepare Dados prepare para compor o texto
+     * @return void
+     * @see \PhpMx\Prepare
+     */
+    static function echo(string $text = '', string|array $prepare = []): void
     {
         self::loadColors();
         $prepare = is_array($prepare) ? $prepare : [$prepare];
         echo prepare($text, [...self::$colors, ...$prepare]);
     }
 
-    /** Solicita confirmação y/n do usuário */
-    static function confirm(string|array $label = '', $default = null): bool
+    /**
+     * Solicita confirmação do usuário (y/n)
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param boolean|null $default Valor retornado por padrão. Se não informado, o terminal vai entrar em loop ate receber um valor válido.
+     * @return boolean 
+     */
+    static function confirm(string $text = '', string|array $prepare = [], ?bool $default = null): bool
     {
         $input = '';
-        $label = is_array($label) ? $label : [$label];
         self::echol();
 
         while ($input != 'y' && $input != 'n') {
             self::echo("\e[1A\e[K");
 
-            self::echo(...$label);
+            self::echo($text, $prepare);
             self::echo(" [#c:dd,(][#c:#styleY,#textY][#c:dd,/][#c:#styleN,#textN][#c:dd,):] ", [
                 'styleY' => $default === true ? 'sub' : 's',
                 'styleN' => $default === false ? 'eub' : 'e',
@@ -136,16 +170,22 @@ abstract class Terminal
         return $input == 'y';
     }
 
-    /** Solicita entrada de texto do usuário */
-    static function input(string|array $label = '', string $default = '', bool $required = true): string
+    /**
+     * Solicita entrada de texto do usuário
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param string|null $default Valor retornado por padrão.
+     * @param boolean $required Se o terminal deve entrar em loop ate receber um valor válido.
+     * @return string
+     */
+    static function input(string $text = '', string|array $prepare = [], ?string $default = null, bool $required = true): string
     {
-        $label = is_array($label) ? $label : [$label];
         self::echol();
 
         while (true) {
             self::echo("\e[1A\e[K");
 
-            self::echo(...$label);
+            self::echo($text, $prepare);
 
             $prompt = is_blank($default) ? "[#c:dd,:] " : " [#c:dd,(][#c:pd,$default][#c:dd,):] ";
 
@@ -153,7 +193,7 @@ abstract class Terminal
 
             $input = trim(fgets(STDIN));
 
-            if (is_blank($input) && $required && is_blank($default))
+            if (is_blank($input) && $required && is_null($default))
                 continue;
 
             usleep(250000);
@@ -165,15 +205,21 @@ abstract class Terminal
         }
     }
 
-    /** Solicita entrada de senha (texto oculto) */
-    static function password(string|array $label = '', ?string $expected = null, bool $required = true): string
+    /**
+     * Solicita entrada de senha (texto oculto)
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param string|null $expected Valor experado para validação rápida
+     * @param boolean $required Se o terminal deve entrar em loop ate receber o valor experado
+     * @return string
+     */
+    static function password(string $text = '', string|array $prepare = [], ?string $expected = null, bool $required = true): string
     {
-        $label = is_array($label) ? $label : [$label];
         self::echol();
 
         while (true) {
             self::echo("\e[1A\e[K");
-            self::echo(...$label);
+            self::echo($text, $prepare);
             self::echo("[#c:dd,:] ");
 
             if (PHP_OS_FAMILY === 'Windows') {
@@ -200,13 +246,20 @@ abstract class Terminal
         }
     }
 
-    /** Solicita uma escolha de uma lista numerada */
-    static function select(string|array $label = '', array $options = [], $default = null, bool $required = true): mixed
+    /**
+     * Solicita uma escolha entre opções numeradas 
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param array $options Valores para composição da lista ['option'=>'value']
+     * @param mixed $default Valor retornado por padrão.
+     * @param bool $required
+     * @return mixed Chave da opção escolhida no array $options
+     */
+    static function select(string $text = '', string|array $prepare = [], array $options = [], mixed $default = null, bool $required = true): mixed
     {
         if (empty($options)) return null;
 
-        $label = is_array($label) ? $label : [$label];
-        self::echol(...$label);
+        self::echo($text, $prepare);
 
         $col = [];
         $size = [];
@@ -257,8 +310,15 @@ abstract class Terminal
         return $return;
     }
 
-    /** Barra de progresso */
-    static function progress(int $current, int $total, string $label = '', string $color = 'pd')
+    /**
+     * Exibe uma barra de progresso 
+     * @param string text Mensagem de texto que deve ser exibida
+     * @param string|array prepare Dados prepare para compor o texto
+     * @param int $current Valor atual da barra
+     * @param int $total Valor total da barra
+     * @return void
+     */
+    static function progress(string $text = '', string|array $prepare = [], int $current = 0, int $total = 0): void
     {
         $percent = ($current / $total);
         $barWidth = 33;
@@ -268,19 +328,20 @@ abstract class Terminal
         $bar = str_repeat("█", $done) . str_repeat("░", $left);
         $p = ' ' . round($percent * 100);
 
-        self::echo("\r[#] [#c:$color,#] [#]/[#][#]%", [
-            $label,
-            $bar,
-            $current,
-            $total,
-            $p
-        ]);
+        self::echo("\r");
+        self::echo($text, $prepare);
+        self::echo(" [#c:pd,#] [#]/[#][#]%", [$bar, $current, $total, $p]);
 
         if ($current === $total) self::echo("\n");
     }
 
-    /** Exibe uma tabela a partir de uma matriz */
-    static function table(array $data, bool $hasHeader = true, string $color = 'p')
+    /**
+     * Exibe uma tabela a partir de uma matriz
+     * @param array $data Dados da tabela
+     * @param bool $hasHeader Se a primeira linha da tabela deve ser tratada como cabeçalho
+     * @return void
+     */
+    static function table(array $data, bool $hasHeader = true)
     {
         if (empty($data)) return;
 
@@ -290,18 +351,18 @@ abstract class Terminal
                 $widths[$i] = max($widths[$i] ?? 0, mb_strlen("$value"));
 
         $separator = "+-" . implode("-+-", array_map(fn($w) => str_repeat("-", $w), $widths)) . "-+";
-        $colorTag = "[#c:{$color}d,#]";
+        $colorTag = "[#c:pd,#]";
 
         self::echol($colorTag, [$separator]);
 
         foreach ($data as $index => $row) {
-            $line = "[#c:{$color}d,|] ";
+            $line = "[#c:pd,|] ";
             $values = array_values($row);
 
             foreach ($values as $i => $v) {
                 $space = $widths[$i] - mb_strlen($v);
-                $v = $index === 0 && $hasHeader ? "[#c:{$color},$v]" : "$v";
-                $line .= $v . str_repeat(" ", $space) . " [#c:{$color}d,|] ";
+                $v = $index === 0 && $hasHeader ? "[#c:p,$v]" : "$v";
+                $line .= $v . str_repeat(" ", $space) . " [#c:pd,|] ";
             }
 
             self::echol($line);
@@ -313,6 +374,7 @@ abstract class Terminal
         self::echol($colorTag, [$separator]);
     }
 
+    /** @ignore */
     private static function loadColors()
     {
         if (is_null(self::$colors))
@@ -338,6 +400,7 @@ abstract class Terminal
             }
     }
 
+    /** @ignore */
     private static function checkANSI(): bool
     {
         if (PHP_OS_FAMILY !== 'Windows') return true;

@@ -2,7 +2,13 @@
 
 if (!function_exists('applyChanges')) {
 
-    /** Aplica mudanças em um array */
+    /**
+     * Aplica mudanças em um array de forma recursiva. 
+     * Valores nulos nas mudanças resultam na remoção da chave correspondente.
+     * @param array &$array Array original que receberá as alterações (passado por referência).
+     * @param array $changes Mapa de alterações a serem aplicadas.
+     * @return void
+     */
     function applyChanges(&$array, $changes): void
     {
         foreach ($changes as $key => $newValue) {
@@ -23,7 +29,13 @@ if (!function_exists('applyChanges')) {
 
 if (!function_exists('getChanges')) {
 
-    /** Retorna as mudanças realizadas em um array */
+    /**
+     * Compara dois arrays e retorna as diferenças estruturais.
+     * Chaves presentes no original mas ausentes no alterado são marcadas como null.
+     * @param array $changed Array com as versões novas dos dados.
+     * @param array $original Array com os dados originais.
+     * @return array Mapa de mudanças encontradas.
+     */
     function getChanges($changed, $original): array
     {
         $changes = [];
