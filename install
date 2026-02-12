@@ -17,7 +17,7 @@ return new class {
         self::createDir('system/helper/constant');
         self::createDir('system/helper/script');
 
-        self::promote('.vscode');
+        self::promote('.vscode/settings.json');
         self::promote('system/helper/script/path.php');
 
         self::blockFile('.env', 'MX-CORE', [
