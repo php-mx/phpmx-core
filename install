@@ -27,6 +27,7 @@ return new class {
         self::blockFile('.gitignore', 'MX-CORE', [
             '/.env',
             '/vendor',
+            '/.vscode',
             '/library/cache',
             '/library/certificate',
         ]);
