@@ -7,7 +7,6 @@ namespace PhpMx;
  */
 abstract class Mime
 {
-    /** @ignore */
     protected static array $MIMETYPE = [
         'txt' => 'text/plain',
         'html' => 'text/html',

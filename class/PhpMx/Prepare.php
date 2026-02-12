@@ -79,7 +79,6 @@ abstract class Prepare
         }
     }
 
-    /** @ignore */
     protected static function resolve($string, $tags, $prepare): string
     {
         list($ppN, $ppR) = self::separePrepare($prepare);
@@ -96,7 +95,6 @@ abstract class Prepare
         return $string;
     }
 
-    /** @ignore */
     protected static function getTagValue($tag, &$ppN, $ppR, bool $runClosure = true): mixed
     {
         if ($tag == '#') {
@@ -139,7 +137,6 @@ abstract class Prepare
         }
     }
 
-    /** @ignore */
     protected static function separePrepare($prepare): array
     {
         $sequence = [];
@@ -154,7 +151,6 @@ abstract class Prepare
         return [$sequence, $reference];
     }
 
-    /** @ignore */
     protected static function combinePrepare(array|string $prepare): array
     {
         $prepare = is_array($prepare) ? $prepare : [$prepare];
@@ -170,7 +166,6 @@ abstract class Prepare
         return $prepare;
     }
 
-    /** @ignore */
     protected static function getPrepareTags(string $string): array
     {
         preg_match_all("#\[[\#\>][^\]]*+\]#i", $string, $tags);

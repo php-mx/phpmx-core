@@ -7,7 +7,6 @@ namespace PhpMx;
  */
 abstract class Env
 {
-    /** @ignore */
     protected static array $DEFAULT = [];
 
     /**

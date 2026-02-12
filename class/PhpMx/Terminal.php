@@ -17,7 +17,6 @@ use Throwable;
  */
 abstract class Terminal
 {
-    /** @ignore */
     private static ?array $colors = null;
 
     /**
@@ -374,7 +373,6 @@ abstract class Terminal
         self::echol($colorTag, [$separator]);
     }
 
-    /** @ignore */
     private static function loadColors()
     {
         if (is_null(self::$colors))
@@ -400,7 +398,6 @@ abstract class Terminal
             }
     }
 
-    /** @ignore */
     private static function checkANSI(): bool
     {
         if (PHP_OS_FAMILY !== 'Windows') return true;

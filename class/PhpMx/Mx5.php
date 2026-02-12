@@ -8,11 +8,8 @@ namespace PhpMx;
  */
 abstract class Mx5
 {
-    /** @ignore */
     protected static ?array $KEY = null;
-    /** @ignore */
     protected static array $HEX_CHARS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f'];
-    /** @ignore */
     protected static array $MX_CHARS  = ['s', 'i', 'q', 'j', 'n', 'g', 'p', 'l', 'v', 'o', 'u', 'y', 't', 'w', 'r', 'h'];
 
     /**
@@ -81,7 +78,6 @@ abstract class Mx5
         return true;
     }
 
-    /** @ignore */
     private static function loadKey(): array
     {
         if (is_null(self::$KEY)) {

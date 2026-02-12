@@ -10,11 +10,8 @@ use Exception;
  */
 abstract class Cif
 {
-    /** @ignore */
     protected static array $ENSURE;
-    /** @ignore */
     protected static ?int $CURRENT_ID_KEY = null;
-    /** @ignore */
     protected static ?array $CIF = null;
 
     final const BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -99,7 +96,6 @@ abstract class Cif
         return true;
     }
 
-    /** @ignore */
     protected static function replace(string $string, string $in, string $out): string
     {
         for ($i = 0; $i < strlen($string); $i++)
@@ -109,7 +105,6 @@ abstract class Cif
         return $string;
     }
 
-    /** @ignore */
     protected static function getUseIdKey(?string $charKey): int
     {
         self::__load();
@@ -122,7 +117,6 @@ abstract class Cif
         return $idKey ?? self::$CURRENT_ID_KEY;
     }
 
-    /** @ignore */
     protected static function getEncapsChar(int $idKey, bool $reverse = false): string
     {
         if ($reverse) $idKey = 61 - $idKey;
@@ -130,14 +124,12 @@ abstract class Cif
         return $charKey;
     }
 
-    /** @ignore */
     protected static function checkEncapsChar(string $string)
     {
         $idCharKeyStart = self::getUseIdKey(substr($string, 0, 1));
         return self::getEncapsChar($idCharKeyStart, true) == substr($string, -1, 1);
     }
 
-    /** @ignore */
     protected static function __load()
     {
         if (is_null(self::$CIF)) {
@@ -152,7 +144,6 @@ abstract class Cif
         }
     }
 
-    /** @ignore */
     private static function loadFileCif(string $path)
     {
         if (!File::check($path))

@@ -11,13 +11,9 @@ use Throwable;
  */
 abstract class Log
 {
-    /** @ignore */
     protected static array $log = [];
-    /** @ignore */
     protected static array $scope = [];
-    /** @ignore */
     protected static bool $useLog = true;
-    /** @ignore */
     protected static array $snap = ['log' => [], 'scope' => [], 'useLog' => true];
 
     /**
@@ -214,14 +210,12 @@ abstract class Log
         return trim($output);
     }
 
-    /** @ignore */
     protected static function set(string $type, ?string $message = null, bool $isScope = false)
     {
         $scope = count(self::$scope);
         self::$log[] = [$type, $message, $scope, null];
     }
 
-    /** @ignore */
     protected static function openScope(string $type, ?string $message = null)
     {
         self::set($type, $message);
@@ -230,7 +224,6 @@ abstract class Log
         self::$scope[] = $index;
     }
 
-    /** @ignore */
     protected static function closeScope()
     {
         if (count(self::$scope)) {
@@ -239,13 +232,11 @@ abstract class Log
         }
     }
 
-    /** @ignore */
     protected static function closeLine(&$line)
     {
         $line[3] = $line[3] ? memory_get_peak_usage(true) - $line[3] : null;
     }
 
-    /** @ignore */
     protected static function formatMemory(?int $bytes): ?string
     {
         if (is_null($bytes)) return null;
