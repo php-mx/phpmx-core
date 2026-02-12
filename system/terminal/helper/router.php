@@ -3,6 +3,7 @@
 use PhpMx\DocScheme;
 use PhpMx\Dir;
 use PhpMx\Path;
+use PhpMx\ReflectionFile;
 use PhpMx\Terminal;
 
 /** Lista as rotas registradas no projeto */
@@ -18,10 +19,10 @@ return new class {
 
         foreach (Path::seekForDirs('system/router') as $path) {
             foreach (array_reverse(Dir::seekForFile($path, true)) as $file) {
-                $origim = DocScheme::originPath($path);
+                $origim = Path::origin($path);
                 $registredRoutes[$origim] = $registredRoutes[$origim] ?? $defaultScheme;
-                foreach (DocScheme::docSchemeRouteFile(path($path, $file)) as $scheme) {
-                    $routeTemplate = $scheme['ref'];
+                foreach (ReflectionFile::routerFile(path($path, $file)) as $scheme) {
+                    $routeTemplate = $scheme['path'];
                     $routeMethod = $scheme['method'];
 
                     $scheme['order'] = $routeTemplate;
