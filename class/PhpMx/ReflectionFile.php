@@ -323,7 +323,6 @@ abstract class ReflectionFile
         ];
     }
 
-    /** @internal */
     protected static function docBlockBefore(string $code, int $pos): string
     {
         $before = substr($code, 0, $pos);
@@ -337,7 +336,6 @@ abstract class ReflectionFile
         return '';
     }
 
-    /** @internal */
     protected static function parseDocBlock(?string $docBlock, array $keys = [], ?string $origim = null): array
     {
         if (!is_null($origim))
@@ -444,7 +442,6 @@ abstract class ReflectionFile
         return $data;
     }
 
-    /** @internal */
     protected static function extractConstantsReflection(ReflectionClass $reflection): array
     {
         $constants = [];
@@ -485,7 +482,6 @@ abstract class ReflectionFile
         return $constants;
     }
 
-    /** @internal */
     protected static function extractPropertiesReflection(ReflectionClass $reflect): array
     {
         $props = [];
@@ -529,7 +525,6 @@ abstract class ReflectionFile
         return $props;
     }
 
-    /** @internal */
     protected static function extractMethodsReflection(ReflectionClass $reflect): array
     {
         $methods = [];
