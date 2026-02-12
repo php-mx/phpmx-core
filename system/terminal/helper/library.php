@@ -25,7 +25,7 @@ return new class {
         $files = [];
 
         foreach (Dir::seekForFile($path, true) as $file)
-            $files[] = ['name' => $file, 'file' => path($path, $file)];
+            $files[] = ['key' => $file, 'name' => $file, 'file' => path($path, $file)];
 
         return $files;
     }
