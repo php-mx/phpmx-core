@@ -90,9 +90,9 @@ abstract class Terminal
                 $type = $e::class;
 
                 self::echol('[#c:e,#] [#c:e,#]', [$type, $message]);
-                self::echol(' [#]:[#]', [$file, $line]);
-                foreach ($trace as $pos => $traceLine)
-                    self::echol(' [#]:[#]', [$traceLine['file'], $traceLine['line']]);
+                self::echol(' [#c:dd,#][#c:dd,:][#c:dd,#]', [$file, $line]);
+                foreach ($trace as $traceLine)
+                    self::echol(' [#c:dd,#][#c:dd,:][#c:dd,#]', [$traceLine['file'], $traceLine['line']]);
 
                 Log::exception($e);
                 return false;
