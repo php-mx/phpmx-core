@@ -160,8 +160,8 @@ abstract class Terminal
 
             $input = strtolower(trim(fgets(STDIN)));
 
-            if ($input === '' && $default !== null)
-                $input = $default;
+            if ($input === '' && !is_null($default))
+                $input = $default ? 'y' : 'n';
         }
 
         usleep(250000);
