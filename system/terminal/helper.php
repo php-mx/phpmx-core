@@ -63,8 +63,8 @@ return new class {
 
         $pos = $match[0][1];
 
-        $docBlock = self::docBlockBefore($content, $pos);
-        $docScheme = self::parseDocBlock($docBlock, ['description', 'params']);
+        $docBlock = $this->docBlockBefore($content, $pos);
+        $docScheme = $this->parseDocBlock($docBlock, ['description', 'params']);
 
         $command = explode('system/terminal/', $file);
         $command = array_pop($command);

@@ -47,8 +47,8 @@ return new class {
             $constantName = $match[1][0];
             $pos = $match[0][1];
 
-            $docBlock = self::docBlockBefore($content, $pos);
-            $docScheme = self::parseDocBlock($docBlock, ['description']);
+            $docBlock = $this->docBlockBefore($content, $pos);
+            $docScheme = $this->parseDocBlock($docBlock, ['description']);
 
             $schemes[] = [
                 'key' => $constantName,

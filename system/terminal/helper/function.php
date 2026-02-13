@@ -48,25 +48,7 @@ return new class {
 
             $reflection = new ReflectionFunction($functionName);
             $docBlock = $reflection->getDocComment();
-            $docScheme = self::parseDocBlock($docBlock, ['description', 'params', 'return', 'examples', 'see', 'internal', 'context']);
-
-            foreach ($reflection->getParameters() as $p) {
-                $name = $p->getName();
-                $type = $p->hasType() ? strval($p->getType()) : null;
-                $optional = $p->isOptional();
-                $default = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
-                $reference = $p->isPassedByReference();
-
-                $docScheme['params'][$name] = $docScheme['params'][$name] ?? ['name' => $name, 'description' => []];
-
-                $docScheme['params'][$name]['type'] = $docScheme['params'][$name]['type'] ?? $type ?? null;
-                $docScheme['params'][$name]['optional'] = $optional;
-                $docScheme['params'][$name]['default'] = $default;
-                $docScheme['params'][$name]['reference'] = $reference;
-            }
-
-            $returnType = $reflection->hasReturnType() ? strval($reflection->getReturnType()) : null;
-            $docScheme['return'] = $docScheme['return'] ?? $returnType ?? null;
+            $docScheme = $this->parseDocBlock($docBlock, ['description']);
 
             $schemes[] = [
                 'key' => $functionName,
