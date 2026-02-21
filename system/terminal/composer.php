@@ -6,7 +6,7 @@ use PhpMx\Terminal;
 
 /**
  * Gerencia o mapeamento automático do Composer para o framework.
- * @param int forceDev Define se deve forçar o dump em modo desenvolvimento (0 ou 1).
+ * @param int $forceDev Define se deve forçar o dump em modo desenvolvimento (0 ou 1).
  */
 return new class {
 
@@ -39,7 +39,6 @@ return new class {
         $composer['autoload']['files'] = $files;
 
         Json::export('composer', $composer, false);
-
 
         $forceDev || env('DEV') ? self::inDev() : self::inProd();
     }

@@ -4,7 +4,6 @@ if (!function_exists('str_get_var')) {
 
     /**
      * Extrai e converte um valor de dentro de uma string para seu tipo real (bool, int, float ou null).
-     * Útil para processar valores vindos de arquivos .env ou inputs de texto.
      * @param mixed $var
      * @return mixed
      */

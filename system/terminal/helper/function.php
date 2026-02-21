@@ -3,13 +3,12 @@
 use PhpMx\Dir;
 use PhpMx\Import;
 use PhpMx\Path;
-use PhpMx\ReflectionMxFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /**
- * Lista todas as funções utilitárias (helpers) registradas no sistema.
- * @param string filter Nome ou parte do nome de uma função para filtrar a busca.
+ * Lista todas as helpers de funções registradas no sistema.
+ * @param string $filter Nome ou parte do nome de uma função para filtrar a busca.
  */
 return new class {
 

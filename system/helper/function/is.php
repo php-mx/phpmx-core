@@ -198,7 +198,7 @@ if (!function_exists('is_password')) {
 if (!function_exists('is_mx5')) {
 
     /**
-     * Atalho para verificar se uma variável é um hash MX5 válido (via Mx5::check).
+     * Atalho para verificar se uma variável é um hash MX5 válido.
      * @param mixed $var
      * @return bool
      */

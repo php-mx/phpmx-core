@@ -4,7 +4,6 @@ if (!function_exists('strToCamelCase')) {
 
     /**
      * Converte uma string para o formato camelCase.
-     * Remove acentos, caracteres especiais e normaliza a capitalização (ex: "Test string" -> "testString").
      * @param string $string
      * @return string
      */
@@ -23,7 +22,7 @@ if (!function_exists('strToCamelCase')) {
 if (!function_exists('strToKebabCase')) {
 
     /**
-     * Converte uma string para o formato kebab-case (hifenizado).
+     * Converte uma string para o formato kebab-case.
      * @param string $string
      * @return string
      */
@@ -59,7 +58,7 @@ if (!function_exists('strToPascalCase')) {
 if (!function_exists('strToSnakeCase')) {
 
     /**
-     * Converte uma string para o formato snake_case (sublinhado).
+     * Converte uma string para o formato snake_case.
      * @param string $string
      * @return string
      */

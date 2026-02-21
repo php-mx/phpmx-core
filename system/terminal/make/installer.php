@@ -5,9 +5,7 @@ use PhpMx\Import;
 use PhpMx\Path;
 use PhpMx\Terminal;
 
-/**
- * Cria o arquivo de script "install" na raiz do projeto para automatizar instalação de pacotes.
- */
+/** Cria o arquivo de script "install" na raiz do projeto para automatizar instalação de pacotes. */
 return new class {
 
     function __invoke()

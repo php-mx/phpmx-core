@@ -2,10 +2,7 @@
 
 namespace PhpMx;
 
-/**
- * Classe utilitária para codificação e verificação com hash MX5.
- * O MX5 é uma representação ofuscada de um MD5, utilizando um alfabeto personalizado baseado em uma chave de segurança definida no ambiente.
- */
+/** Classe utilitária para codificação e verificação com hash MX5. */
 abstract class Mx5
 {
     protected static ?array $KEY = null;

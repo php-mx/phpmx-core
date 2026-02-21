@@ -6,7 +6,7 @@ use PhpMx\Log;
 if (!function_exists('cache')) {
 
     /**
-     * Armazena e recupera o retorno de uma Closure em /library/cache.
+     * Armazena e recupera o retorno de uma Closure em /storage/cache.
      * @param string $cacheName Nome identificador do cache.
      * @param Closure $action Função que gera o valor caso o cache não exista ou esteja em DEV.
      * @return mixed Resultado processado ou recuperado do arquivo JSON.
@@ -15,7 +15,7 @@ if (!function_exists('cache')) {
     {
         $cacheName = strToCamelCase($cacheName);
         return Log::add('cache', $cacheName, function () use ($cacheName, $action) {
-            $file = path('library/cache', $cacheName);
+            $file = path('storage/cache', $cacheName);
 
             if (!env('USE_CACHE_FILE'))
                 return $action();
@@ -47,7 +47,7 @@ if (!function_exists('cache')) {
 if (!function_exists('cacheTime')) {
 
     /**
-     * Armazena e recupera o retorno de uma Closure em /library/cache por um período determinado.
+     * Armazena e recupera o retorno de uma Closure em /storage/cache por um período determinado.
      * @param string $cacheName Nome identificador do cache.
      * @param int $seconds Tempo de vida do cache em segundos.
      * @param Closure $action Função que gera o valor caso o cache tenha expirado.
@@ -62,7 +62,7 @@ if (!function_exists('cacheTime')) {
             if (!env('USE_CACHE_FILE'))
                 return $action();
 
-            $file = path('library/cacheTime', $cacheName);
+            $file = path('storage/cacheTime', $cacheName);
 
             $result = Json::import($file);
 

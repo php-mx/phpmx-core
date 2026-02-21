@@ -6,10 +6,25 @@ use Exception;
 use ReflectionMethod;
 use Throwable;
 
-/** Classe base para criação e execução de comandos de terminal. */
+/**
+ * Classe base para criação e execução de comandos de terminal.
+ * Oferece suporte a estilização ANSI via tags de composição:
+ * - Formato: `[#c:estilo,texto]` ou `[#c:estilo,#]` com prepare.
+ * - Estilos (Cores): `p` (Primária), `s` (Sucesso), `e` (Erro), `w` (Alerta), `d` (Padrão).
+ * - Modificadores: `b` (Negrito), `i` (Itálico), `u` (Sublinhado), `s` (Riscado).
+ * @example self::echo("[#c:pb,Texto em negrito ciano]");
+ * @example self::echol("[#c:e,#]", ["Mensagem de Erro"]);
+ */
 abstract class Terminal
 {
     /** Executa uma linha de comando */
+
+    /**
+     * Executa uma linha de comando 
+     * @param mixed ...$commandLine Comando que deve ser executado
+     * @example Terminal::run('make.command teste') Equivalente a php mx make.command teste
+     * @example Terminal::run('make.command', 'teste') Equivalente a php mx make.command teste
+     */
     final static function run(...$commandLine)
     {
         if (count($commandLine) == 1)
@@ -89,13 +104,25 @@ abstract class Terminal
         return $result;
     }
 
-    /** Exibe uma linha de texto no terminal com quebra de linha. */
+    /**
+     * Exibe uma linha de texto no terminal com quebra de linha.
+     * @param string $text Texto que deve ser exibido
+     * @param array $prepare Dados prepare para compor o texto
+     * @return void
+     * @see \PhpMx\Prepare
+     */
     static function echol(string $text = '', string|array $prepare = []): void
     {
         self::echo("$text\n", $prepare);
     }
 
-    /** Exibe uma linha de texto no terminal sem quebra de linha. */
+    /**
+     * Exibe uma linha de texto no terminal sem quebra de linha.
+     * @param string $text Texto que deve ser exibido
+     * @param array $prepare Dados prepare para compor o texto
+     * @return void
+     * @see \PhpMx\Prepare
+     */
     static function echo(string $text = '', string|array $prepare = []): void
     {
         $prepare = is_array($prepare) ? $prepare : [$prepare];
@@ -103,7 +130,13 @@ abstract class Terminal
         echo prepare($text, $prepare);
     }
 
-    /** Solicita confirmação do usuário (y/n) */
+    /**
+     * Solicita confirmação do usuário (y/n)
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param boolean|null $default Valor retornado por padrão. Se não informado, o terminal vai entrar em loop ate receber um valor válido.
+     * @return boolean 
+     */
     static function confirm(string $text = '', string|array $prepare = [], ?bool $default = null): bool
     {
         $input = '';
@@ -129,7 +162,14 @@ abstract class Terminal
         return $input == 'y';
     }
 
-    /** Solicita entrada de texto do usuário */
+    /**
+     * Solicita entrada de texto do usuário
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param string|null $default Valor retornado por padrão.
+     * @param boolean $required Se o terminal deve entrar em loop ate receber um valor válido.
+     * @return string
+     */
     static function input(string $text = '', string|array $prepare = [], ?string $default = null, bool $required = true): string
     {
         self::echol();
@@ -157,7 +197,14 @@ abstract class Terminal
         }
     }
 
-    /** Solicita entrada de senha (texto oculto) */
+    /**
+     * Solicita entrada de senha (texto oculto)
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param string|null $expected Valor experado para validação rápida
+     * @param boolean $required Se o terminal deve entrar em loop ate receber o valor experado
+     * @return string
+     */
     static function password(string $text = '', string|array $prepare = [], ?string $expected = null, bool $required = true): string
     {
         self::echol();
@@ -191,7 +238,14 @@ abstract class Terminal
         }
     }
 
-    /** Solicita uma escolha entre opções numeradas */
+    /**
+     * Solicita uma escolha entre opções numeradas 
+     * @param string $text Mensagem de texto que deve ser exibida
+     * @param array $prepare Dados prepare para compor o texto
+     * @param array $options Valores para composição da lista ['option'=>'value']
+     * @param mixed $default Valor retornado por padrão.
+     * @return mixed Chave da opção escolhida no array $options
+     */
     static function select(string $text = '', string|array $prepare = [], array $options = [], mixed $default = null): mixed
     {
         if (empty($options)) return null;
@@ -266,7 +320,14 @@ abstract class Terminal
         return $return;
     }
 
-    /** Exibe uma barra de progresso */
+    /**
+     * Exibe uma barra de progresso 
+     * @param string text Mensagem de texto que deve ser exibida
+     * @param string|array prepare Dados prepare para compor o texto
+     * @param int $current Valor atual da barra
+     * @param int $total Valor total da barra
+     * @return void
+     */
     static function progress(string $text = '', string|array $prepare = [], int $current = 0, int $total = 0): void
     {
         $percent = ($current / $total);
@@ -284,7 +345,12 @@ abstract class Terminal
         if ($current === $total) self::echo("\n");
     }
 
-    /** Exibe uma tabela a partir de uma matriz */
+    /**
+     * Exibe uma tabela a partir de uma matriz
+     * @param array $data Dados da tabela
+     * @param bool $hasHeader Se a primeira linha da tabela deve ser tratada como cabeçalho
+     * @return void
+     */
     static function table(array $data, bool $hasHeader = true)
     {
         if (empty($data)) return;

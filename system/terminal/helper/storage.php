@@ -5,7 +5,7 @@ use PhpMx\Trait\TerminalHelperTrait;
 
 /**
  * Lista todos os arquivos e recursos registrados no diretório storage do projeto.
- * @param string filter Parte do nome ou caminho do arquivo para filtrar a busca.
+ * @param string $filter Parte do nome ou caminho do arquivo para filtrar a busca.
  */
 return new class {
 

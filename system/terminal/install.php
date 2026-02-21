@@ -5,9 +5,7 @@ use PhpMx\Path;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalInstallTrait;
 
-/**
- * Executa os scripts de instalação de pacotes externos e atualiza o mapeamento do Composer.
- */
+/** Executa os scripts de instalação de pacotes mx externos. */
 return new class {
 
     function __invoke()

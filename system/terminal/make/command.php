@@ -7,7 +7,7 @@ use PhpMx\Terminal;
 
 /**
  * Cria um novo arquivo de comando para o terminal em system/terminal
- * @param string command Nome do comando a ser criado.
+ * @param string $command Nome do comando a ser criado.
  */
 return new class {
 

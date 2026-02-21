@@ -5,8 +5,8 @@ use PhpMx\Path;
 use PhpMx\Terminal;
 
 /**
- * Promove um arquivo do sistema (vendor) para o diretório local do projeto.
- * @param string file O caminho relativo do arquivo a ser promovido.
+ * Promove um arquivo do sistema para o diretório local do projeto.
+ * @param string $file O caminho relativo do arquivo a ser promovido.
  * @example mx promote system/terminal/promote.php
  */
 return new class {

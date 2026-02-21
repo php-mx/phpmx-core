@@ -6,7 +6,7 @@ use PhpMx\Terminal;
 
 /**
  * Gera um novo arquivo de certificado (.crt) para o motor de criptografia Cif em storage/certificate
- * @param string cifName Nome do arquivo de certificado (sem extensão).
+ * @param string $cifName Nome do arquivo de certificado sem extensão.
  */
 return new class {
 

@@ -4,7 +4,6 @@ if (!function_exists('applyChanges')) {
 
     /**
      * Aplica mudanças em um array de forma recursiva. 
-     * Valores nulos nas mudanças resultam na remoção da chave correspondente.
      * @param array &$array Array original que receberá as alterações (passado por referência).
      * @param array $changes Mapa de alterações a serem aplicadas.
      * @return void
@@ -31,7 +30,6 @@ if (!function_exists('getChanges')) {
 
     /**
      * Compara dois arrays e retorna as diferenças estruturais.
-     * Chaves presentes no original mas ausentes no alterado são marcadas como null.
      * @param array $changed Array com as versões novas dos dados.
      * @param array $original Array com os dados originais.
      * @return array Mapa de mudanças encontradas.

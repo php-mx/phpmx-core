@@ -4,8 +4,8 @@ use PhpMx\Cif;
 use PhpMx\Terminal;
 
 /**
- * Descriptografa e exibe no terminal o valor original de uma cifra MX.
- * @param string cif A string cifrada (incluindo os hífens) para decodificação.
+ * Descriptografa e exibe no terminal o valor original de uma cifra.
+ * @param string $cif A string cifrada.
  */
 return new class {
 

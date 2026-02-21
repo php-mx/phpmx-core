@@ -2,10 +2,7 @@
 
 namespace PhpMx;
 
-/**
- * Classe utilitária para importar arquivos e extrair valores.
- * Gerencia a inclusão de scripts PHP e a captura de conteúdos/variáveis com isolamento de escopo.
- */
+/** Classe utilitária para importar arquivos e extrair valores. */
 abstract class Import
 {
     /**

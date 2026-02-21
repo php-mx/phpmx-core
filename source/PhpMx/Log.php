@@ -5,10 +5,7 @@ namespace PhpMx;
 use Closure;
 use Throwable;
 
-/**
- * Classe utilitária para registro estruturado de logs e escopos.
- * Permite o rastreamento de execução, medição de memória e aninhamento de mensagens.
- */
+/** Classe utilitária para registro estruturado de logs e escopos. */
 abstract class Log
 {
     protected static array $log = [];

@@ -7,8 +7,8 @@ use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /**
- * Lista e detalha todos os comandos disponíveis no terminal do PhpMx.
- * @param string filter Nome ou parte do nome de um comando para filtrar a busca.
+ * Lista e todos os comandos disponíveis no terminal.
+ * @param string $filter Nome ou parte do nome de um comando para filtrar a busca.
  */
 return new class {
 
