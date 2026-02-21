@@ -14,6 +14,7 @@ use Throwable;
  * - Modificadores: `b` (Negrito), `i` (Itálico), `u` (Sublinhado), `s` (Riscado).
  * @example self::echo("[#c:pb,Texto em negrito ciano]");
  * @example self::echol("[#c:e,#]", ["Mensagem de Erro"]);
+ * @see \PhpMx\Prepare
  */
 abstract class Terminal
 {
@@ -109,7 +110,6 @@ abstract class Terminal
      * @param string $text Texto que deve ser exibido
      * @param array $prepare Dados prepare para compor o texto
      * @return void
-     * @see \PhpMx\Prepare
      */
     static function echol(string $text = '', string|array $prepare = []): void
     {
@@ -121,7 +121,6 @@ abstract class Terminal
      * @param string $text Texto que deve ser exibido
      * @param array $prepare Dados prepare para compor o texto
      * @return void
-     * @see \PhpMx\Prepare
      */
     static function echo(string $text = '', string|array $prepare = []): void
     {
