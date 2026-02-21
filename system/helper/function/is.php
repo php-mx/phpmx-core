@@ -106,50 +106,6 @@ if (!function_exists('is_extend')) {
     }
 }
 
-if (!function_exists('is_httpStatus')) {
-
-    /**
-     * Verifica se uma variável corresponde a um status HTTP válido (100~599).
-     * @param mixed $var Variável a verificar.
-     * @return bool
-     */
-    function is_httpStatus($var): bool
-    {
-        return is_numeric($var) && $var >= 100 && $var <= 599;
-    }
-}
-
-if (!function_exists('is_httpStatusError')) {
-
-    /**
-     * Verifica se uma variável corresponde a um status de erro HTTP (400~599).
-     * @param mixed $var Variável a verificar.
-     * @return bool
-     */
-    function is_httpStatusError($var): bool
-    {
-        return is_numeric($var) && $var >= 400 && $var < 600;
-    }
-}
-
-if (!function_exists('is_idKey')) {
-
-    /**
-     * Verifica se uma variável é um idKey válido.
-     * @param mixed $idKey Variável a verificar.
-     * @return bool
-     */
-    function is_idKey(mixed $idKey): bool
-    {
-        if (Cif::check($idKey)) {
-            $idKey = Cif::off($idKey);
-            if (is_array($idKey) && is_string(array_shift($idKey)) && is_int(array_shift($idKey)))
-                return true;
-        }
-        return false;
-    }
-}
-
 if (!function_exists('is_image_base64')) {
 
     /**
