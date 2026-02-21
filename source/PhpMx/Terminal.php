@@ -56,7 +56,7 @@ abstract class Terminal
                 foreach ($reflection->getparameters() as $required) {
                     if ($countParams) {
                         $countParams--;
-                    } elseif (!$required->isDefaultValueAvailable()) {
+                    } elseif (!$required->isDefaultValueAvailable() && !$required->isVariadic()) {
                         $name = $required->getName();
                         throw new Exception("Parameter [$name] is required in [$command]");
                     }

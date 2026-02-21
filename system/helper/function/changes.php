@@ -9,18 +9,18 @@ if (!function_exists('applyChanges')) {
      * @param array $changes Mapa de alterações a serem aplicadas.
      * @return void
      */
-    function applyChanges(&$array, $changes): void
+    function applyChanges(array &$array, $changes): void
     {
         foreach ($changes as $key => $newValue) {
             if (isset($array[$key])) {
                 if (is_null($newValue)) {
                     unset($array[$key]);
-                } elseif (is_array($newValue) && is_array($array[$key])) {
+                } else if (is_array($newValue) && is_array($array[$key])) {
                     applyChanges($array[$key], $newValue);
                 } else {
                     $array[$key] = $newValue;
                 }
-            } elseif (!is_null($newValue)) {
+            } else if (!is_null($newValue)) {
                 $array[$key] = $newValue;
             }
         }
@@ -46,7 +46,7 @@ if (!function_exists('getChanges')) {
                     if (count($innerChanges)) {
                         $changes[$key] = $innerChanges;
                     }
-                } elseif ($newValue !== $original[$key]) {
+                } else if ($newValue !== $original[$key]) {
                     $changes[$key] = $newValue;
                 }
             } else {
@@ -54,11 +54,9 @@ if (!function_exists('getChanges')) {
             }
         }
 
-        foreach ($original as $key => $value) {
-            if (!isset($changed[$key])) {
+        foreach (array_keys($original) as $key)
+            if (!isset($changed[$key]))
                 $changes[$key] = null;
-            }
-        }
 
         return $changes;
     }

@@ -191,8 +191,7 @@ if (!function_exists('is_password')) {
      */
     function is_password(string $value): bool
     {
-        return password_needs_rehash($value, PASSWORD_BCRYPT) === false
-            && strlen($value) === 60;
+        return password_needs_rehash($value, PASSWORD_BCRYPT) === false && strlen($value) === 60;
     }
 }
 
@@ -219,56 +218,48 @@ if (!function_exists('is_serialized')) {
      */
     function is_serialized($var, $strict = true): bool
     {
-        if (!is_string($var)) {
+        if (!is_string($var))
             return false;
-        }
+
         $var = trim($var);
-        if ('N;' === $var) {
+
+        if ('N;' === $var)
             return true;
-        }
-        if (strlen($var) < 4) {
+        if (strlen($var) < 4)
             return false;
-        }
-        if (':' !== $var[1]) {
+        if (':' !== $var[1])
             return false;
-        }
+
         if ($strict) {
             $lastc = substr($var, -1);
-            if (';' !== $lastc && '}' !== $lastc) {
+            if (';' !== $lastc && '}' !== $lastc)
                 return false;
-            }
         } else {
             $semicolon = strpos($var, ';');
-            $brace     = strpos($var, '}');
-            if (false === $semicolon && false === $brace) {
+            $brace = strpos($var, '}');
+            if (false === $semicolon && false === $brace)
                 return false;
-            }
-            if (false !== $semicolon && $semicolon < 3) {
+            if (false !== $semicolon && $semicolon < 3)
                 return false;
-            }
-            if (false !== $brace && $brace < 4) {
+            if (false !== $brace && $brace < 4)
                 return false;
-            }
         }
         $token = $var[0];
         switch ($token) {
             case 's':
-                if ($strict) {
-                    if ('"' !== substr($var, -2, 1)) {
-                        return false;
-                    }
-                } elseif (!str_contains($var, '"')) {
+                if (!$strict && !str_contains($var, '"'))
                     return false;
-                }
+                if ('"' !== substr($var, -2, 1))
+                    return false;
             case 'a':
             case 'O':
             case 'E':
-                return (bool) preg_match("/^{$token}:[0-9]+:/s", $var);
+                return boolval(preg_match("/^{$token}:[0-9]+:/s", $var));
             case 'b':
             case 'i':
             case 'd':
                 $end = $strict ? '$' : '';
-                return (bool) preg_match("/^{$token}:[0-9.E+-]+;$end/", $var);
+                return boolval(preg_match("/^{$token}:[0-9.E+-]+;$end/", $var));
         }
         return false;
     }

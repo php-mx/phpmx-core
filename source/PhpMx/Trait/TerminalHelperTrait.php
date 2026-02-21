@@ -13,8 +13,8 @@ trait TerminalHelperTrait
 
     protected function handle(string $scan, ?string $filter, null|Closure|string $echo = null, null|Closure|string $replaced = null)
     {
-        $echo = $echo ?? ' - [#c:p,#name] [#description]';
-        $replaced = $replaced ?? ' - [#c:pd,#name] [#c:wd,replaced]';
+        $echo = $echo ?? ' [#c:p,#name] [#description]';
+        $replaced = $replaced ?? ' [#c:pd,#name] [#c:wd,replaced]';
 
         $echo = is_closure($echo) ? $echo : fn($item) => Terminal::echol($echo, $item);
         $replaced = is_closure($replaced) ? $replaced : fn($item) => Terminal::echol($replaced, $item);
@@ -27,15 +27,18 @@ trait TerminalHelperTrait
             foreach ($items as $p => $item) {
 
                 $item['filter'] = $item['filter'] ?? $item['name'];
+
                 if (isset($this->key[$item['key']])) {
                     $item['replaced'] = $this->key[$item['key']];
                 } else {
                     $item['replaced'] = false;
                     $this->key[$item['key']] = $item;
                 }
+
                 $item['description'] = $item['description'] ?? '';
                 $items[$p] = $item;
             }
+
             usort($items, fn($a, $b) => $a['name'] <=> $b['name']);
             $origins[Path::origin($path, $scan)] = $items;
         }
@@ -45,12 +48,11 @@ trait TerminalHelperTrait
         $originsLn = -1;
         foreach ($origins as $origin => $items) {
 
-            if (!is_null($filter))
-                $items = array_filter($items, fn($item) => is_null($filter) || str_starts_with(strtolower($item['filter']), strtolower($filter)));
+            if (!is_null($filter)) $items = array_filter($items, fn($item) => is_null($filter) || str_starts_with(strtolower($item['filter']), strtolower($filter)));
 
             if (count($items)) {
                 if (++$originsLn) Terminal::echol();
-                Terminal::echol('[#c:sb,#]', $origin);
+                Terminal::echol('[#c:sb,#]', strtoupper($origin));
                 foreach ($items as $item) {
                     Terminal::echol();
                     !$item['replaced'] ? $echo($item) : $replaced($item);
@@ -58,8 +60,7 @@ trait TerminalHelperTrait
             }
         }
 
-        if ($originsLn == -1)
-            Terminal::echol('[#c:dd,- empty -]');
+        if ($originsLn == -1) Terminal::echol('[#c:dd,- empty -]');
     }
 
     protected function docBlockBefore(string $code, int $pos): string
