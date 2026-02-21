@@ -7,7 +7,7 @@ if (!function_exists('dbug')) {
      * @param mixed ...$params Variáveis para depuração.
      * @return void
      */
-    function dbug(mixed ...$params): void
+    function d(mixed ...$params): void
     {
         ini_set('xdebug.var_display_max_depth', '10');
         ini_set('xdebug.var_display_max_children', '256');
@@ -27,7 +27,7 @@ if (!function_exists('dd')) {
      */
     function dd(mixed ...$params): void
     {
-        dbug(...$params);
+        d(...$params);
         die;
     }
 }

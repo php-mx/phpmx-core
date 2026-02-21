@@ -1,11 +1,9 @@
 /.env
 /.conf
 /vendor
-
 /composer.lock
 
 /library/cache
-
 /library/certificate/*
 !/library/certificate/base.crt
 

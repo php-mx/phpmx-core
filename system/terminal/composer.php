@@ -20,7 +20,7 @@ return new class {
         $composer['autoload']['psr-4'] = $composer['autoload']['psr-4'] ?? [];
         $composer['autoload']['files'] = $composer['autoload']['files'] ?? [];
 
-        $composer['autoload']['psr-4'][''] = path('class/');
+        $composer['autoload']['psr-4'][''] = path('source/');
 
         $autoImport = path('system/helper/');
 
