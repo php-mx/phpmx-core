@@ -3,7 +3,7 @@
 /vendor
 /composer.lock
 
-/library/cache
-/library/certificate/*
-!/library/certificate/base.crt
+/storage/cache
+/storage/certificate/*
+!/storage/certificate/base.crt
 

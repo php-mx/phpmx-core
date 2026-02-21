@@ -1,0 +1,10 @@
+{
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "composer.json": "composer.lock",
+    "mx": "install",
+    "index.php": ".htaccess",
+    "README.md": "LICENSE"
+  }
+}
