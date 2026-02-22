@@ -1,8 +1,7 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\Import;
-use PhpMx\Path;
+use PhpMx\Reflection\ReflectionHelperFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -32,39 +31,9 @@ return new class {
         $items = [];
 
         foreach (Dir::seekForFile($path, true) as $item)
-            foreach ($this->reflectionFile(path($path, $item)) as $scheme)
+            foreach (ReflectionHelperFile::schemeConstants(path($path, $item)) as $scheme)
                 $items[] = $scheme;
 
         return $items;
-    }
-
-    protected function reflectionFile(string $file): array
-    {
-        $content = Import::content($file);
-        $schemes = [];
-
-        preg_match_all('/^\s*define\s*\(\s*[\'"]([\w_]+)[\'"]\s*,/im', $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
-        foreach ($matches as $match) {
-            $constantName = $match[1][0];
-            $pos = $match[0][1];
-
-            $docBlock = self::docBlockBefore($content, $pos);
-            $docScheme = self::parseDocBlock($docBlock, ['description']);
-
-            $schemes[] = [
-                'key' => "constant:$constantName",
-                'typeKey' => 'constant',
-
-                'name' => $constantName,
-
-                'origin' => Path::origin($file),
-                'file' => $file,
-                'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
-
-                ...$docScheme
-            ];
-        }
-
-        return $schemes;
     }
 };

@@ -1,8 +1,7 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\Import;
-use PhpMx\Path;
+use PhpMx\Reflection\ReflectionCommandFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -33,7 +32,7 @@ return new class {
     {
         $items = [];
         foreach (Dir::seekForFile($path, true) as $item) {
-            $scheme = $this->reflectionFile(path($path, $item));
+            $scheme = ReflectionCommandFile::scheme(path($path, $item));
             if (!empty($scheme)) {
                 $formattedNames = [];
                 $requiredCount = 0;
@@ -60,62 +59,5 @@ return new class {
         }
 
         return $items;
-    }
-
-    protected function reflectionFile(string $file): array
-    {
-        $content = Import::content($file);
-
-        preg_match('/(?:return|.*?=)\s*new\s+class/i', $content, $match, PREG_OFFSET_CAPTURE);
-        if (!$match) return [];
-
-        $pos = $match[0][1];
-        $docBlock = self::docBlockBefore($content, $pos);
-        $docScheme = self::parseDocBlock($docBlock, ['description', 'params', 'return', 'examples', 'see', 'internal', 'context']);
-
-        $command = explode('system/terminal/', $file);
-        $command = array_pop($command);
-        $command = substr($command, 0, -4);
-        $command = str_replace(['/', '\\'], '.', $command);
-
-        $orderedParams = [];
-
-        preg_match('/function\s+__invoke\s*\((.*?)\)/s', $content, $invokeMatch);
-        if (!empty($invokeMatch[1])) {
-            $paramsStr = trim($invokeMatch[1]);
-            if ($paramsStr !== '') {
-                preg_match_all('/(?:([^\s,$]+)\s+)?(&)?(\.\.\.)?\$(\w+)(?:\s*=\s*([^,]+))?/', $paramsStr, $paramMatches, PREG_SET_ORDER);
-
-                foreach ($paramMatches as $p) {
-                    $name = trim($p[4]);
-                    $optional = !empty($p[5]);
-                    $variadic = !empty($p[3]);
-
-                    $docParam = $docScheme['params'][$name] ?? [];
-
-                    $orderedParams[] = [
-                        'name'     => $name,
-                        'optional' => $optional,
-                        'variadic' => $variadic,
-                        'type'     => $p[1] ?? ($docParam['type'] ?? null),
-                        'reference' => !empty($p[2]),
-                        'description' => $docParam['description'] ?? []
-                    ];
-                }
-            }
-        }
-
-        $docScheme['params'] = $orderedParams;
-        $docScheme['context'] = $docScheme['context'] ?? 'cli';
-
-        return [
-            'key' => "command:$command",
-            'typeKey' => 'command',
-            'name' => $command,
-            'origin' => Path::origin($file),
-            'file' => $file,
-            'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
-            ...$docScheme,
-        ];
     }
 };

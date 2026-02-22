@@ -1,8 +1,7 @@
 <?php
 
 use PhpMx\Dir;
-use PhpMx\Import;
-use PhpMx\Path;
+use PhpMx\Reflection\ReflectionHelperFile;
 use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
@@ -14,7 +13,7 @@ return new class {
 
     use TerminalHelperTrait;
 
-    function __invoke($filter = null, ...$teste)
+    function __invoke($filter = null)
     {
         $this->handle(
             'system/helper/function',
@@ -34,7 +33,7 @@ return new class {
         $items = [];
 
         foreach (Dir::seekForFile($path, true) as $item)
-            foreach ($this->reflectionFile(path($path, $item)) as $scheme) {
+            foreach (ReflectionHelperFile::schemeFunctions(path($path, $item)) as $scheme) {
                 $variations = [''];
 
                 foreach ($scheme['params'] ?? [] as $param) {
@@ -69,54 +68,5 @@ return new class {
             }
 
         return $items;
-    }
-
-    protected function reflectionFile(string $file): array
-    {
-        $content = Import::content($file);
-        $schemes = [];
-
-        preg_match_all('/^\s*function\s+(\w+)/im', $content, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match) {
-            $functionName = $match[1];
-
-            $reflection = new ReflectionFunction($functionName);
-            $docBlock = $reflection->getDocComment();
-            $docScheme = self::parseDocBlock($docBlock, ['description', 'params', 'return']);
-
-            $orderedParams = [];
-
-            foreach ($reflection->getParameters() as $p) {
-                $name = $p->getName();
-
-                $paramData = $docScheme['params'][$name] ?? [];
-
-                $orderedParams[] = [
-                    'name' => $name,
-                    'type' => $p->hasType() ? strval($p->getType()) : ($paramData['type'] ?? null),
-                    'optional' => $p->isOptional(),
-                    'reference' => $p->isPassedByReference(),
-                    'isVariadic' => $p->isVariadic(),
-                    'description' => $paramData['description'] ?? []
-                ];
-            }
-
-            $docScheme['params'] = $orderedParams;
-
-            $returnType = $reflection->hasReturnType() ? strval($reflection->getReturnType()) : null;
-            $docScheme['return'] = $docScheme['return'] ?? $returnType ?? '';
-
-            $schemes[] = [
-                'key' => "function:$functionName",
-                'typeKey' => 'function',
-                'name' => $functionName,
-                'origin' => Path::origin($file),
-                'file' => $reflection->getFileName(),
-                'line' => $reflection->getStartLine(),
-                ...$docScheme,
-            ];
-        }
-
-        return $schemes;
     }
 };
