@@ -68,13 +68,12 @@ class ReflectionExampleFile extends ReflectionSourceFile
 
                 if ($inBlock) {
                     $trimmed = trim(preg_replace('/^\*\s?/', '', $trimmed));
-                    $result[] = str_starts_with($trimmed, '>') ? $trimmed : $trimmed;
+                    $result[] = $trimmed;
                     continue;
                 }
 
                 if (preg_match('/^(\/\/|#)\s?(.*)$/', $trimmed, $m)) {
-                    $trimmed = trim($m[2]);
-                    $result[] = str_starts_with($trimmed, '>') ? $trimmed : $trimmed;
+                    $result[] = trim($m[2]);
                     continue;
                 }
 
@@ -92,7 +91,18 @@ class ReflectionExampleFile extends ReflectionSourceFile
         while (!empty($result) && trim($result[0]) === '') array_shift($result);
         while (!empty($result) && trim(end($result)) === '') array_pop($result);
 
-        return ['description' => array_values(array_filter($result))];
+        $summary = null;
+        foreach ($result as $line) {
+            if ($line !== '' && !str_starts_with($line, '>')) {
+                $summary = $line;
+                break;
+            }
+        }
+
+        return [
+            'summary'     => $summary,
+            'description' => array_values(array_filter($result)),
+        ];
     }
 
     protected static function schemeClass(string $file, string $content): array

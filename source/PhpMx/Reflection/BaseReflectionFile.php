@@ -177,9 +177,8 @@ abstract class BaseReflectionFile
         $docRet = (string)($regexDoc['return'] ?? '');
 
         $finalReturn = $refRet;
-        if ($docRet && (!in_array(strtolower($refRet), self::PRIMITIVES) || !in_array(strtolower($docRet), self::PRIMITIVES))) {
+        if ($docRet && (!in_array(strtolower($refRet), self::PRIMITIVES) || !in_array(strtolower($docRet), self::PRIMITIVES)))
             $finalReturn = $docRet;
-        }
 
         return [
             'summary' => $regexDoc['summary'] ?? null,
