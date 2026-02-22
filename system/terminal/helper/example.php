@@ -16,7 +16,7 @@ return new class {
     function __invoke($filter = null)
     {
         $this->handle(
-            'storage/exemple',
+            'storage/example',
             $filter,
             function ($item) {
                 Terminal::echol('   [#c:p,#name] [#c:sd,#file]', $item);
