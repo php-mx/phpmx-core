@@ -11,9 +11,9 @@ class ReflectionHelperFile extends BaseReflectionFile
     static function scheme(string $file): array
     {
         return [
-            'constant' => array_filter(self::schemeConstants($file)),
-            'function' => array_filter(self::schemeFunctions($file)),
-            'environment' => array_filter(self::schemeEnvironments($file)),
+            'constant' => self::schemeConstants($file),
+            'function' => self::schemeFunctions($file),
+            'environment' => self::schemeEnvironments($file),
         ];
     }
 
@@ -41,7 +41,7 @@ class ReflectionHelperFile extends BaseReflectionFile
             ];
         }
 
-        return $schemes;
+        return array_filter($schemes);
     }
 
     static function schemeFunctions(string $file): array
@@ -87,7 +87,7 @@ class ReflectionHelperFile extends BaseReflectionFile
             ];
         }
 
-        return $schemes;
+        return array_filter($schemes);
     }
 
     static function schemeEnvironments(string $file): array
@@ -117,6 +117,6 @@ class ReflectionHelperFile extends BaseReflectionFile
             ];
         }
 
-        return $schemes;
+        return array_filter($schemes);
     }
 }

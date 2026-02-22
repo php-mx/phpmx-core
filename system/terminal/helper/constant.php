@@ -34,6 +34,6 @@ return new class {
             foreach (ReflectionHelperFile::schemeConstants(path($path, $item)) as $scheme)
                 $items[] = $scheme;
 
-        return $items;
+        return array_filter($items);
     }
 };
