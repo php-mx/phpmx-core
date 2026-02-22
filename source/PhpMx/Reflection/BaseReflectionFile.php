@@ -22,7 +22,7 @@ abstract class BaseReflectionFile
         return '';
     }
 
-    protected static function parseDocBlock(?string $docBlock, array $keys = []): array
+    protected static function parseDocBlock(?string $docBlock): array
     {
         $data = [
             'summary' => null,
@@ -139,8 +139,6 @@ abstract class BaseReflectionFile
                 }
             }
         }
-
-        if (count($keys)) $data = array_intersect_key($data, array_flip($keys));
 
         return $data;
     }
