@@ -39,6 +39,7 @@ class ReflectionSourceFile extends BaseReflectionFile
             'file' => path($reflection->getFileName()),
             'line' => $reflection->getStartLine(),
             'abstract' => $reflection->isAbstract(),
+            'anonimous' => false,
             'final' => $reflection->isFinal(),
             'extends' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
             'interface' => $reflection->getInterfaceNames(),

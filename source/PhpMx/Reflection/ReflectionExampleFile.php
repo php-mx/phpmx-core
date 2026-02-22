@@ -5,6 +5,7 @@ namespace PhpMx\Reflection;
 use PhpMx\File;
 use PhpMx\Import;
 use PhpMx\Path;
+use ReflectionClass;
 
 class ReflectionExampleFile extends ReflectionSourceFile
 {
@@ -36,7 +37,7 @@ class ReflectionExampleFile extends ReflectionSourceFile
             return 'class';
 
         if (preg_match('/new\s+class/i', $content))
-            return 'anonimous-class';
+            return 'class';
 
         return 'narrative';
     }
@@ -96,32 +97,82 @@ class ReflectionExampleFile extends ReflectionSourceFile
 
     protected static function schemeClass(string $file, string $content): array
     {
-        preg_match('/namespace\s+([\w\\\\]+);/m', $content, $nsMatch);
-        preg_match('/(?:abstract\s+|final\s+)?class\s+(\w+)/i', $content, $classMatch);
+        $fileReturn = Import::return($file);
 
-        if (!$classMatch) return [];
+        if (is_object($fileReturn)) {
+            $reflection = new \ReflectionClass($fileReturn);
+        } else {
+            preg_match('/namespace\s+([\w\\\\]+);/m', $content, $nsMatch);
+            preg_match('/(?:abstract\s+|final\s+)?class\s+(\w+)/i', $content, $classMatch);
 
-        $namespace = $nsMatch[1] ?? '';
-        $className = $classMatch[1];
-        $fullName = trim("$namespace\\$className", '\\');
+            if (!$classMatch) return [];
 
-        require_once $file;
+            $namespace = $nsMatch[1] ?? '';
+            $className = $classMatch[1];
+            $fullName = trim("$namespace\\$className", '\\');
 
-        $reflection = new \ReflectionClass($fullName);
+            $reflection = new \ReflectionClass($fullName);
+        }
 
         $docBlock = $reflection->getDocComment();
         $docScheme = self::parseDocBlock($docBlock);
 
         return [
-            'summary' => $docScheme['summary'],
+            'summary'     => $docScheme['summary'],
             'description' => $docScheme['description'],
-            'abstract' => $reflection->isAbstract(),
-            'extends' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
-            'implements' => $reflection->getInterfaceNames(),
-            'traits' => $reflection->getTraitNames(),
-            'constants' => self::extractConstantsReflection($reflection),
-            'properties' => self::extractPropertiesReflection($reflection, $docScheme['properties'] ?? []),
-            'methods' => self::extractMethodsReflection($reflection, $docScheme['methods'] ?? []),
+            'abstract'    => $reflection->isAbstract(),
+            'anonymous'   => is_object($fileReturn),
+            'final'       => $reflection->isFinal(),
+            'extends'     => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
+            'implements'  => $reflection->getInterfaceNames(),
+            'traits'      => $reflection->getTraitNames(),
+            'constants'   => self::extractConstantsReflection($reflection),
+            'properties'  => self::extractPropertiesReflection($reflection, $docScheme['properties'] ?? []),
+            'methods'     => self::extractMethodsReflection($reflection, $docScheme['methods'] ?? []),
         ];
+    }
+
+    protected static function extractMethodsReflection(ReflectionClass $reflect, array $docMethods): array
+    {
+        $methods = parent::extractMethodsReflection($reflect, $docMethods);
+
+        $file = $reflect->getFileName();
+        $fileLines = file($file);
+
+        foreach ($reflect->getMethods() as $method) {
+            if ($method->getDeclaringClass()->getName() !== $reflect->getName()) continue;
+
+            $name = $method->getName();
+            if (!isset($methods[$name])) continue;
+
+            $start = $method->getStartLine();
+            $end = $method->getEndLine();
+            $bodyLines = array_slice($fileLines, $start, $end - $start - 1);
+
+            $bodyLines = array_values($bodyLines);
+            if (!empty($bodyLines) && trim($bodyLines[0]) === '{')
+                array_shift($bodyLines);
+
+            $minIndent = PHP_INT_MAX;
+            foreach ($bodyLines as $line) {
+                if (trim($line) === '') continue;
+                preg_match('/^(\s*)/', $line, $m);
+                $minIndent = min($minIndent, strlen($m[1]));
+            }
+            if ($minIndent === PHP_INT_MAX) $minIndent = 0;
+
+            $body = [];
+            foreach ($bodyLines as $line) {
+                $body[] = rtrim(substr($line, $minIndent));
+            }
+
+            while (!empty($body) && trim($body[0]) === '') array_shift($body);
+            while (!empty($body) && trim(end($body)) === '') array_pop($body);
+
+            if (!empty($body))
+                $methods[$name]['implementation'] = array_values(array_filter($body));
+        }
+
+        return $methods;
     }
 }

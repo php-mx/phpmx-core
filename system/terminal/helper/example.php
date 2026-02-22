@@ -17,8 +17,8 @@ return new class {
         $this->handle(
             'storage/exemple',
             $filter,
-            '   [#c:p,#name] [[#typeKey]] [#c:sd,#file]',
-            '   [#c:p,#name] [[#typeKey]] [#c:sd,#file]',
+            '   [#c:p,#name] [#c:sd,#file]',
+            '   [#c:p,#name] [#c:sd,#file]',
         );
     }
 
