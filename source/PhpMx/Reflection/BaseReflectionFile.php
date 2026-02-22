@@ -33,6 +33,7 @@ abstract class BaseReflectionFile
             'methods' => [],
             'properties' => [],
             'internal' => false,
+            'ignore' => false,
             'deprecated' => false,
             'since' => null,
             'throws' => [],
@@ -52,8 +53,11 @@ abstract class BaseReflectionFile
                     $content = trim(substr($trimmedLine, strlen($m[0])));
                     $currentTag = $tag;
 
-                    if ($tag == 'internal' || $tag == 'ignore')
+                    if ($tag == 'internal')
                         $data['internal'] = true;
+
+                    if ($tag == 'ignore')
+                        $data['ignore'] = true;
 
                     if ($tag == 'deprecated')
                         $data['deprecated'] = $content !== '' ? $content : true;
