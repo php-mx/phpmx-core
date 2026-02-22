@@ -51,7 +51,7 @@ class ReflectionExampleFile extends ReflectionSourceFile
         $inBlock = false;
 
         foreach ($lines as $line) {
-            $trimmed = trim($line);
+            $trimmed = $line;
 
             if (preg_match('/^<\?php$/i', $trimmed)) continue;
 
