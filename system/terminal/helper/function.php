@@ -103,7 +103,7 @@ return new class {
             $docScheme['params'] = $orderedParams;
 
             $returnType = $reflection->hasReturnType() ? strval($reflection->getReturnType()) : null;
-            $docScheme['return'] = $docScheme['return'] ?? $returnType ?? null;
+            $docScheme['return'] = $docScheme['return'] ?? $returnType ?? '';
 
             $schemes[] = [
                 'key' => "function:$functionName",
