@@ -35,7 +35,7 @@ class ReflectionHelperFile extends BaseReflectionFile
                 'typeKey' => 'constant',
                 'name' => $constantName,
                 'origin' => Path::origin($file),
-                'file' => $file,
+                'file' => path($file),
                 'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
                 ...$docScheme
             ];
@@ -81,7 +81,7 @@ class ReflectionHelperFile extends BaseReflectionFile
                 'typeKey' => 'function',
                 'name' => $functionName,
                 'origin' => Path::origin($file),
-                'file' => $reflection->getFileName(),
+                'file' => path($reflection->getFileName()),
                 'line' => $reflection->getStartLine(),
                 ...$mergedDoc,
             ];
@@ -111,7 +111,7 @@ class ReflectionHelperFile extends BaseReflectionFile
                 'typeKey' => 'environment',
                 'name' => $environmentsName,
                 'origin' => Path::origin($file),
-                'file' => $file,
+                'file' => path($file),
                 'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
                 ...$docScheme
             ];

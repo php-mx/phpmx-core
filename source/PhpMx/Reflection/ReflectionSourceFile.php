@@ -36,7 +36,7 @@ class ReflectionSourceFile extends BaseReflectionFile
             'typeKey' => $type,
             'name' => $sourceName,
             'origin' => Path::origin($file),
-            'file' => $reflection->getFileName(),
+            'file' => path($reflection->getFileName()),
             'line' => $reflection->getStartLine(),
             'abstract' => $reflection->isAbstract(),
             'final' => $reflection->isFinal(),

@@ -59,7 +59,7 @@ abstract class ReflectionCommandFile extends BaseReflectionFile
             'typeKey' => 'command',
             'name' => $command,
             'origin' => Path::origin($file),
-            'file' => $file,
+            'file' => path($file),
             'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
             ...$mergedDoc,
         ];
