@@ -43,8 +43,7 @@ abstract class ReflectionCommandFile extends BaseReflectionFile
 
         $reflectionData = [
             'params' => $reflectionParams,
-            'return' => null,
-            'context' => 'cli'
+            'return' => null
         ];
 
         $mergedDoc = self::mergeDocMethod($reflectionData, $docScheme);

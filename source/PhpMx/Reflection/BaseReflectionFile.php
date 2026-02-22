@@ -29,7 +29,6 @@ abstract class BaseReflectionFile
             'description' => [],
             'params' => [],
             'return' => null,
-            'context' => null,
             'examples' => [],
             'methods' => [],
             'properties' => [],
@@ -65,9 +64,6 @@ abstract class BaseReflectionFile
                     if ($tag == 'throws')
                         if (preg_match('/^([^\s]+)\s*(.*)$/', $content, $tm))
                             $data['throws'][] = ['type' => $tm[1], 'description' => trim($tm[2])];
-
-                    if ($tag == 'category' || $tag == 'context')
-                        $data['context'] = $content !== '' ? $content : null;
 
                     if ($tag == 'see')
                         if ($content !== '') $data['see'][] = $content;
@@ -186,7 +182,6 @@ abstract class BaseReflectionFile
             'description' => $regexDoc['description'] ?? [],
             'params' => self::mergeDocParams($reflectionData['params'] ?? [], $regexDoc['params'] ?? []),
             'return' => $finalReturn ?: null,
-            'context' => $regexDoc['context'] ?? ($reflectionData['context'] ?? null),
             'deprecated' => $regexDoc['deprecated'] ?? false,
             'since' => $regexDoc['since'] ?? null,
             'throws' => $regexDoc['throws'] ?? [],
