@@ -2,6 +2,7 @@
 
 use PhpMx\Dir;
 use PhpMx\Reflection\ReflectionExampleFile;
+use PhpMx\Terminal;
 use PhpMx\Trait\TerminalHelperTrait;
 
 /**
@@ -17,8 +18,16 @@ return new class {
         $this->handle(
             'storage/exemple',
             $filter,
-            '   [#c:p,#name] [#c:sd,#file]',
-            '   [#c:p,#name] [#c:sd,#file]',
+            function ($item) {
+                Terminal::echol('   [#c:p,#name] [#c:sd,#file]', $item);
+                if ($item['summary'])
+                    Terminal::echol("      [#summary]", $item);
+            },
+            function ($item) {
+                Terminal::echol('   [#c:p,#name] [#c:sd,#file]', $item);
+                if ($item['summary'])
+                    Terminal::echol("      [#summary]", $item);
+            },
         );
     }
 

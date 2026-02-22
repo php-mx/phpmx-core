@@ -64,6 +64,8 @@ class ReflectionExampleFile extends ReflectionSourceFile
                 if ($inBlock && str_contains($trimmed, '*/')) {
                     $inBlock = false;
                     $trimmed = trim(preg_replace('/\s*\*\/.*$/', '', $trimmed));
+                    if ($trimmed !== '') $result[] = $trimmed;
+                    continue;
                 }
 
                 if ($inBlock) {
