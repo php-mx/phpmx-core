@@ -24,7 +24,7 @@ return new class {
                 foreach ($item['description'] as $description)
                     Terminal::echol("      $description");
                 foreach ($item['variations'] as $variation)
-                    Terminal::echol("         [#name][#c:dd,(]{$variation}[#c:dd,):][#c:pd,#return]", $item);
+                    Terminal::echol("         [#name][#c:dd,(]{$variation}[#c:pd,#return]", $item);
             }
         );
     }
@@ -63,6 +63,7 @@ return new class {
 
                 $scheme['variations'] = $variations;
                 $scheme['sep'] = ',';
+                $scheme['return'] =  $scheme['return'] ? ":" . $scheme['return'] : '';
 
                 $items[] = $scheme;
             }
