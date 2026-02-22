@@ -28,8 +28,8 @@ abstract class Terminal
      */
     final static function run(...$commandLine)
     {
-        if (count($commandLine) == 1)
-            $commandLine = explode(' ', array_shift($commandLine));
+        $commandLine = implode(' ', $commandLine);
+        $commandLine = explode(' ', $commandLine);
 
         $showLog = false;
 
