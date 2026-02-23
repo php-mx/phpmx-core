@@ -73,6 +73,7 @@ class ReflectionSourceFile extends BaseReflectionFile
     protected static function extractPropertiesReflection(ReflectionClass $reflect, array $docProperties): array
     {
         $props = [];
+
         foreach ($reflect->getProperties() as $prop) {
             if ($prop->getDeclaringClass()->getName() !== $reflect->getName()) continue;
 
@@ -83,16 +84,15 @@ class ReflectionSourceFile extends BaseReflectionFile
                 'type' => $prop->hasType() ? strval($prop->getType()) : null,
             ];
 
-            $doc = $docProperties[$name] ?? [];
-
-            $merged = self::mergeDoc($reflectionData, $doc);
-
             $props[$name] = array_filter([
-                ...$merged,
+                ...$reflectionData,
                 'static' => $prop->isStatic(),
                 'visibility' => $prop->isPublic() ? 'public' : ($prop->isProtected() ? 'protected' : 'private'),
             ]);
         }
+
+        $props = self::mergeDoc($props, $docProperties);
+
         return array_filter($props);
     }
 
@@ -121,10 +121,6 @@ class ReflectionSourceFile extends BaseReflectionFile
                 'return' => $method->hasReturnType() ? strval($method->getReturnType()) : null
             ]);
 
-            $doc = $docMethods[$name] ?? self::parseDocBlock($method->getDocComment());
-
-            $merged = self::mergeDoc($reflectionData, $doc);
-
             $methods[$name] = array_filter([
                 'name' => $name,
                 'visibility' => $method->isPublic() ? 'public' : ($method->isProtected() ? 'protected' : 'private'),
@@ -132,9 +128,12 @@ class ReflectionSourceFile extends BaseReflectionFile
                 'abstract' => $method->isAbstract(),
                 'final' => $method->isFinal(),
                 'line' => $method->getStartLine(),
-                ...$merged
+                ...$reflectionData
             ]);
         }
+
+        $methods = self::mergeDoc($methods, $docMethods);
+
         return array_filter($methods);
     }
 }
