@@ -38,7 +38,6 @@ class ReflectionHelperFile extends BaseReflectionFile
                 '_origin' => Path::origin($file),
 
                 'name' => $constantName,
-                'call' => $constantName,
                 ...$docScheme
             ]);
         }
@@ -86,7 +85,6 @@ class ReflectionHelperFile extends BaseReflectionFile
                 '_origin' => Path::origin($file),
 
                 'name' => $functionName,
-                'call' => "$functionName()",
                 ...$mergedDoc,
             ]);
         }
@@ -117,7 +115,6 @@ class ReflectionHelperFile extends BaseReflectionFile
                 '_origin' => Path::origin($file),
 
                 'name' => $environmentsName,
-                'call' => "env('$environmentsName')",
                 ...$docScheme
             ]);
         }
