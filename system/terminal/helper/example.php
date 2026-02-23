@@ -15,31 +15,28 @@ return new class {
 
     function __invoke($filter = null)
     {
+        $show = function ($item) {
+            Terminal::echol('   [#c:p,#name] [#c:dd,#_type] [#c:sd,#_file]', $item);
+            if (isset($item['description']))
+                Terminal::echol("      [#]", array_shift($item['description']));
+        };
+
         $this->handle(
             'storage/example',
             $filter,
-            function ($item) {
-                Terminal::echol('   [#c:p,#name] [#c:sd,#file]', $item);
-                if ($item['summary'])
-                    Terminal::echol("      [#summary]", $item);
-            },
-            function ($item) {
-                Terminal::echol('   [#c:p,#name] [#c:sd,#file]', $item);
-                if ($item['summary'])
-                    Terminal::echol("      [#summary]", $item);
-            },
+            $show,
+            $show,
         );
     }
 
     protected function scan($path): array
     {
         $items = [];
-        foreach (Dir::seekForFile($path, true) as $item) {
-            $scheme = ReflectionExampleFile::scheme(path($path, $item));
-            if (!empty($scheme))
-                $items[] = $scheme;
-        }
 
-        return $items;
+        foreach (Dir::seekForFile($path, true) as $item)
+            $items[] = ReflectionExampleFile::scheme(path($path, $item));
+
+
+        return array_filter($items);
     }
 };

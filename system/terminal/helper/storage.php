@@ -13,7 +13,7 @@ return new class {
 
     function __invoke($filter = null)
     {
-        $this->handle('storage', $filter, '   [#c:p,#name] [#c:sd,#file]');
+        $this->handle('storage', $filter, '   [#c:p,#name] [#c:sd,#_file]');
     }
 
     protected function scan($path)
@@ -21,7 +21,7 @@ return new class {
         $files = [];
 
         foreach (Dir::seekForFile($path, true) as $file)
-            $files[] = ['key' => $file, 'name' => $file, 'file' => path($path, $file)];
+            $files[] = ['_key' => md5($file), 'name' => $file, '_file' => path($path, $file)];
 
         return $files;
     }

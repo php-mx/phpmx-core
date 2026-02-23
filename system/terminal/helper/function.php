@@ -19,9 +19,9 @@ return new class {
             'system/helper/function',
             $filter,
             function ($item) {
-                Terminal::echol('   [#c:p,#name] [#c:sd,#file][#c:sd,:][#c:sd,#line]', $item);
-                if ($item['summary'])
-                    Terminal::echol("      [#summary]", $item);
+                Terminal::echol('   [#c:p,#name] [#c:sd,#_file][#c:sd,:][#c:sd,#_line]', $item);
+                foreach ($item['description'] ?? [] as $description)
+                    Terminal::echol("      $description");
                 foreach ($item['variations'] as $variation)
                     Terminal::echol("         [#name][#c:dd,(]{$variation}[#c:dd,)][#c:pd,#return]", $item);
             }

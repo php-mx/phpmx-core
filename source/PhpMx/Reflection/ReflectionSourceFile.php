@@ -31,15 +31,15 @@ class ReflectionSourceFile extends BaseReflectionFile
         $properties = self::extractPropertiesReflection($reflection, $docScheme['properties'] ?? []);
         $methods = self::extractMethodsReflection($reflection, $docScheme['methods'] ?? []);
 
-        return [
-            'key' => "source:$sourceName",
-            'typeKey' => $type,
+        return array_filter([
+            '_key' => md5("source:$sourceName"),
+            '_type' => $type,
+            '_file' => path($reflection->getFileName()),
+            '_line' => $reflection->getStartLine(),
+            '_origin' => Path::origin($file),
+
             'name' => $sourceName,
-            'origin' => Path::origin($file),
-            'file' => path($reflection->getFileName()),
-            'line' => $reflection->getStartLine(),
             'abstract' => $reflection->isAbstract(),
-            'anonimous' => false,
             'final' => $reflection->isFinal(),
             'extends' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
             'interface' => $reflection->getInterfaceNames(),
@@ -48,7 +48,7 @@ class ReflectionSourceFile extends BaseReflectionFile
             'properties' => $properties,
             'methods' => $methods,
             ...array_diff_key($docScheme, array_flip(['properties', 'methods']))
-        ];
+        ]);
     }
 
     protected static function extractConstantsReflection(ReflectionClass $reflection): array
@@ -60,14 +60,14 @@ class ReflectionSourceFile extends BaseReflectionFile
             $name = $const->getName();
             $docScheme = self::parseDocBlock($const->getDocComment());
 
-            $constants[$name] = [
+            $constants[$name] = array_filter([
                 'name' => $name,
                 'visibility' => $const->isPublic() ? 'public' : ($const->isProtected() ? 'protected' : 'private'),
-                'file' => $reflection->getFileName(),
                 ...$docScheme
-            ];
+            ]);
         }
-        return $constants;
+
+        return array_filter($constants);
     }
 
     protected static function extractPropertiesReflection(ReflectionClass $reflect, array $docProperties): array
@@ -77,24 +77,23 @@ class ReflectionSourceFile extends BaseReflectionFile
             if ($prop->getDeclaringClass()->getName() !== $reflect->getName()) continue;
 
             $name = $prop->getName();
+
+            $reflectionData = [
+                'name' => $name,
+                'type' => $prop->hasType() ? strval($prop->getType()) : null,
+            ];
+
             $doc = $docProperties[$name] ?? [];
 
-            $refType = $prop->hasType() ? strval($prop->getType()) : '';
-            $docType = $doc['type'] ?? '';
-            $finalType = $refType;
+            $merged = self::mergeDoc($reflectionData, $doc);
 
-            if ($docType && (!in_array(strtolower($refType), self::PRIMITIVES) || !in_array(strtolower($docType), self::PRIMITIVES)))
-                $finalType = $docType;
-
-            $props[$name] = [
-                'name' => $name,
-                'type' => $finalType ?: null,
+            $props[$name] = array_filter([
+                ...$merged,
                 'static' => $prop->isStatic(),
                 'visibility' => $prop->isPublic() ? 'public' : ($prop->isProtected() ? 'protected' : 'private'),
-                'description' => $doc['description'] ?? ''
-            ];
+            ]);
         }
-        return $props;
+        return array_filter($props);
     }
 
     protected static function extractMethodsReflection(ReflectionClass $reflect, array $docMethods): array
@@ -107,25 +106,26 @@ class ReflectionSourceFile extends BaseReflectionFile
 
             $reflectionParams = [];
             foreach ($method->getParameters() as $p) {
-                $reflectionParams[] = [
+                $reflectionParams[$p->getName()] = array_filter([
                     'name' => $p->getName(),
                     'type' => $p->hasType() ? strval($p->getType()) : null,
                     'optional' => $p->isOptional(),
                     'variadic' => $p->isVariadic(),
                     'reference' => $p->isPassedByReference(),
                     'default' => $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null,
-                ];
+                ]);
             }
 
-            $reflectionData = [
-                'params' => $reflectionParams,
+            $reflectionData = array_filter([
+                'params' => array_filter($reflectionParams),
                 'return' => $method->hasReturnType() ? strval($method->getReturnType()) : null
-            ];
+            ]);
 
             $doc = $docMethods[$name] ?? self::parseDocBlock($method->getDocComment());
-            $merged = self::mergeDocMethod($reflectionData, $doc);
 
-            $methods[$name] = [
+            $merged = self::mergeDoc($reflectionData, $doc);
+
+            $methods[$name] = array_filter([
                 'name' => $name,
                 'visibility' => $method->isPublic() ? 'public' : ($method->isProtected() ? 'protected' : 'private'),
                 'static' => $method->isStatic(),
@@ -133,8 +133,8 @@ class ReflectionSourceFile extends BaseReflectionFile
                 'final' => $method->isFinal(),
                 'line' => $method->getStartLine(),
                 ...$merged
-            ];
+            ]);
         }
-        return $methods;
+        return array_filter($methods);
     }
 }

@@ -25,7 +25,6 @@ abstract class BaseReflectionFile
     protected static function parseDocBlock(?string $docBlock): array
     {
         $data = [
-            'summary' => null,
             'description' => [],
             'params' => [],
             'return' => null,
@@ -74,11 +73,12 @@ abstract class BaseReflectionFile
 
                     if ($tag == 'param') {
                         if (preg_match('/^([^\s]+)\s+(\.\.\.)?\$(\w+)\s*(.*)$/', $content, $pm)) {
-                            $data['params'][$pm[3]] = [
+                            $data['params'][$pm[3]] = array_filter([
+                                'name' => $pm[3],
                                 'type' => $pm[1],
                                 'variadic' => !empty($pm[2]),
                                 'description' => trim($pm[4])
-                            ];
+                            ]);
                         }
                     }
 
@@ -133,64 +133,68 @@ abstract class BaseReflectionFile
                         $data['examples'][count($data['examples']) - 1][] = $line;
                     } else if ($currentTag === null && $trimmedLine !== '') {
                         $data['description'][] = $trimmedLine;
-                        if ($data['summary'] === null)
-                            $data['summary'] = $trimmedLine;
                     }
                 }
             }
         }
 
-        return $data;
+        return array_filter($data);
     }
 
-    protected static function mergeDocParams(array $reflectionParams, array $regexDocParams): array
+    protected static function mergeDoc(array $primary, array $secondary): array
     {
         $merged = [];
-        foreach ($reflectionParams as $p) {
-            $name = $p['name'];
-            $doc = $regexDocParams[$name] ?? [];
+        $keys = array_unique(array_merge(array_keys($primary), array_keys($secondary)));
 
-            $refType = (string)($p['type'] ?? '');
-            $docType = (string)($doc['type'] ?? '');
-            $finalType = $refType;
+        foreach ($keys as $key) {
+            $p1 = $primary[$key] ?? null;
+            $p2 = $secondary[$key] ?? null;
 
-            if ($docType && (!in_array(strtolower($refType), self::PRIMITIVES) || !in_array(strtolower($docType), self::PRIMITIVES))) {
-                $finalType = $docType;
+            if (is_blank($p1) || is_blank($p2)) {
+                $merged[$key] = $p1 ?? $p2;
+                continue;
             }
 
-            $merged[$name] = [
-                'name' => $name,
-                'type' => $finalType ?: null,
-                'optional' => $p['optional'] ?? false,
-                'variadic' => $p['variadic'] ?? false,
-                'reference' => $p['reference'] ?? false,
-                'default' => $p['default'] ?? null,
-                'description' => $doc['description'] ?? ''
-            ];
+            if ($key == 'type' || $key == 'return') {
+                $t1 = strtolower(str_replace(['?', '|', '&'], ' ', strval($p1)));
+                $t2 = strtolower(str_replace(['?', '|', '&'], ' ', strval($p2)));
+
+                $t1IsPrim = true;
+                foreach (explode(' ', $t1) as $w)
+                    if ($w !== '' && !in_array($w, self::PRIMITIVES)) {
+                        $t1IsPrim = false;
+                        break;
+                    }
+
+                $t2IsPrim = true;
+                foreach (explode(' ', $t2) as $w)
+                    if ($w !== '' && !in_array($w, self::PRIMITIVES)) {
+                        $t2IsPrim = false;
+                        break;
+                    }
+
+                if ($t1 === 'mixed' && $t2 !== '' && $t2 !== 'mixed') {
+                    $merged[$key] = $p2;
+                    continue;
+                }
+
+                if ($t1IsPrim && !$t2IsPrim) {
+                    $merged[$key] = $p2;
+                    continue;
+                }
+
+                $merged[$key] = $p1;
+                continue;
+            }
+
+            if (is_array($p1) && is_array($p2) && count(array_filter(array_keys($p1), 'is_string')) > 0) {
+                $merged[$key] = self::mergeDoc($p1, $p2);
+                continue;
+            }
+
+            $merged[$key] = $p1;
         }
+
         return $merged;
-    }
-
-    protected static function mergeDocMethod(array $reflectionData, array $regexDoc): array
-    {
-        $refRet = (string)($reflectionData['return'] ?? '');
-        $docRet = (string)($regexDoc['return'] ?? '');
-
-        $finalReturn = $refRet;
-        if ($docRet && (!in_array(strtolower($refRet), self::PRIMITIVES) || !in_array(strtolower($docRet), self::PRIMITIVES)))
-            $finalReturn = $docRet;
-
-        return [
-            'summary' => $regexDoc['summary'] ?? null,
-            'description' => $regexDoc['description'] ?? [],
-            'params' => self::mergeDocParams($reflectionData['params'] ?? [], $regexDoc['params'] ?? []),
-            'return' => $finalReturn ?: null,
-            'deprecated' => $regexDoc['deprecated'] ?? false,
-            'since' => $regexDoc['since'] ?? null,
-            'throws' => $regexDoc['throws'] ?? [],
-            'see' => $regexDoc['see'] ?? [],
-            'examples' => $regexDoc['examples'] ?? [],
-            'internal' => $regexDoc['internal'] ?? false,
-        ];
     }
 }

@@ -30,15 +30,16 @@ class ReflectionHelperFile extends BaseReflectionFile
             $docBlock = self::docBlockBefore($content, $pos);
             $docScheme = self::parseDocBlock($docBlock);
 
-            $schemes[] = [
-                'key' => "constant:$constantName",
-                'typeKey' => 'constant',
+            $schemes[] = array_filter([
+                '_key' => md5("constant:$constantName"),
+                '_type' => 'constant',
+                '_file' => path($file),
+                '_line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+                '_origin' => Path::origin($file),
+
                 'name' => $constantName,
-                'origin' => Path::origin($file),
-                'file' => path($file),
-                'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
                 ...$docScheme
-            ];
+            ]);
         }
 
         return array_filter($schemes);
@@ -59,7 +60,7 @@ class ReflectionHelperFile extends BaseReflectionFile
 
             $reflectionParams = [];
             foreach ($reflection->getParameters() as $p) {
-                $reflectionParams[] = [
+                $reflectionParams[$p->getName()] = [
                     'name' => $p->getName(),
                     'type' => $p->hasType() ? strval($p->getType()) : null,
                     'optional' => $p->isOptional(),
@@ -74,17 +75,18 @@ class ReflectionHelperFile extends BaseReflectionFile
                 'return' => $reflection->hasReturnType() ? strval($reflection->getReturnType()) : null
             ];
 
-            $mergedDoc = self::mergeDocMethod($reflectionData, $docScheme);
+            $mergedDoc = self::mergeDoc($reflectionData, $docScheme);
 
-            $schemes[] = [
-                'key' => "function:$functionName",
-                'typeKey' => 'function',
+            $schemes[] = array_filter([
+                '_key' => md5("function:$functionName"),
+                '_type' => 'function',
+                '_file' => path($reflection->getFileName()),
+                '_line' => $reflection->getStartLine(),
+                '_origin' => Path::origin($file),
+
                 'name' => $functionName,
-                'origin' => Path::origin($file),
-                'file' => path($reflection->getFileName()),
-                'line' => $reflection->getStartLine(),
                 ...$mergedDoc,
-            ];
+            ]);
         }
 
         return array_filter($schemes);
@@ -106,15 +108,16 @@ class ReflectionHelperFile extends BaseReflectionFile
             $docScheme['see'][] = 'env()';
             $docScheme['examples'][] = "env('$environmentsName');";
 
-            $schemes[] = [
-                'key' => "environment:$environmentsName",
-                'typeKey' => 'environment',
+            $schemes[] = array_filter([
+                '_key' => md5("environment:$environmentsName"),
+                '_type' => 'environment',
+                '_file' => path($file),
+                '_line' => substr_count(substr($content, 0, $pos), "\n") + 1,
+                '_origin' => Path::origin($file),
+
                 'name' => $environmentsName,
-                'origin' => Path::origin($file),
-                'file' => path($file),
-                'line' => substr_count(substr($content, 0, $pos), "\n") + 1,
                 ...$docScheme
-            ];
+            ]);
         }
 
         return array_filter($schemes);

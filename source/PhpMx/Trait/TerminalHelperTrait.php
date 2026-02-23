@@ -13,7 +13,7 @@ trait TerminalHelperTrait
 
     protected function handle(string $scan, ?string $filter, null|Closure|string $echo = null, null|Closure|string $replaced = null)
     {
-        $echo = $echo ?? ' [#c:p,#name] [#description]';
+        $echo = $echo ?? ' [#c:p,#name]';
         $replaced = $replaced ?? ' [#c:pd,#name] [#c:wd,replaced]';
 
         $echo = is_closure($echo) ? $echo : fn($item) => Terminal::echol($echo, $item);
@@ -28,14 +28,12 @@ trait TerminalHelperTrait
 
                 $item['filter'] = $item['filter'] ?? $item['name'];
 
-                if (isset($this->key[$item['key']])) {
-                    $item['replaced'] = $this->key[$item['key']];
+                if (isset($this->key[$item['_key']])) {
+                    $item['replaced'] = $this->key[$item['_key']];
                 } else {
                     $item['replaced'] = false;
-                    $this->key[$item['key']] = $item;
+                    $this->key[$item['_key']] = $item;
                 }
-
-                $item['description'] = $item['description'] ?? '';
                 $items[$p] = $item;
             }
 

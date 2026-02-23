@@ -17,27 +17,31 @@ class ReflectionExampleFile extends ReflectionSourceFile
 
         $name = File::getName($file);
 
-        if ($type == 'narrative') $scheme = self::schemeNarrative($content);
-        if ($type == 'class') $scheme = self::schemeClass($file, $content);
+        $scheme = $type == 'implement' ? self::schemeImplement($file, $content) : self::schemeNarrative($content);
 
-        if (empty($scheme)) return [];
+        if ($type == 'implement')
+            dd($scheme);
 
-        $scheme['key'] = "example:$name";
-        $scheme['typeKey'] = $type;
-        $scheme['name'] = $name;
-        $scheme['origin'] = Path::origin($file);
-        $scheme['file'] = path($file);
 
-        return $scheme;
+        $metaScheme = [
+            '_key' => md5("example:$name"),
+            '_type' => $type,
+            '_file' => path($file),
+            '_origin' => Path::origin($file),
+
+            'name' => $name,
+        ];
+
+        return array_filter(self::mergeDoc($metaScheme, $scheme));
     }
 
     protected static function detectType(string $content): string
     {
         if (preg_match('/^\s*(?:abstract\s+|final\s+)?class\s+\w+/im', $content))
-            return 'class';
+            return 'implement';
 
         if (preg_match('/new\s+class/i', $content))
-            return 'class';
+            return 'implement';
 
         return 'narrative';
     }
@@ -93,21 +97,10 @@ class ReflectionExampleFile extends ReflectionSourceFile
         while (!empty($result) && trim($result[0]) === '') array_shift($result);
         while (!empty($result) && trim(end($result)) === '') array_pop($result);
 
-        $summary = null;
-        foreach ($result as $line) {
-            if ($line !== '' && !str_starts_with($line, '>')) {
-                $summary = $line;
-                break;
-            }
-        }
-
-        return [
-            'summary'     => $summary,
-            'description' => array_values(array_filter($result)),
-        ];
+        return ['description' => $result];
     }
 
-    protected static function schemeClass(string $file, string $content): array
+    protected static function schemeImplement(string $file, string $content): array
     {
         $fileReturn = Import::return($file);
 
@@ -129,19 +122,18 @@ class ReflectionExampleFile extends ReflectionSourceFile
         $docBlock = $reflection->getDocComment();
         $docScheme = self::parseDocBlock($docBlock);
 
-        return [
-            'summary'     => $docScheme['summary'],
-            'description' => $docScheme['description'],
-            'abstract'    => $reflection->isAbstract(),
-            'anonymous'   => is_object($fileReturn),
-            'final'       => $reflection->isFinal(),
-            'extends'     => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
-            'implements'  => $reflection->getInterfaceNames(),
-            'traits'      => $reflection->getTraitNames(),
-            'constants'   => self::extractConstantsReflection($reflection),
-            'properties'  => self::extractPropertiesReflection($reflection, $docScheme['properties'] ?? []),
-            'methods'     => self::extractMethodsReflection($reflection, $docScheme['methods'] ?? []),
-        ];
+        return array_filter([
+            'description' => $docScheme['description'] ?? null,
+            'abstract' => $reflection->isAbstract(),
+            'anonymous' => is_object($fileReturn),
+            'final' => $reflection->isFinal(),
+            'extends' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
+            'implements' => $reflection->getInterfaceNames(),
+            'traits' => $reflection->getTraitNames(),
+            'constants' => self::extractConstantsReflection($reflection),
+            'properties' => self::extractPropertiesReflection($reflection, $docScheme['properties'] ?? []),
+            'methods' => self::extractMethodsReflection($reflection, $docScheme['methods'] ?? []),
+        ]);
     }
 
     protected static function extractMethodsReflection(ReflectionClass $reflect, array $docMethods): array
@@ -185,6 +177,6 @@ class ReflectionExampleFile extends ReflectionSourceFile
                 $methods[$name]['implementation'] = array_values(array_filter($body));
         }
 
-        return $methods;
+        return array_filter($methods);
     }
 }
