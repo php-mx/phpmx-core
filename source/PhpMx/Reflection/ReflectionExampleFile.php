@@ -19,10 +19,6 @@ class ReflectionExampleFile extends ReflectionSourceFile
 
         $scheme = $type == 'implement' ? self::schemeImplement($file, $content) : self::schemeNarrative($content);
 
-        if ($type == 'implement')
-            dd($scheme);
-
-
         $metaScheme = [
             '_key' => md5("example:$name"),
             '_type' => $type,
