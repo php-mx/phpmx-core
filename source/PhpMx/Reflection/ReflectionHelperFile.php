@@ -38,6 +38,7 @@ class ReflectionHelperFile extends BaseReflectionFile
                 '_origin' => Path::origin($file),
 
                 'name' => $constantName,
+                'call' => $constantName,
                 ...$docScheme
             ]);
         }
@@ -85,6 +86,7 @@ class ReflectionHelperFile extends BaseReflectionFile
                 '_origin' => Path::origin($file),
 
                 'name' => $functionName,
+                'call' => "$functionName()",
                 ...$mergedDoc,
             ]);
         }
@@ -106,7 +108,6 @@ class ReflectionHelperFile extends BaseReflectionFile
             $docScheme = self::parseDocBlock($docBlock);
 
             $docScheme['see'][] = 'env()';
-            $docScheme['examples'][] = "env('$environmentsName');";
 
             $schemes[] = array_filter([
                 '_key' => md5("environment:$environmentsName"),
@@ -116,6 +117,7 @@ class ReflectionHelperFile extends BaseReflectionFile
                 '_origin' => Path::origin($file),
 
                 'name' => $environmentsName,
+                'call' => "env('$environmentsName')",
                 ...$docScheme
             ]);
         }

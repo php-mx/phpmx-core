@@ -65,6 +65,7 @@ abstract class ReflectionCommandFile extends BaseReflectionFile
             '_origin' => Path::origin($file),
 
             'name' => $command,
+            'call' => "php mx $command",
             ...$commandDocScheme,
         ]);
     }

@@ -19,16 +19,15 @@ class ReflectionExampleFile extends ReflectionSourceFile
 
         $scheme = $type == 'implement' ? self::schemeImplement($file, $content) : self::schemeNarrative($content);
 
-        $metaScheme = [
+        return array_filter([
             '_key' => md5("example:$name"),
             '_type' => $type,
             '_file' => path($file),
             '_origin' => Path::origin($file),
 
             'name' => $name,
-        ];
-
-        return array_filter(self::mergeDoc($metaScheme, $scheme));
+            ...$scheme
+        ]);
     }
 
     protected static function detectType(string $content): string
@@ -100,7 +99,9 @@ class ReflectionExampleFile extends ReflectionSourceFile
     {
         $fileReturn = Import::return($file);
 
-        if (is_object($fileReturn)) {
+        $anonimous = is_object($fileReturn);
+
+        if ($anonimous) {
             $reflection = new \ReflectionClass($fileReturn);
         } else {
             preg_match('/namespace\s+([\w\\\\]+);/m', $content, $nsMatch);
@@ -118,10 +119,18 @@ class ReflectionExampleFile extends ReflectionSourceFile
         $docBlock = $reflection->getDocComment();
         $docScheme = self::parseDocBlock($docBlock);
 
+        $metaScheme = [];
+
+        if (!$anonimous) {
+            $metaScheme['name'] = $reflection->getName();
+            $metaScheme['call'] = "\\" . $reflection->getName();
+        }
+
         return array_filter([
+            ...$metaScheme,
             'description' => $docScheme['description'] ?? null,
             'abstract' => $reflection->isAbstract(),
-            'anonymous' => is_object($fileReturn),
+            'anonymous' => $anonimous,
             'final' => $reflection->isFinal(),
             'extends' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
             'implements' => $reflection->getInterfaceNames(),

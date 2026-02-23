@@ -39,6 +39,7 @@ class ReflectionSourceFile extends BaseReflectionFile
             '_origin' => Path::origin($file),
 
             'name' => $sourceName,
+            'call' => "\\$sourceName",
             'abstract' => $reflection->isAbstract(),
             'final' => $reflection->isFinal(),
             'extends' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
