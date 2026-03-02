@@ -119,15 +119,8 @@ class ReflectionExampleFile extends ReflectionSourceFile
         $docBlock = $reflection->getDocComment();
         $docScheme = self::parseDocBlock($docBlock);
 
-        $metaScheme = [];
-
-        if (!$anonimous) {
-            $metaScheme['name'] = $reflection->getName();
-            $metaScheme['call'] = "\\" . $reflection->getName();
-        }
-
         return array_filter([
-            ...$metaScheme,
+            'name' => $anonimous ? null : $reflection->getName(),
             'description' => $docScheme['description'] ?? null,
             'abstract' => $reflection->isAbstract(),
             'anonymous' => $anonimous,
