@@ -10,7 +10,6 @@
   "explorer.fileNesting.patterns": {
     "composer.json": "composer.lock",
     "mx": "install, deploy",
-    "index.php": ".htaccess",
-    "README.md": "LICENSE"
+    "README.md": "LICENSE, CLAUDE.md"
   }
 }

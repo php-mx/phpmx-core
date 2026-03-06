@@ -83,7 +83,7 @@ class ReflectionExampleFile extends ReflectionSourceFile
                 }
 
                 if ($inBlock) {
-                    $trimmed = trim(preg_replace('/^\*\s?/', '', $trimmed));
+                    $trimmed = trim(preg_replace('/^\s*\*\s?/', '', $trimmed));
                     $result[] = $trimmed;
                     continue;
                 }
