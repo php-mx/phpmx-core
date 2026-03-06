@@ -9,10 +9,6 @@ return new class {
 
     function __invoke()
     {
-        if (getenv('MX_DEPLOYING')) return;
-
-        putenv('MX_DEPLOYING=1');
-
         foreach (array_reverse(Path::seekForFiles('deploy')) as $deployFile) {
 
             $origin = Path::origin($deployFile);
@@ -30,6 +26,6 @@ return new class {
             });
         }
 
-        putenv('MX_DEPLOYING');
+        Terminal::run('composer');
     }
 };

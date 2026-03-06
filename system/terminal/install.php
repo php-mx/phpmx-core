@@ -29,6 +29,6 @@ return new class {
             }
         }
 
-        Terminal::run('composer 1');
+        Terminal::run('composer');
     }
 };
