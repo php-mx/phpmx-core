@@ -1,4 +1,8 @@
 {
+  "files.associations": {
+    "mx": "php",
+    "install": "php"
+  },
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "intelephense.files.exclude": ["storage/**"],
