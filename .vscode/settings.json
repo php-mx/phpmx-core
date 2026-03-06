@@ -1,14 +1,15 @@
 {
   "files.associations": {
     "mx": "php",
-    "install": "php"
+    "install": "php",
+    "deploy": "php"
   },
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "intelephense.files.exclude": ["storage/**"],
   "explorer.fileNesting.patterns": {
     "composer.json": "composer.lock",
-    "mx": "install",
+    "mx": "install, deploy",
     "index.php": ".htaccess",
     "README.md": "LICENSE"
   }
