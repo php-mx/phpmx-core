@@ -9,6 +9,12 @@ return new class {
 
     function __invoke()
     {
+        $composerCmd = env('DEV') ? 'composer install' : 'composer install --no-dev';
+
+        Terminal::echol("Running [#c:s,$composerCmd]");
+
+        echo shell_exec($composerCmd);
+
         foreach (array_reverse(Path::seekForFiles('deploy')) as $deployFile) {
 
             $origin = Path::origin($deployFile);
