@@ -30,6 +30,7 @@ abstract class BaseReflectionFile
 
     /**
      * Analisa um docblock em um array estruturado com description, params, return, examples, etc.
+     * Tags suportadas: @param, @return, @throws, @see, @example, @method, @property, @internal, @ignore, @deprecated, @final, @since.
      * @param string|null $docBlock String do docblock ou null.
      * @return array Dados estruturados extraídos do docblock.
      */
@@ -45,6 +46,7 @@ abstract class BaseReflectionFile
             'internal' => false,
             'ignore' => false,
             'deprecated' => false,
+            'final' => false,
             'since' => null,
             'throws' => [],
             'see' => []
@@ -68,6 +70,9 @@ abstract class BaseReflectionFile
 
                     if ($tag == 'ignore')
                         $data['ignore'] = true;
+
+                    if ($tag == 'final')
+                        $data['final'] = true;
 
                     if ($tag == 'deprecated')
                         $data['deprecated'] = $content !== '' ? $content : true;
