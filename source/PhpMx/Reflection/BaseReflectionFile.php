@@ -159,6 +159,7 @@ abstract class BaseReflectionFile
 
     /**
      * Mescla dois arrays de documentação, dando prioridade ao primário e preferindo tipos mais específicos.
+     * Exceção: flags booleanas do secundário com valor true (ex: @final) sempre sobrescrevem o primário.
      * @param array $primary Dados primários (maior prioridade).
      * @param array $secondary Dados secundários (fallback quando o primário está vazio).
      * @return array Array mesclado resultante.
@@ -171,6 +172,11 @@ abstract class BaseReflectionFile
         foreach ($keys as $key) {
             $p1 = $primary[$key] ?? null;
             $p2 = $secondary[$key] ?? null;
+
+            if ($p2 === true && in_array($key, ['final', 'internal', 'ignore', 'deprecated'])) {
+                $merged[$key] = true;
+                continue;
+            }
 
             if (is_blank($p1) || is_blank($p2)) {
                 $merged[$key] = $p1 ?? $p2;
