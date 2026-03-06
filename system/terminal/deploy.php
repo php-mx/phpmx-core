@@ -15,6 +15,8 @@ return new class {
 
         echo shell_exec($composerCmd);
 
+        Terminal::echol();
+
         foreach (array_reverse(Path::seekForFiles('deploy')) as $deployFile) {
 
             $origin = Path::origin($deployFile);
