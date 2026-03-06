@@ -8,6 +8,11 @@ use ReflectionFunction;
 
 class ReflectionHelperFile extends BaseReflectionFile
 {
+    /**
+     * Retorna o esquema completo de um arquivo helper (constantes, funções e variáveis de ambiente).
+     * @param string $file Caminho do arquivo.
+     * @return array Esquema com as chaves 'constant', 'function' e 'environment'.
+     */
     static function scheme(string $file): array
     {
         return [
@@ -17,6 +22,11 @@ class ReflectionHelperFile extends BaseReflectionFile
         ];
     }
 
+    /**
+     * Extrai e retorna os esquemas de todas as constantes definidas em um arquivo.
+     * @param string $file Caminho do arquivo.
+     * @return array Lista de esquemas de constantes encontradas.
+     */
     static function schemeConstants(string $file): array
     {
         $content = Import::content($file);
@@ -45,6 +55,11 @@ class ReflectionHelperFile extends BaseReflectionFile
         return array_filter($schemes);
     }
 
+    /**
+     * Extrai e retorna os esquemas de todas as funções definidas em um arquivo.
+     * @param string $file Caminho do arquivo.
+     * @return array Lista de esquemas de funções encontradas.
+     */
     static function schemeFunctions(string $file): array
     {
         $content = Import::content($file);
@@ -92,6 +107,11 @@ class ReflectionHelperFile extends BaseReflectionFile
         return array_filter($schemes);
     }
 
+    /**
+     * Extrai e retorna os esquemas de todas as variáveis de ambiente configuradas via Env::default em um arquivo.
+     * @param string $file Caminho do arquivo.
+     * @return array Lista de esquemas de variáveis de ambiente encontradas.
+     */
     static function schemeEnvironments(string $file): array
     {
         $content = Import::content($file);

@@ -7,6 +7,11 @@ use PhpMx\Path;
 
 abstract class ReflectionCommandFile extends BaseReflectionFile
 {
+    /**
+     * Retorna o esquema de um arquivo de comando de terminal, extraindo nome, parâmetros e documentação.
+     * @param string $file Caminho do arquivo de comando.
+     * @return array Esquema do comando ou array vazio se o arquivo não contiver um comando válido.
+     */
     static function scheme(string $file): array
     {
         $content = Import::content($file);

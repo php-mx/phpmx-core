@@ -11,6 +11,14 @@ trait TerminalHelperTrait
 {
     protected $key = [];
 
+    /**
+     * Escaneia itens em todos os paths registrados para um diretório, exibindo-os agrupados por origem.
+     * Itens que existem em mais de uma origem são marcados como substituídos (replaced).
+     * @param string $scan Caminho relativo do diretório a escanear nos paths registrados.
+     * @param string|null $filter Prefixo para filtrar os itens pelo campo 'filter'. Null exibe todos.
+     * @param Closure|string|null $echo Template ou Closure para exibir um item normal.
+     * @param Closure|string|null $replaced Template ou Closure para exibir um item substituído.
+     */
     protected function handle(string $scan, ?string $filter, null|Closure|string $echo = null, null|Closure|string $replaced = null)
     {
         $echo = $echo ?? ' [#c:p,#name]';

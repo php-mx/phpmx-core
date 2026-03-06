@@ -2,7 +2,9 @@
 
 namespace PhpMx;
 
-/** Classe utilitária para manipulação de arquivos. */
+/** 
+ * Classe utilitária para manipulação de arquivos.
+ */
 abstract class File
 {
     /**

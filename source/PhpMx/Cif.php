@@ -4,7 +4,9 @@ namespace PhpMx;
 
 use Exception;
 
-/** Classe utilitária para cifrar e decifrar variáveis de forma segura. */
+/** 
+ * Classe utilitária para cifrar e decifrar variáveis de forma segura.
+ */
 abstract class Cif
 {
     protected static array $ENSURE;
@@ -93,6 +95,13 @@ abstract class Cif
         return true;
     }
 
+    /**
+     * Substitui caracteres posicionalmente conforme os alfabetos de entrada e saída.
+     * @param string $string String a ser transformada.
+     * @param string $in Alfabeto de origem.
+     * @param string $out Alfabeto de destino.
+     * @return string String com os caracteres substituídos.
+     */
     protected static function replace(string $string, string $in, string $out): string
     {
         for ($i = 0; $i < strlen($string); $i++)
@@ -102,6 +111,11 @@ abstract class Cif
         return $string;
     }
 
+    /**
+     * Retorna o índice de chave a usar na cifra, aleatório ou fixado pelo $charKey.
+     * @param string|null $charKey Caractere que força um índice fixo, ou null para usar o atual/aleatório.
+     * @return int Índice da chave (0-61).
+     */
     protected static function getUseIdKey(?string $charKey): int
     {
         self::__load();
@@ -114,6 +128,12 @@ abstract class Cif
         return $idKey ?? self::$CURRENT_ID_KEY;
     }
 
+    /**
+     * Retorna o caractere de encapsulamento para o índice de chave informado.
+     * @param int $idKey Índice da chave.
+     * @param bool $reverse Se true, inverte o índice (61 - $idKey) para gerar o par de fechamento.
+     * @return string Caractere de encapsulamento.
+     */
     protected static function getEncapsChar(int $idKey, bool $reverse = false): string
     {
         if ($reverse) $idKey = 61 - $idKey;
@@ -121,12 +141,21 @@ abstract class Cif
         return $charKey;
     }
 
+    /**
+     * Verifica se o primeiro e o último caractere de uma string formam um par de encapsulamento válido.
+     * @param string $string String cujo encapsulamento deve ser verificado.
+     * @return bool
+     */
     protected static function checkEncapsChar(string $string)
     {
         $idCharKeyStart = self::getUseIdKey(substr($string, 0, 1));
         return self::getEncapsChar($idCharKeyStart, true) == substr($string, -1, 1);
     }
 
+    /**
+     * Inicializa o estado interno carregando o certificado CIF caso ainda não esteja carregado.
+     * @return void
+     */
     protected static function __load()
     {
         if (is_null(self::$CIF)) {
@@ -141,6 +170,11 @@ abstract class Cif
         }
     }
 
+    /**
+     * Lê e processa um arquivo de certificado .crt, preenchendo os arrays $CIF e $ENSURE.
+     * @param string $path Caminho do arquivo de certificado.
+     * @return void
+     */
     private static function loadFileCif(string $path)
     {
         if (!File::check($path))

@@ -5,7 +5,9 @@ namespace PhpMx;
 use Closure;
 use Throwable;
 
-/** Classe utilitária para registro estruturado de logs e escopos. */
+/** 
+ * Classe utilitária para registro estruturado de logs e escopos.
+ */
 abstract class Log
 {
     protected static array $log = [];
@@ -207,12 +209,23 @@ abstract class Log
         return trim($output);
     }
 
+    /**
+     * Registra uma entrada bruta no array interno de log.
+     * @param string $type Categoria da entrada.
+     * @param string|null $message Mensagem da entrada.
+     * @param bool $isScope Indica se a entrada representa um escopo.
+     */
     protected static function set(string $type, ?string $message = null, bool $isScope = false)
     {
         $scope = count(self::$scope);
         self::$log[] = [$type, $message, $scope, null];
     }
 
+    /**
+     * Adiciona uma entrada ao log e abre um escopo, registrando o pico de memória inicial.
+     * @param string $type Categoria do escopo.
+     * @param string|null $message Mensagem do escopo.
+     */
     protected static function openScope(string $type, ?string $message = null)
     {
         self::set($type, $message);
@@ -221,6 +234,9 @@ abstract class Log
         self::$scope[] = $index;
     }
 
+    /**
+     * Fecha o escopo mais recente e calcula o delta de memória consumida.
+     */
     protected static function closeScope()
     {
         if (count(self::$scope)) {
@@ -229,11 +245,20 @@ abstract class Log
         }
     }
 
+    /**
+     * Calcula e atualiza o delta de memória pico de uma entrada de escopo.
+     * @param array $line Referência à entrada do log a ser finalizada.
+     */
     protected static function closeLine(&$line)
     {
         $line[3] = $line[3] ? memory_get_peak_usage(true) - $line[3] : null;
     }
 
+    /**
+     * Converte um valor em bytes para uma string legível (b, kb, mb, gb).
+     * @param int|null $bytes Valor em bytes ou null.
+     * @return string|null String formatada ou null se o valor for nulo ou insignificante.
+     */
     protected static function formatMemory(?int $bytes): ?string
     {
         if (is_null($bytes)) return null;

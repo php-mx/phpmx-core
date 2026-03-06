@@ -2,7 +2,9 @@
 
 namespace PhpMx;
 
-/** Classe utilitária para codificação e verificação com hash MX5. */
+/** 
+ * Classe utilitária para codificação e verificação com hash MX5.
+ */
 abstract class Mx5
 {
     protected static ?array $KEY = null;
@@ -75,6 +77,11 @@ abstract class Mx5
         return true;
     }
 
+    /**
+     * Carrega e retorna o array de índices de substituição derivado de MX5_KEY.
+     * O resultado é cacheado em $KEY para evitar reprocessamento.
+     * @return array Índices de permutação para a tradução HEX ↔ MX.
+     */
     private static function loadKey(): array
     {
         if (is_null(self::$KEY)) {

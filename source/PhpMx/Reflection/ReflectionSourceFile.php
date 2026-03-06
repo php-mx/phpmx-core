@@ -8,6 +8,11 @@ use ReflectionClass;
 
 class ReflectionSourceFile extends BaseReflectionFile
 {
+    /**
+     * Retorna o esquema completo de uma classe, trait ou interface de um arquivo PHP.
+     * @param string $file Caminho do arquivo fonte.
+     * @return array Esquema com tipo, nome, constantes, propriedades, métodos e documentação, ou array vazio se não houver classe.
+     */
     static function scheme(string $file): array
     {
         $content = Import::content($file);
@@ -51,6 +56,11 @@ class ReflectionSourceFile extends BaseReflectionFile
         ]);
     }
 
+    /**
+     * Extrai as constantes definidas diretamente na classe refletida.
+     * @param ReflectionClass $reflection Instância de ReflectionClass da classe alvo.
+     * @return array Mapa de constantes com nome, visibilidade e docblock.
+     */
     protected static function extractConstantsReflection(ReflectionClass $reflection): array
     {
         $constants = [];
@@ -70,6 +80,12 @@ class ReflectionSourceFile extends BaseReflectionFile
         return array_filter($constants);
     }
 
+    /**
+     * Extrai as propriedades definidas diretamente na classe refletida, mesclando com dados do docblock.
+     * @param ReflectionClass $reflect Instância de ReflectionClass da classe alvo.
+     * @param array $docProperties Propriedades documentadas no docblock da classe.
+     * @return array Mapa de propriedades com nome, tipo, visibilidade e modificadores.
+     */
     protected static function extractPropertiesReflection(ReflectionClass $reflect, array $docProperties): array
     {
         $props = [];
@@ -96,6 +112,12 @@ class ReflectionSourceFile extends BaseReflectionFile
         return array_filter($props);
     }
 
+    /**
+     * Extrai os métodos definidos diretamente na classe refletida, mesclando com dados do docblock.
+     * @param ReflectionClass $reflect Instância de ReflectionClass da classe alvo.
+     * @param array $docMethods Métodos documentados no docblock da classe.
+     * @return array Mapa de métodos com nome, visibilidade, modificadores, parâmetros e tipo de retorno.
+     */
     protected static function extractMethodsReflection(ReflectionClass $reflect, array $docMethods): array
     {
         $methods = [];

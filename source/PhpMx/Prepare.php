@@ -79,6 +79,13 @@ abstract class Prepare
         }
     }
 
+    /**
+     * Executa as substituições de todas as tags encontradas no texto.
+     * @param string $string Texto com as tags a serem substituídas.
+     * @param array $tags Lista de tags encontradas no texto.
+     * @param array $prepare Dados de substituição já normalizados.
+     * @return string Texto com todas as substituições aplicadas.
+     */
     protected static function resolve($string, $tags, $prepare): string
     {
         list($ppN, $ppR) = self::separePrepare($prepare);
@@ -95,6 +102,14 @@ abstract class Prepare
         return $string;
     }
 
+    /**
+     * Resolve o valor correspondente a uma tag individual (sequencial, por referência ou função closure).
+     * @param string $tag Nome da tag sem os colchetes.
+     * @param array $ppN Referência ao array de valores sequenciais (consumidos por posição).
+     * @param array $ppR Array de valores por referência (chave nomeada).
+     * @param bool $runClosure Se deve executar closures automaticamente ao resolver.
+     * @return mixed Valor resolvido ou null se não encontrado.
+     */
     protected static function getTagValue($tag, &$ppN, $ppR, bool $runClosure = true): mixed
     {
         if ($tag == '#') {
@@ -137,6 +152,11 @@ abstract class Prepare
         }
     }
 
+    /**
+     * Separa um array de dados em dois grupos: sequenciais (chaves numéricas) e por referência (chaves string).
+     * @param array $prepare Array de dados a separar.
+     * @return array Par [$sequenciais, $referências].
+     */
     protected static function separePrepare($prepare): array
     {
         $sequence = [];
@@ -151,6 +171,11 @@ abstract class Prepare
         return [$sequence, $reference];
     }
 
+    /**
+     * Normaliza e expande o array de dados, convertendo subarrays em entradas com chaves dot notation.
+     * @param array|string $prepare Dados de entrada a normalizar.
+     * @return array Array expandido com chaves planas e dot notation.
+     */
     protected static function combinePrepare(array|string $prepare): array
     {
         $prepare = is_array($prepare) ? $prepare : [$prepare];
@@ -166,6 +191,11 @@ abstract class Prepare
         return $prepare;
     }
 
+    /**
+     * Extrai todas as tags [#...] presentes em uma string usando regex.
+     * @param string $string Texto a ser analisado.
+     * @return array Lista de tags encontradas (com os colchetes).
+     */
     protected static function getPrepareTags(string $string): array
     {
         preg_match_all("#\[[\#\>][^\]]*+\]#i", $string, $tags);

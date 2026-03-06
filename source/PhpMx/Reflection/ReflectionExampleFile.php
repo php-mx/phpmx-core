@@ -9,6 +9,11 @@ use ReflectionClass;
 
 class ReflectionExampleFile extends ReflectionSourceFile
 {
+    /**
+     * Retorna o esquema de um arquivo de exemplo, detectando automaticamente se é narrativo ou de implementação.
+     * @param string $file Caminho do arquivo de exemplo.
+     * @return array Esquema com tipo, nome e conteúdo estruturado do exemplo.
+     */
     static function scheme(string $file): array
     {
         $content = Import::content($file);
@@ -30,6 +35,11 @@ class ReflectionExampleFile extends ReflectionSourceFile
         ]);
     }
 
+    /**
+     * Detecta se o conteúdo de um arquivo de exemplo é uma implementação de classe ou um exemplo narrativo.
+     * @param string $content Conteúdo do arquivo de exemplo.
+     * @return string 'implement' se contiver definição de classe, 'narrative' caso contrário.
+     */
     protected static function detectType(string $content): string
     {
         if (preg_match('/^\s*(?:abstract\s+|final\s+)?class\s+\w+/im', $content))
@@ -41,6 +51,11 @@ class ReflectionExampleFile extends ReflectionSourceFile
         return 'narrative';
     }
 
+    /**
+     * Extrai o conteúdo narrativo de um arquivo de exemplo, convertendo comentários e código em linhas de descrição.
+     * @param string $content Conteúdo bruto do arquivo de exemplo.
+     * @return array Array com chave 'description' contendo as linhas extraídas.
+     */
     protected static function schemeNarrative(string $content): array
     {
         $hasPHP = (bool) preg_match('/^<\?php/im', $content);
@@ -95,6 +110,12 @@ class ReflectionExampleFile extends ReflectionSourceFile
         return ['description' => $result];
     }
 
+    /**
+     * Extrai o esquema de um arquivo de exemplo do tipo implementação, refletindo a classe ou objeto anônimo retornado.
+     * @param string $file Caminho do arquivo de exemplo.
+     * @param string $content Conteúdo bruto do arquivo de exemplo.
+     * @return array Esquema com descrição, modificadores, constantes, propriedades e métodos da implementação.
+     */
     protected static function schemeImplement(string $file, string $content): array
     {
         $fileReturn = Import::return($file);
@@ -134,6 +155,12 @@ class ReflectionExampleFile extends ReflectionSourceFile
         ]);
     }
 
+    /**
+     * Extrai os métodos da classe refletida, enriquecendo cada método com o corpo de implementação extraído do arquivo fonte.
+     * @param ReflectionClass $reflect Instância de ReflectionClass da classe alvo.
+     * @param array $docMethods Métodos documentados no docblock da classe.
+     * @return array Mapa de métodos com os dados herdados de ReflectionSourceFile acrescidos da chave 'implementation'.
+     */
     protected static function extractMethodsReflection(ReflectionClass $reflect, array $docMethods): array
     {
         $methods = parent::extractMethodsReflection($reflect, $docMethods);
