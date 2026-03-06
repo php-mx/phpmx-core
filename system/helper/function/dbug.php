@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('dbug')) {
+if (!function_exists('d')) {
 
     /**
      * Realiza o var_dump de múltiplas variáveis com configurações otimizadas de profundidade e exibição.
