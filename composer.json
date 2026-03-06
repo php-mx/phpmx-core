@@ -44,5 +44,13 @@
     },
     "bin": [
         "mx"
-    ]
+    ],
+    "scripts": {
+        "post-install-cmd": [
+            "@php mx deploy"
+        ],
+        "post-update-cmd": [
+            "@php mx deploy"
+        ]
+    }
 }

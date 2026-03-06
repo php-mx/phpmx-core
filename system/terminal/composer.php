@@ -22,6 +22,15 @@ return new class {
 
         $composer['autoload']['psr-4'][''] = path('source/');
 
+        $composer['scripts'] = $composer['scripts'] ?? [];
+        $composer['scripts']['post-install-cmd'] = $composer['scripts']['post-install-cmd'] ?? [];
+        $composer['scripts']['post-update-cmd'] = $composer['scripts']['post-update-cmd'] ?? [];
+
+        foreach (['post-install-cmd', 'post-update-cmd'] as $event) {
+            if (!in_array('@php mx deploy', $composer['scripts'][$event]))
+                $composer['scripts'][$event][] = '@php mx deploy';
+        }
+
         $autoImport = path('system/helper/');
 
         $files = [];

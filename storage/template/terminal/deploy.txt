@@ -1,0 +1,12 @@
+<?php
+
+use PhpMx\Terminal;
+
+return new class {
+
+    function __invoke()
+    {
+        // Deploy code here
+        Terminal::echol('deploying');
+    }
+};
