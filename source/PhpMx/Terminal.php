@@ -18,10 +18,8 @@ use Throwable;
  */
 abstract class Terminal
 {
-    /** Executa uma linha de comando */
-
     /**
-     * Executa uma linha de comando 
+     * Executa uma linha de comando
      * @param mixed ...$commandLine Comando que deve ser executado
      * @example Terminal::run('make.command teste') Equivalente a php mx make.command teste
      * @example Terminal::run('make.command', 'teste') Equivalente a php mx make.command teste
@@ -389,6 +387,12 @@ abstract class Terminal
         self::echol($colorTag, [$separator]);
     }
 
+    /**
+     * Aplica escape ANSI ao texto conforme o estilo informado (cor + modificadores).
+     * @param string $style Código de estilo (ex: 'pb' = primário + negrito).
+     * @param string $text Texto a ser colorido.
+     * @return string Texto com escape ANSI ou texto puro se ANSI não for suportado.
+     */
     private static function colorize($style, $text = ''): string
     {
         if (!self::checkANSI()) return $text;
@@ -407,6 +411,10 @@ abstract class Terminal
         return "\033[" . implode(';', $codes) . "m$text\033[0m";
     }
 
+    /**
+     * Verifica se o ambiente suporta saída ANSI colorida.
+     * @return bool True se ANSI for suportado, false caso contrário.
+     */
     private static function checkANSI(): bool
     {
         if (PHP_OS_FAMILY !== 'Windows') return true;
