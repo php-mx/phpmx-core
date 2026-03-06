@@ -33,21 +33,21 @@ abstract class ReflectionCommandFile extends BaseReflectionFile
             $invokeDocContent = self::docBlockBefore($content, $invokePos);
             $invokeDocScheme = self::parseDocBlock($invokeDocContent);
 
-            $commandDocScheme = self::mergeDoc($commandDocScheme, $invokeDocScheme);
+            $commandDocScheme = self::mergeDoc($invokeDocScheme, $commandDocScheme);
 
             $paramsStr = trim($invokeMatch[1][0] ?? '');
             if (!empty($paramsStr)) {
-                preg_match_all('/(?:([^\s,$]+)\s+)?(&)?(\.\.\.)?\$(\w+)(?:\s*=\s*([^,]+))?/', $paramsStr, $paramMatches, PREG_SET_ORDER);
+                preg_match_all('/(?:([^\s,$]+)\s+)?(&)?(\.\.\.)?\$(\w+)(?:\s*=\s*((?:[^,]|\'[^\']*\'|"[^"]*"|\[[^\]]*\])+))?/', $paramsStr, $paramMatches, PREG_SET_ORDER);
                 foreach ($paramMatches as $p) {
                     $name = trim($p[4]);
-                    $reflectionParams[$name] = array_filter([
+                    $reflectionParams[$name] = [
                         'name' => $name,
                         'type' => !empty($p[1]) ? trim($p[1]) : null,
                         'optional' => !empty($p[5]),
                         'variadic' => !empty($p[3]),
                         'reference' => !empty($p[2]),
                         'default' => !empty($p[5]) ? trim($p[5]) : null,
-                    ]);
+                    ];
                 }
                 $reflectionData = ['params' => $reflectionParams];
 

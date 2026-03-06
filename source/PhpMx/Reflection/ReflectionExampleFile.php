@@ -42,7 +42,7 @@ class ReflectionExampleFile extends ReflectionSourceFile
      */
     protected static function detectType(string $content): string
     {
-        if (preg_match('/^\s*(?:abstract\s+|final\s+)?class\s+\w+/im', $content))
+        if (preg_match('/^\s*(?:abstract\s+|final\s+|readonly\s+)*(?:class|enum|interface|trait)\s+\w+/im', $content))
             return 'implement';
 
         if (preg_match('/new\s+class/i', $content))
