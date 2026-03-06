@@ -4,7 +4,7 @@ if (!function_exists('strToCamelCase')) {
 
     /**
      * Converte uma string para o formato camelCase.
-     * @param string $string
+     * @param string $string A string a ser convertida.
      * @return string
      */
     function strToCamelCase(string $string): string
@@ -23,7 +23,7 @@ if (!function_exists('strToKebabCase')) {
 
     /**
      * Converte uma string para o formato kebab-case.
-     * @param string $string
+     * @param string $string A string a ser convertida.
      * @return string
      */
     function strToKebabCase(string $string): string
@@ -41,7 +41,7 @@ if (!function_exists('strToPascalCase')) {
 
     /**
      * Converte uma string para o formato PascalCase.
-     * @param string $string
+     * @param string $string A string a ser convertida.
      * @return string
      */
     function strToPascalCase(string $string): string
@@ -59,7 +59,7 @@ if (!function_exists('strToSnakeCase')) {
 
     /**
      * Converte uma string para o formato snake_case.
-     * @param string $string
+     * @param string $string A string a ser convertida.
      * @return string
      */
     function strToSnakeCase(string $string): string

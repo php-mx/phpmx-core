@@ -79,7 +79,7 @@ if (!function_exists('num_positive')) {
 
     /**
      * Retorna o valor absoluto (positivo) de um número.
-     * @param int|float|string $number
+     * @param int|float|string $number O número de entrada.
      * @return int|float
      */
     function num_positive(int|float|string $number): int|float
@@ -93,7 +93,7 @@ if (!function_exists('num_negative')) {
 
     /**
      * Retorna a representação negativa de um número.
-     * @param int|float|string $number
+     * @param int|float|string $number O número de entrada.
      * @return int|float
      */
     function num_negative(int|float|string $number): int|float

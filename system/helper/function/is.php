@@ -7,7 +7,7 @@ if (!function_exists('is_base64')) {
 
     /**
      * Verifica se uma variável é uma string codificada em Base64 válida.
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_base64(mixed $var): bool
@@ -24,7 +24,7 @@ if (!function_exists('is_blank')) {
     /**
      * Verifica se uma variável é nula, vazia ou composta apenas de espaços em branco.
      * Diferente de empty(), retorna false para números (0) e booleanos.
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_blank(mixed $var): bool
@@ -62,7 +62,7 @@ if (!function_exists('is_cif')) {
 
     /**
      * Atalho para verificar se uma variável é uma cifra MX válida (via Cif::check).
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_cif(mixed $var): bool
@@ -75,7 +75,7 @@ if (!function_exists('is_closure')) {
 
     /**
      * Verifica se uma variável é uma função anônima ou um objeto invocável (callable).
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_closure(mixed $var): bool
@@ -88,8 +88,8 @@ if (!function_exists('is_extend')) {
 
     /**
      * Verifica especificamente se um objeto ou classe estende uma classe pai.
-     * @param mixed $object
-     * @param object|string $class
+     * @param mixed $object Objeto ou nome da classe a verificar.
+     * @param object|string $class Classe pai de referência.
      * @return bool
      */
     function is_extend(mixed $object, object|string $class): bool
@@ -110,7 +110,7 @@ if (!function_exists('is_image_base64')) {
 
     /**
      * Verifica se uma string é uma URL de imagem codificada em Base64 (data:image/...).
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_image_base64(mixed $var): bool
@@ -132,8 +132,8 @@ if (!function_exists('is_implement')) {
 
     /**
      * Verifica se um objeto ou classe implementa uma interface específica.
-     * @param mixed $object
-     * @param object|string $interface
+     * @param mixed $object Objeto ou nome da classe a verificar.
+     * @param object|string $interface Interface de referência.
      * @return bool
      */
     function is_implement(mixed $object, object|string $interface): bool
@@ -153,7 +153,7 @@ if (!function_exists('is_json')) {
 
     /**
      * Verifica se uma string é um JSON válido.
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_json(mixed $var): bool
@@ -173,7 +173,7 @@ if (!function_exists('is_md5')) {
 
     /**
      * Verifica se uma string possui o formato hexadecimal de 32 caracteres de um MD5.
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_md5(mixed $var): bool
@@ -186,7 +186,7 @@ if (!function_exists('is_password')) {
 
     /**
      * Verifica se uma string é um hash de senha BCRYPT válido de 60 caracteres.
-     * @param string $value
+     * @param string $value O hash a ser verificado.
      * @return bool
      */
     function is_password(string $value): bool
@@ -199,7 +199,7 @@ if (!function_exists('is_mx5')) {
 
     /**
      * Atalho para verificar se uma variável é um hash MX5 válido.
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_mx5(mixed $var): bool
@@ -269,7 +269,7 @@ if (!function_exists('is_stringable')) {
 
     /**
      * Verifica se uma variável pode ser convertida para string (string, número ou objeto com __toString).
-     * @param mixed $var
+     * @param mixed $var A variável a ser verificada.
      * @return bool
      */
     function is_stringable(mixed $var): bool
@@ -282,8 +282,8 @@ if (!function_exists('is_trait')) {
 
     /**
      * Verifica se um objeto ou classe utiliza uma Trait específica (incluindo herança).
-     * @param mixed $object
-     * @param object|string|null $trait
+     * @param mixed $object Objeto ou nome da classe a verificar.
+     * @param object|string|null $trait Nome da Trait de referência.
      * @return bool
      */
     function is_trait(mixed $object, object|string|null $trait): bool

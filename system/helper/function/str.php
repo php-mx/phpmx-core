@@ -4,7 +4,7 @@ if (!function_exists('str_get_var')) {
 
     /**
      * Extrai e converte um valor de dentro de uma string para seu tipo real (bool, int, float ou null).
-     * @param mixed $var
+     * @param mixed $var O valor a ser analisado e convertido.
      * @return mixed
      */
     function str_get_var($var): mixed
@@ -35,9 +35,9 @@ if (!function_exists('str_replace_all')) {
 
     /**
      * Substitui repetidamente as ocorrências de uma string até que não haja mais mudanças ou atinja o limite.
-     * @param array|string $search
-     * @param array|string $replace
-     * @param string $subject
+     * @param array|string $search Valor(es) a buscar na string.
+     * @param array|string $replace Valor(es) de substituição.
+     * @param string $subject A string alvo da substituição.
      * @param int $loop Limite de iterações para evitar loops infinitos.
      * @return string
      */
@@ -57,9 +57,9 @@ if (!function_exists('str_replace_first')) {
 
     /**
      * Substitui apenas a primeira ocorrência encontrada da string de pesquisa.
-     * @param array|string $search
-     * @param array|string $replace
-     * @param string $subject
+     * @param array|string $search Valor(es) a buscar na string.
+     * @param array|string $replace Valor(es) de substituição.
+     * @param string $subject A string alvo da substituição.
      * @return string
      */
     function str_replace_first(array|string $search, array|string $replace, string $subject): string
@@ -76,9 +76,9 @@ if (!function_exists('str_replace_last')) {
 
     /**
      * Substitui apenas a última ocorrência encontrada da string de pesquisa.
-     * @param array|string $search
-     * @param array|string $replace
-     * @param string $subject
+     * @param array|string $search Valor(es) a buscar na string.
+     * @param array|string $replace Valor(es) de substituição.
+     * @param string $subject A string alvo da substituição.
      * @return string
      */
     function str_replace_last(array|string $search, array|string $replace, string $subject): string
@@ -126,9 +126,9 @@ if (!function_exists('mb_str_replace')) {
 
     /**
      * Versão multibyte segura da função str_replace.
-     * @param array|string $search
-     * @param array|string $replace
-     * @param string $subject
+     * @param array|string $search Valor(es) a buscar na string.
+     * @param array|string $replace Valor(es) de substituição.
+     * @param string $subject A string alvo da substituição.
      * @param int &$count Referência para contagem de substituições.
      * @return string
      */
@@ -155,10 +155,10 @@ if (!function_exists('mb_str_replace_all')) {
 
     /**
      * Versão multibyte segura da função str_replace_all.
-     * @param array|string $search
-     * @param array|string $replace
-     * @param string $subject
-     * @param int $loop
+     * @param array|string $search Valor(es) a buscar na string.
+     * @param array|string $replace Valor(es) de substituição.
+     * @param string $subject A string alvo da substituição.
+     * @param int $loop Limite de iterações para evitar loops infinitos.
      * @return string
      */
     function mb_str_replace_all(array|string $search, array|string $replace, string $subject, int $loop = 10): string
