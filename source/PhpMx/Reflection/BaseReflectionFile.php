@@ -2,7 +2,7 @@
 
 namespace PhpMx\Reflection;
 
-/** @ignore */
+/** @internal */
 abstract class BaseReflectionFile
 {
     const PRIMITIVES = ['int', 'integer', 'string', 'bool', 'boolean', 'float', 'double', 'array', 'object', 'callable', 'iterable', 'void', 'mixed', 'null'];

@@ -9,7 +9,7 @@ use ReflectionClass;
 class ReflectionSourceFile extends BaseReflectionFile
 {
     /**
-     * Retorna o esquema completo de uma classe, trait ou interface de um arquivo PHP.
+     * Retorna o esquema completo de uma classe, trait, interface ou enum de um arquivo PHP.
      * @param string $file Caminho do arquivo fonte.
      * @return array Esquema com tipo, nome, constantes, propriedades, métodos e documentação, ou array vazio se não houver classe.
      */
@@ -18,7 +18,7 @@ class ReflectionSourceFile extends BaseReflectionFile
         $content = Import::content($file);
 
         preg_match('/namespace\s+([\w\\\\]+);/m', $content, $nsMatch);
-        preg_match('/^\s*(?:abstract\s+|final\s+)?(?:class|trait|interface)\s+(\w+)/im', $content, $nameMatch);
+        preg_match('/^\s*(?:abstract\s+|final\s+|readonly\s+)*(?:class|trait|interface|enum)\s+(\w+)/im', $content, $nameMatch);
 
         if (!$nameMatch) return [];
 
@@ -28,6 +28,7 @@ class ReflectionSourceFile extends BaseReflectionFile
         $type = 'class';
         if ($reflection->isInterface()) $type = 'interface';
         if ($reflection->isTrait()) $type = 'trait';
+        if ($reflection->isEnum()) $type = 'enum';
 
         $docBlock = $reflection->getDocComment();
         $docScheme = self::parseDocBlock($docBlock);
