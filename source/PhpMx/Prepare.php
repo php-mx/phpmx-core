@@ -37,7 +37,7 @@ abstract class Prepare
 
     /** 
      * Retorna as tags prepare existentes em uma string (sem os colchetes).
-     * @param string $string
+     * @param string $string O texto a ser analisado.
      * @return array Lista de tags únicas encontradas.
      */
     static function tags($string): array
@@ -49,7 +49,7 @@ abstract class Prepare
 
     /** 
      * Retorna as chaves disponíveis em um array de prepare processado.
-     * @param array|string $prepare
+     * @param array|string $prepare Os dados de prepare a serem analisados.
      * @return array Lista de chaves (incluindo dot notation de subarrays).
      */
     static function keys($prepare): array

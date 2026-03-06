@@ -190,7 +190,7 @@ abstract class Dir
 
     /**
      * Verifica se o caminho informado é um diretório válido.
-     * @param string $path
+     * @param string $path O caminho a verificar.
      * @return bool
      */
     static function check(string $path): bool

@@ -7,7 +7,7 @@ abstract class Json
 {
     /**
      * Importa o conteúdo de um arquivo json para um array
-     * @param string $path
+     * @param string $path Caminho do arquivo (extensão .json adicionada automaticamente se omitida).
      * @return array|null
      */
     static function import(string $path): ?array
@@ -22,9 +22,9 @@ abstract class Json
 
     /**
      * Exporta um array para um arquivo json
-     * @param string $path
-     * @param array $array
-     * @param bool $merge
+     * @param string $path Caminho do arquivo de destino (extensão .json adicionada automaticamente se omitida).
+     * @param array $array Dados a serem exportados.
+     * @param bool $merge Se deve mesclar com o conteúdo já existente no arquivo.
      * @return void
      */
     static function export(string $path, array $array, bool $merge = false): void

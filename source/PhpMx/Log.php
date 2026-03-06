@@ -37,7 +37,7 @@ abstract class Log
 
     /**
      * Habilita ou desabilita o registro de logs.
-     * @param bool $useLog
+     * @param bool $useLog True para habilitar, false para desabilitar.
      * @return void
      */
     static function useLog(bool $useLog): void
@@ -91,7 +91,7 @@ abstract class Log
 
     /**
      * Registra uma exceção detalhada no log.
-     * @param Throwable $e
+     * @param Throwable $e A exceção a ser registrada.
      * @return void
      */
     static function exception(Throwable $e): void
