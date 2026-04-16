@@ -101,10 +101,13 @@ class ReflectionSourceFile extends BaseReflectionFile
                 'type' => $prop->hasType() ? strval($prop->getType()) : null,
             ];
 
+            $propDocScheme = self::parseDocBlock($prop->getDocComment() ?: null);
+
             $props[$name] = array_filter([
                 ...$reflectionData,
                 'static' => $prop->isStatic(),
                 'visibility' => $prop->isPublic() ? 'public' : ($prop->isProtected() ? 'protected' : 'private'),
+                ...$propDocScheme,
             ]);
         }
 
@@ -144,6 +147,8 @@ class ReflectionSourceFile extends BaseReflectionFile
                 'return' => $method->hasReturnType() ? strval($method->getReturnType()) : null
             ]);
 
+            $methodDocScheme = self::parseDocBlock($method->getDocComment() ?: null);
+
             $methods[$name] = array_filter([
                 'name' => $name,
                 'visibility' => $method->isPublic() ? 'public' : ($method->isProtected() ? 'protected' : 'private'),
@@ -151,7 +156,7 @@ class ReflectionSourceFile extends BaseReflectionFile
                 'abstract' => $method->isAbstract(),
                 'final' => $method->isFinal(),
                 'line' => $method->getStartLine(),
-                ...$reflectionData
+                ...self::mergeDoc($reflectionData, $methodDocScheme),
             ]);
         }
 
