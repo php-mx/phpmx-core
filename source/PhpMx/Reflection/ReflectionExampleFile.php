@@ -3,205 +3,242 @@
 namespace PhpMx\Reflection;
 
 use PhpMx\File;
-use PhpMx\Import;
 use PhpMx\Path;
-use ReflectionClass;
 
-class ReflectionExampleFile extends ReflectionSourceFile
+class ReflectionExampleFile extends BaseReflectionFile
 {
-    /**
-     * Retorna o esquema de um arquivo de exemplo, detectando automaticamente se é narrativo ou de implementação.
-     * @param string $file Caminho do arquivo de exemplo.
-     * @return array Esquema com tipo, nome e conteúdo estruturado do exemplo.
-     */
     static function scheme(string $file): array
     {
-        $content = Import::content($file);
-
-        $type = self::detectType($content);
-
+        $content = file_get_contents($file);
         $name = File::getName($file);
-
-        $scheme = $type == 'implement' ? self::schemeImplement($file, $content) : self::schemeNarrative($content);
+        $description = self::parseContent($content);
 
         return array_filter([
             '_key' => md5("example:$name"),
-            '_type' => $type,
+            '_type' => 'example',
             '_file' => path($file),
             '_origin' => Path::origin($file),
-
             'name' => $name,
-            ...$scheme
+            'description' => $description ?: null,
         ]);
     }
 
-    /**
-     * Detecta se o conteúdo de um arquivo de exemplo é uma implementação de classe ou um exemplo narrativo.
-     * @param string $content Conteúdo do arquivo de exemplo.
-     * @return string 'implement' se contiver definição de classe, 'narrative' caso contrário.
-     */
-    protected static function detectType(string $content): string
+    protected static function parseContent(string $content): array
     {
-        if (preg_match('/^\s*(?:abstract\s+|final\s+|readonly\s+)*(?:class|enum|interface|trait)\s+\w+/im', $content))
-            return 'implement';
+        $lines = [];
+        $pos = 0;
+        $len = strlen($content);
+        $inPhp = false;
+        $buffer = '';
 
-        if (preg_match('/new\s+class/i', $content))
-            return 'implement';
-
-        return 'narrative';
-    }
-
-    /**
-     * Extrai o conteúdo narrativo de um arquivo de exemplo, convertendo comentários e código em linhas de descrição.
-     * @param string $content Conteúdo bruto do arquivo de exemplo.
-     * @return array Array com chave 'description' contendo as linhas extraídas.
-     */
-    protected static function schemeNarrative(string $content): array
-    {
-        $hasPHP = (bool) preg_match('/^<\?php/im', $content);
-
-        $lines = preg_split('/\r\n|\n|\r/', $content);
-        $result = [];
-        $inBlock = false;
-
-        foreach ($lines as $line) {
-            $trimmed = $line;
-
-            if (preg_match('/^<\?php$/i', $trimmed)) continue;
-
-            if ($hasPHP) {
-                if (!$inBlock && preg_match('/^\/\*/', $trimmed)) {
-                    $inBlock = true;
-                    $trimmed = trim(preg_replace('/^\/\*+\s*/', '', $trimmed));
+        while ($pos < $len) {
+            if (!$inPhp) {
+                $next = stripos($content, '<?php', $pos);
+                if ($next === false) {
+                    $buffer .= substr($content, $pos);
+                    $pos = $len;
+                } else {
+                    $buffer .= substr($content, $pos, $next - $pos);
+                    foreach (self::parseTextSegment($buffer) as $line) $lines[] = $line;
+                    $buffer = '';
+                    $inPhp = true;
+                    $pos = $next + 5;
                 }
-
-                if ($inBlock && str_contains($trimmed, '*/')) {
-                    $inBlock = false;
-                    $trimmed = trim(preg_replace('/\s*\*\/.*$/', '', $trimmed));
-                    if ($trimmed !== '') $result[] = $trimmed;
-                    continue;
-                }
-
-                if ($inBlock) {
-                    $trimmed = trim(preg_replace('/^\s*\*\s?/', '', $trimmed));
-                    $result[] = $trimmed;
-                    continue;
-                }
-
-                if (preg_match('/^(\/\/|#)\s?(.*)$/', $trimmed, $m)) {
-                    $result[] = trim($m[2]);
-                    continue;
-                }
-
-                if ($trimmed !== '') {
-                    $result[] = '> ' . $trimmed;
-                    continue;
-                }
-
-                $result[] = '';
             } else {
+                $next = strpos($content, '?>', $pos);
+                if ($next === false) {
+                    $buffer .= substr($content, $pos);
+                    $pos = $len;
+                } else {
+                    $buffer .= substr($content, $pos, $next - $pos);
+                    foreach (self::parsePhpSegment($buffer) as $line) $lines[] = $line;
+                    $buffer = '';
+                    $inPhp = false;
+                    $pos = $next + 2;
+                }
+            }
+        }
+
+        if ($buffer !== '') {
+            foreach ($inPhp ? self::parsePhpSegment($buffer) : self::parseTextSegment($buffer) as $line)
+                $lines[] = $line;
+        }
+
+        $collapsed = [];
+        $prevBlank = false;
+        foreach ($lines as $line) {
+            $isBlank = $line === '';
+            if ($isBlank && $prevBlank) continue;
+            $collapsed[] = $line;
+            $prevBlank = $isBlank;
+        }
+        $lines = $collapsed;
+
+        $result = [];
+        $i = 0;
+        $total = count($lines);
+        while ($i < $total) {
+            if (str_starts_with($lines[$i], '> ')) {
+                $block = [];
+                while ($i < $total && str_starts_with($lines[$i], '> ')) {
+                    $block[] = $lines[$i++];
+                }
+                while (!empty($block) && $block[0] === '> ') array_shift($block);
+                while (!empty($block) && end($block) === '> ') array_pop($block);
+                foreach ($block as $bl) $result[] = $bl;
+            } else {
+                $result[] = $lines[$i++];
+            }
+        }
+        $lines = $result;
+
+        while (!empty($lines) && $lines[0] === '') array_shift($lines);
+        while (!empty($lines) && end($lines) === '') array_pop($lines);
+
+        return $lines;
+    }
+
+    protected static function parseTextSegment(string $text): array
+    {
+        $rawLines = preg_split('/\r\n|\n|\r/', $text);
+        $result = [];
+        $i = 0;
+        $total = count($rawLines);
+
+        while ($i < $total) {
+            $line = $rawLines[$i];
+            $trimmed = rtrim($line);
+            $ltrimmed = ltrim($trimmed);
+
+            if (str_starts_with($ltrimmed, '> ')) {
+                $result[] = $ltrimmed;
+                $i++;
+                continue;
+            }
+
+            if (str_starts_with($ltrimmed, '/*')) {
+                [$block, $consumed] = self::collectBlock($rawLines, $i);
+                foreach ($block as $bl) $result[] = $bl;
+                $i += $consumed;
+                continue;
+            }
+
+            if (preg_match('/^(\/\/|#)\s?(.*)$/', $ltrimmed, $m)) {
+                $result[] = trim($m[2]);
+                $i++;
+                continue;
+            }
+
+            $result[] = $trimmed;
+            $i++;
+        }
+
+        return $result;
+    }
+
+    protected static function parsePhpSegment(string $code): array
+    {
+        $rawLines = preg_split('/\r\n|\n|\r/', $code);
+        $result = [];
+        $depth = 0;
+        $i = 0;
+        $total = count($rawLines);
+
+        while ($i < $total) {
+            $line = $rawLines[$i];
+            $trimmed = trim($line);
+            $content = rtrim($line);
+
+
+            if ($trimmed === '') {
+                $result[] = '> ';
+                $i++;
+                continue;
+            }
+
+            if ($depth > 0) {
+                $result[] = '> ' . $content;
+                $depth += substr_count($trimmed, '{') - substr_count($trimmed, '}');
+                if ($depth < 0) $depth = 0;
+                $i++;
+                continue;
+            }
+
+            if (str_starts_with($trimmed, '> ')) {
                 $result[] = $trimmed;
+                $i++;
+                continue;
             }
+
+            if (preg_match('/^(\/\/|#)(.*)$/', $trimmed, $m)) {
+                $result[] = trim($m[2]);
+                $i++;
+                continue;
+            }
+
+            if (str_starts_with($trimmed, '/**')) {
+                [$block, $consumed] = self::collectBlock($rawLines, $i);
+
+                $next = $i + $consumed;
+                while ($next < $total && trim($rawLines[$next]) === '') $next++;
+                $nextLine = $next < $total ? trim($rawLines[$next]) : '';
+
+                $isFollowedByCode = $nextLine !== ''
+                    && !preg_match('/^(\/\/|#|\/\*|\?>)/', $nextLine);
+
+                if ($isFollowedByCode) {
+                    for ($j = $i; $j < $i + $consumed; $j++)
+                        $result[] = '> ' . rtrim($rawLines[$j]);
+                } else {
+                    foreach ($block as $bl) $result[] = $bl;
+                }
+
+                $i += $consumed;
+                continue;
+            }
+
+            if (str_starts_with($trimmed, '/*')) {
+                [$block, $consumed] = self::collectBlock($rawLines, $i);
+                foreach ($block as $bl) $result[] = $bl;
+                $i += $consumed;
+                continue;
+            }
+
+            $result[] = '> ' . $content;
+            $depth += substr_count($trimmed, '{') - substr_count($trimmed, '}');
+            if ($depth < 0) $depth = 0;
+            $i++;
         }
 
-        while (!empty($result) && trim($result[0]) === '') array_shift($result);
-        while (!empty($result) && trim(end($result)) === '') array_pop($result);
-
-        return ['description' => $result];
+        return $result;
     }
 
-    /**
-     * Extrai o esquema de um arquivo de exemplo do tipo implementação, refletindo a classe ou objeto anônimo retornado.
-     * @param string $file Caminho do arquivo de exemplo.
-     * @param string $content Conteúdo bruto do arquivo de exemplo.
-     * @return array Esquema com descrição, modificadores, constantes, propriedades e métodos da implementação.
-     */
-    protected static function schemeImplement(string $file, string $content): array
+    protected static function collectBlock(array $rawLines, int $start): array
     {
-        $fileReturn = Import::return($file);
+        $lines = [];
+        $consumed = 0;
+        $i = $start;
+        $total = count($rawLines);
+        while ($i < $total) {
+            $line = $rawLines[$i];
+            $trimmed = trim($line);
+            $consumed++;
 
-        $anonimous = is_object($fileReturn);
+            $hasClose = str_contains($trimmed, '*/');
+            $relevant = $hasClose ? substr($trimmed, 0, strpos($trimmed, '*/')) : $trimmed;
 
-        if ($anonimous) {
-            $reflection = new \ReflectionClass($fileReturn);
-        } else {
-            preg_match('/namespace\s+([\w\\\\]+);/m', $content, $nsMatch);
-            preg_match('/(?:abstract\s+|final\s+)?class\s+(\w+)/i', $content, $classMatch);
-
-            if (!$classMatch) return [];
-
-            $namespace = $nsMatch[1] ?? '';
-            $className = $classMatch[1];
-            $fullName = trim("$namespace\\$className", '\\');
-
-            $reflection = new \ReflectionClass($fullName);
-        }
-
-        $docBlock = $reflection->getDocComment();
-        $docScheme = self::parseDocBlock($docBlock);
-
-        return array_filter([
-            'name' => $anonimous ? null : $reflection->getName(),
-            'description' => $docScheme['description'] ?? null,
-            'abstract' => $reflection->isAbstract(),
-            'anonymous' => $anonimous,
-            'final' => $reflection->isFinal(),
-            'extends' => $reflection->getParentClass() ? $reflection->getParentClass()->getName() : null,
-            'implements' => $reflection->getInterfaceNames(),
-            'traits' => $reflection->getTraitNames(),
-            'constants' => self::extractConstantsReflection($reflection),
-            'properties' => self::extractPropertiesReflection($reflection, $docScheme['properties'] ?? []),
-            'methods' => self::extractMethodsReflection($reflection, $docScheme['methods'] ?? []),
-        ]);
-    }
-
-    /**
-     * Extrai os métodos da classe refletida, enriquecendo cada método com o corpo de implementação extraído do arquivo fonte.
-     * @param ReflectionClass $reflect Instância de ReflectionClass da classe alvo.
-     * @param array $docMethods Métodos documentados no docblock da classe.
-     * @return array Mapa de métodos com os dados herdados de ReflectionSourceFile acrescidos da chave 'implementation'.
-     */
-    protected static function extractMethodsReflection(ReflectionClass $reflect, array $docMethods): array
-    {
-        $methods = parent::extractMethodsReflection($reflect, $docMethods);
-
-        $file = $reflect->getFileName();
-        $fileLines = file($file);
-
-        foreach ($reflect->getMethods() as $method) {
-            if ($method->getDeclaringClass()->getName() !== $reflect->getName()) continue;
-
-            $name = $method->getName();
-            if (!isset($methods[$name])) continue;
-
-            $start = $method->getStartLine();
-            $end = $method->getEndLine();
-            $bodyLines = array_slice($fileLines, $start, $end - $start - 1);
-
-            $bodyLines = array_values($bodyLines);
-            if (!empty($bodyLines) && trim($bodyLines[0]) === '{')
-                array_shift($bodyLines);
-
-            $minIndent = PHP_INT_MAX;
-            foreach ($bodyLines as $line) {
-                if (trim($line) === '') continue;
-                preg_match('/^(\s*)/', $line, $m);
-                $minIndent = min($minIndent, strlen($m[1]));
-            }
-            if ($minIndent === PHP_INT_MAX) $minIndent = 0;
-
-            $body = [];
-            foreach ($bodyLines as $line) {
-                $body[] = rtrim(substr($line, $minIndent));
+            if ($i === $start) {
+                $cleaned = trim(preg_replace('/^\/\*+\s*/', '', $relevant));
+            } else {
+                $cleaned = trim(preg_replace('/^\*\s?/', '', $relevant));
             }
 
-            while (!empty($body) && trim($body[0]) === '') array_shift($body);
-            while (!empty($body) && trim(end($body)) === '') array_pop($body);
+            if ($cleaned !== '') $lines[] = $cleaned;
+            $i++;
 
-            if (!empty($body))
-                $methods[$name]['implementation'] = array_values(array_filter($body));
+            if ($hasClose) break;
         }
 
-        return array_filter($methods);
+        return [$lines, $consumed];
     }
 }
