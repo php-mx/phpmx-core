@@ -13,29 +13,6 @@ abstract class Log
     protected static array $log = [];
     protected static array $scope = [];
     protected static bool $useLog = true;
-    protected static array $snap = ['log' => [], 'scope' => [], 'useLog' => true];
-
-    /**
-     * Captura um snapshot do estado atual do log.
-     * @return void
-     */
-    static function snap(): void
-    {
-        self::$snap['log'] = self::$log;
-        self::$snap['scope'] = self::$scope;
-        self::$snap['useLog'] = self::$useLog;
-    }
-
-    /**
-     * Restaura o log para o estado do último snapshot capturado.
-     * @return void
-     */
-    static function reset(): void
-    {
-        self::$log = self::$snap['log'];
-        self::$scope = self::$snap['scope'];
-        self::$useLog = self::$snap['useLog'];
-    }
 
     /**
      * Habilita ou desabilita o registro de logs.

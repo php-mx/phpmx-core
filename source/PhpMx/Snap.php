@@ -12,7 +12,7 @@ class Snap
     /**
      * Registra uma ou mais classes em um snap.
      *
-     * @param string               $snap     Nome do snap
+     * @param string $snap Nome do snap
      * @param string|array<string> ...$classes Classes a registrar
      */
     static function register(string $snap, string|array ...$classes): void
@@ -21,8 +21,10 @@ class Snap
 
         foreach ($classes as $class)
             foreach ((array) $class as $c)
-                if (!in_array($c, self::$groups[$snap]))
-                    self::$groups[$snap][] = $c;
+                Log::add('snap', "register $snap $class", function () use ($snap, $c) {
+                    if (!in_array($c, self::$groups[$snap]))
+                        self::$groups[$snap][] = $c;
+                });
     }
 
     /**
@@ -30,7 +32,7 @@ class Snap
      * Os objetos ReflectionProperty são criados aqui e reutilizados em restore().
      * Opcionalmente registra classes antes de capturar.
      *
-     * @param string               $snap      Nome do snap a criar
+     * @param string $snap Nome do snap a criar
      * @param string|array<string> ...$classes Classes a registrar antes de capturar (opcional)
      */
     static function create(string $snap, string|array ...$classes): void
@@ -38,23 +40,25 @@ class Snap
         if ($classes)
             self::register($snap, ...$classes);
 
-        self::$snaps[$snap] = [];
-        self::$props[$snap] = [];
+        Log::add('snap', "create $snap", function () use ($snap) {
+            self::$snaps[$snap] = [];
+            self::$props[$snap] = [];
 
-        foreach (self::$groups[$snap] ?? [] as $class) {
-            $state = [];
-            $props = [];
+            foreach (self::$groups[$snap] ?? [] as $class) {
+                $state = [];
+                $props = [];
 
-            foreach ((new \ReflectionClass($class))->getProperties(\ReflectionProperty::IS_STATIC) as $prop) {
-                $name = $prop->getName();
-                $props[$name] = $prop;
-                $value = $prop->getValue();
-                $state[$name] = is_object($value) ? clone $value : $value;
+                foreach ((new \ReflectionClass($class))->getProperties(\ReflectionProperty::IS_STATIC) as $prop) {
+                    $name = $prop->getName();
+                    $props[$name] = $prop;
+                    $value = $prop->getValue();
+                    $state[$name] = is_object($value) ? clone $value : $value;
+                }
+
+                self::$snaps[$snap][$class] = $state;
+                self::$props[$snap][$class] = $props;
             }
-
-            self::$snaps[$snap][$class] = $state;
-            self::$props[$snap][$class] = $props;
-        }
+        });
     }
 
     /**
@@ -65,11 +69,12 @@ class Snap
      */
     static function restore(string $snap): void
     {
-        foreach (self::$props[$snap] ?? [] as $class => $props) {
-            foreach ($props as $name => $prop) {
-                $value = self::$snaps[$snap][$class][$name];
-                $prop->setValue(null, is_object($value) ? clone $value : $value);
-            }
-        }
+        Log::add('snap', "restore $snap", function () use ($snap) {
+            foreach (self::$props[$snap] ?? [] as $class => $props)
+                foreach ($props as $name => $prop) {
+                    $value = self::$snaps[$snap][$class][$name];
+                    $prop->setValue(null, is_object($value) ? clone $value : $value);
+                }
+        });
     }
 }
