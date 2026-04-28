@@ -13,9 +13,9 @@ class Snap
     protected static array $props = [];
 
     /**
-     * Registra uma ou mais classes em um snap.
+     * Registra uma ou mais classes em um grupo de snap.
      *
-     * @param string               $snap     Nome do snap
+     * @param string $snap Nome do snap
      * @param string|array<string> ...$classes Classes a registrar
      */
     static function register(string $snap, string|array ...$classes): void
@@ -35,15 +35,15 @@ class Snap
      * Os objetos ReflectionProperty são criados aqui e reutilizados em restore().
      * Opcionalmente registra classes antes de capturar.
      *
-     * @param string               $snap      Nome do snap a criar
+     * @param string $snap Nome do snap a criar
      * @param string|array<string> ...$classes Classes a registrar antes de capturar (opcional)
      */
-    static function create(string $snap, string|array ...$classes): void
+    static function capture(string $snap, string|array ...$classes): void
     {
         if ($classes)
             self::register($snap, ...$classes);
 
-        Log::add('snap.create', $snap, function () use ($snap) {
+        Log::add('snap.capture', $snap, function () use ($snap) {
             self::$snaps[$snap] = [];
             self::$props[$snap] = [];
 
@@ -75,9 +75,8 @@ class Snap
     {
         Log::add('snap.restore', $snap, function () use ($snap) {
             foreach (self::$props[$snap] ?? [] as $class => $props)
-                foreach ($props as $name => $prop) {
+                foreach ($props as $name => $prop)
                     $prop->setValue(null, unserialize(self::$snaps[$snap][$class][$name]));
-                }
         });
     }
 }
