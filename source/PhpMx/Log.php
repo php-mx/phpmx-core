@@ -122,6 +122,11 @@ abstract class Log
             ];
         }
 
+        ksort($count);
+        if (isset($count['mx'])) {
+            $count = ['mx' => $count['mx']] + $count;
+        }
+
         return [
             'log' => $currentLog,
             'count' => $count
