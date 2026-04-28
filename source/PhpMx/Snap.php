@@ -2,6 +2,9 @@
 
 namespace PhpMx;
 
+use ReflectionClass;
+use ReflectionProperty;
+
 /** Captura e restaura o estado de propriedades estáticas de classes registradas. */
 class Snap
 {
@@ -49,11 +52,10 @@ class Snap
                     $state = [];
                     $props = [];
 
-                    foreach ((new \ReflectionClass($class))->getProperties(\ReflectionProperty::IS_STATIC) as $prop) {
+                    foreach ((new ReflectionClass($class))->getProperties(ReflectionProperty::IS_STATIC) as $prop) {
                         $name = $prop->getName();
                         $props[$name] = $prop;
-                        $value = $prop->getValue();
-                        $state[$name] = is_object($value) ? clone $value : $value;
+                        $state[$name] = serialize($prop->getValue());
                     }
 
                     self::$snaps[$snap][$class] = $state;
@@ -74,8 +76,7 @@ class Snap
         Log::add('snap.restore', $snap, function () use ($snap) {
             foreach (self::$props[$snap] ?? [] as $class => $props)
                 foreach ($props as $name => $prop) {
-                    $value = self::$snaps[$snap][$class][$name];
-                    $prop->setValue(null, is_object($value) ? clone $value : $value);
+                    $prop->setValue(null, unserialize(self::$snaps[$snap][$class][$name]));
                 }
         });
     }
