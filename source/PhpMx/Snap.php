@@ -48,7 +48,8 @@ class Snap
             foreach ((new \ReflectionClass($class))->getProperties(\ReflectionProperty::IS_STATIC) as $prop) {
                 $name = $prop->getName();
                 $props[$name] = $prop;
-                $state[$name] = $prop->getValue();
+                $value = $prop->getValue();
+                $state[$name] = is_object($value) ? clone $value : $value;
             }
 
             self::$snaps[$snap][$class] = $state;
@@ -65,10 +66,10 @@ class Snap
     static function restore(string $snap): void
     {
         foreach (self::$props[$snap] ?? [] as $class => $props) {
-            $state = self::$snaps[$snap][$class];
-
-            foreach ($props as $name => $prop)
-                $prop->setValue(null, $state[$name]);
+            foreach ($props as $name => $prop) {
+                $value = self::$snaps[$snap][$class][$name];
+                $prop->setValue(null, is_object($value) ? clone $value : $value);
+            }
         }
     }
 }
