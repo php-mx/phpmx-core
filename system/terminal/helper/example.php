@@ -13,7 +13,7 @@ return new class {
 
     use TerminalHelperTrait;
 
-    function __invoke($filter = null)
+    function __invoke(?string $filter = null)
     {
         $show = function ($item) {
             Terminal::echol('   [#c:p,#name] [#c:dd,#_type] [#c:sd,#_file]', $item);
@@ -29,7 +29,7 @@ return new class {
         );
     }
 
-    protected function scan($path): array
+    protected function scan(string $path): array
     {
         $items = [];
 

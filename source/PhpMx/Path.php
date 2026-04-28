@@ -33,9 +33,9 @@ abstract class Path
      * @param string ...$segments Segmentos do caminho (aceita múltiplos argumentos).
      * @return string Caminho formatado e normalizado.
      */
-    static function format(): string
+    static function format(...$segments): string
     {
-        $path = array_values(func_get_args());
+        $path = array_values($segments);
         $path = implode('/', $path);
         $path = str_replace('\\', '/', $path);
         $path = str_replace_all('//', '/', $path);
@@ -79,12 +79,12 @@ abstract class Path
 
     /**
      * Busca o primeiro arquivo existente percorrendo os caminhos registrados.
-     * @param string ...$args Segmentos do nome/caminho do arquivo.
+     * @param string ...$segments Segmentos do nome/caminho do arquivo.
      * @return string|null Caminho completo do arquivo encontrado ou null.
      */
-    static function seekForFile(): ?string
+    static function seekForFile(...$segments): ?string
     {
-        $path = self::format(...func_get_args());
+        $path = self::format(...$segments);
 
         foreach (self::registred() as $registred)
             if (File::check("$registred/$path"))
@@ -95,12 +95,12 @@ abstract class Path
 
     /**
      * Busca e retorna todos os arquivos correspondentes encontrados nos caminhos registrados.
-     * @param string ...$args Segmentos do nome/caminho do arquivo.
+     * @param string ...$segments Segmentos do nome/caminho do arquivo.
      * @return array Lista de caminhos encontrados (sem duplicatas).
      */
-    static function seekForFiles(): array
+    static function seekForFiles(...$segments): array
     {
-        $path = self::format(...func_get_args());
+        $path = self::format(...$segments);
         $result = [];
 
         foreach (self::registred() as $registred)
@@ -114,12 +114,12 @@ abstract class Path
 
     /**
      * Busca o primeiro diretório existente percorrendo os caminhos registrados.
-     * @param string ...$args Segmentos do nome/caminho do diretório.
+     * @param string ...$segments Segmentos do nome/caminho do diretório.
      * @return string|null Caminho completo do diretório encontrado ou null.
      */
-    static function seekForDir(): ?string
+    static function seekForDir(...$segments): ?string
     {
-        $path = self::format(...func_get_args());
+        $path = self::format(...$segments);
 
         foreach (self::registred() as $registred)
             if (Dir::check("$registred/$path"))
@@ -130,12 +130,12 @@ abstract class Path
 
     /**
      * Busca e retorna todos os diretórios correspondentes encontrados nos caminhos registrados.
-     * @param string ...$args Segmentos do nome/caminho do diretório.
+     * @param string ...$segments Segmentos do nome/caminho do diretório.
      * @return array Lista de caminhos encontrados.
      */
-    static function seekForDirs(): array
+    static function seekForDirs(...$segments): array
     {
-        $path = self::format(...func_get_args());
+        $path = self::format(...$segments);
         $result = [];
 
         foreach (self::registred() as $registred)

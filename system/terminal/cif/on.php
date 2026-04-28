@@ -5,13 +5,13 @@ use PhpMx\Terminal;
 
 /**
  * Criptografa uma string ou um conjunto de argumentos utilizando o motor Cif.
- * @param string $content Texto ou termos que serão cifrados.
+ * @param array<string> ...$content Texto ou termos que serão cifrados.
  */
 return new class {
 
-    function __invoke(...$content)
+    function __invoke(array ...$content)
     {
-        $content = implode(' ', func_get_args());
+        $content = implode(' ', $content);
 
         Terminal::echol(Cif::on($content));
     }

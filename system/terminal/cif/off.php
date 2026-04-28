@@ -9,7 +9,7 @@ use PhpMx\Terminal;
  */
 return new class {
 
-    function __invoke($cif)
+    function __invoke(string $cif)
     {
         Terminal::echol(Cif::off($cif));
     }

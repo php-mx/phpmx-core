@@ -13,7 +13,7 @@ return new class {
 
     use TerminalHelperTrait;
 
-    function __invoke($filter = null)
+    function __invoke(?string $filter = null)
     {
         $this->handle(
             'system/helper/function',
@@ -28,7 +28,7 @@ return new class {
         );
     }
 
-    protected function scan($path): array
+    protected function scan(string $path): array
     {
         $items = [];
 

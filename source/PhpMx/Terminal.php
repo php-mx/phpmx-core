@@ -319,7 +319,7 @@ abstract class Terminal
 
     /**
      * Exibe uma barra de progresso 
-     * @param string text Mensagem de texto que deve ser exibida
+     * @param string $text Mensagem de texto que deve ser exibida
      * @param string|array prepare Dados prepare para compor o texto
      * @param int $current Valor atual da barra
      * @param int $total Valor total da barra

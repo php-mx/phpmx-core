@@ -7,13 +7,13 @@ use PhpMx\Trait\TerminalHelperTrait;
 
 /**
  * Lista todas as helpers de constantes no sistema.
- * @param string $filter Nome ou parte do nome de uma constante para filtrar a busca.
+ * @param ?string $filter Nome ou parte do nome de uma constante para filtrar a busca.
  */
 return new class {
 
     use TerminalHelperTrait;
 
-    function __invoke($filter = null)
+    function __invoke(?string $filter = null)
     {
         $this->handle(
             'system/helper/constant',
@@ -26,7 +26,7 @@ return new class {
         );
     }
 
-    protected function scan($path): array
+    protected function scan(string $path): array
     {
         $items = [];
 

@@ -11,7 +11,7 @@ use PhpMx\Terminal;
  */
 return new class {
 
-    function __invoke($file)
+    function __invoke(string $file)
     {
         $current = Path::seekForFile($file);
 

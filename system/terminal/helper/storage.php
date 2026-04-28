@@ -11,12 +11,12 @@ return new class {
 
     use TerminalHelperTrait;
 
-    function __invoke($filter = null)
+    function __invoke(?string $filter = null)
     {
         $this->handle('storage', $filter, '   [#c:p,#name] [#c:sd,#_file]');
     }
 
-    protected function scan($path)
+    protected function scan(string $path)
     {
         $files = [];
 

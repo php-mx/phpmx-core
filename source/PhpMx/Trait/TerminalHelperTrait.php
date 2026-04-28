@@ -9,7 +9,7 @@ use PhpMx\Terminal;
 /** @ignore */
 trait TerminalHelperTrait
 {
-    protected $key = [];
+    protected array $key = [];
 
     /**
      * Escaneia itens em todos os paths registrados para um diretório, exibindo-os agrupados por origem.
@@ -46,7 +46,7 @@ trait TerminalHelperTrait
             }
 
             usort($items, fn($a, $b) => $a['name'] <=> $b['name']);
-            $origins[Path::origin($path, $scan)] = $items;
+            $origins[Path::origin($path)] = $items;
         }
 
         $origins = array_reverse($origins);
@@ -67,5 +67,10 @@ trait TerminalHelperTrait
         }
 
         if ($originsLn == -1) Terminal::echol('[#c:dd,- empty -]');
+    }
+
+    protected function scan(string $path)
+    {
+        return [];
     }
 }

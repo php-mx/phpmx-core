@@ -9,7 +9,7 @@ use PhpMx\Terminal;
  */
 return new class {
 
-    function __invoke($fileName)
+    function __invoke(string $fileName)
     {
         $fileName = strToCamelCase($fileName);
 

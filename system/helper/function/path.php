@@ -10,8 +10,8 @@ if (!function_exists('path')) {
      * @return string Caminho normalizado e limpo.
      * @see \PhpMx\Path::format()
      */
-    function path(): string
+    function path(...$segments): string
     {
-        return Path::format(...func_get_args());
+        return Path::format(...$segments);
     }
 }

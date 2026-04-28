@@ -59,11 +59,13 @@ abstract class Log
         if (!self::$useLog)
             return $scope();
 
-        if (is_null($scope))
-            return self::set($type, $message);
+        if (is_null($scope)) {
+            self::set($type, $message);
+            return null;
+        }
 
         try {
-            self::openScope($type, $message, true);
+            self::openScope($type, $message);
             $result = $scope();
             self::closeScope();
             return $result;

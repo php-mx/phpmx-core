@@ -10,7 +10,7 @@ use PhpMx\Terminal;
  */
 return new class {
 
-    function __invoke($cifName)
+    function __invoke(string $cifName)
     {
         $file = path("storage/certificate/$cifName");
         $file = File::setEx($file, 'crt');

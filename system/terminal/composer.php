@@ -10,7 +10,7 @@ use PhpMx\Terminal;
  */
 return new class {
 
-    function __invoke($forceDev = 0)
+    function __invoke(int $forceDev = 0)
     {
         Terminal::echol('Updating [#c:s,composer.json]');
 
@@ -55,7 +55,7 @@ return new class {
         echo shell_exec("composer dump-autoload --no-dev --optimize");
     }
 
-    protected static function seekForFile($ref)
+    protected static function seekForFile(string $ref)
     {
         $return = [];
 
